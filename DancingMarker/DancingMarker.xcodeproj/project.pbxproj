@@ -505,6 +505,7 @@
 /* Begin XCBuildConfiguration section */
 		901BF9892C29804B00C02FF9 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 51675E272CA2F0E800D8D08F /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -568,6 +569,7 @@
 		};
 		901BF98A2C29804B00C02FF9 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 51675E272CA2F0E800D8D08F /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -624,6 +626,7 @@
 		};
 		901BF98C2C29804B00C02FF9 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 51675E272CA2F0E800D8D08F /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -632,7 +635,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"DancingMarker/Preview Content\"";
-				DEVELOPMENT_TEAM = 2U3B7G3F2A;
+				DEVELOPMENT_TEAM = WTK65UP9RZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DancingMarker/Info.plist;
@@ -667,6 +670,7 @@
 		};
 		901BF98D2C29804B00C02FF9 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 51675E272CA2F0E800D8D08F /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -675,7 +679,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"DancingMarker/Preview Content\"";
-				DEVELOPMENT_TEAM = 2U3B7G3F2A;
+				DEVELOPMENT_TEAM = WTK65UP9RZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DancingMarker/Info.plist;
@@ -709,6 +713,7 @@
 		};
 		901BF9A12C29809A00C02FF9 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 51675E272CA2F0E800D8D08F /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -716,7 +721,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"WatchDancingMarker Watch App/Preview Content\"";
-				DEVELOPMENT_TEAM = 2U3B7G3F2A;
+				DEVELOPMENT_TEAM = WTK65UP9RZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "WatchDancingMarker-Watch-App-Info.plist";
@@ -743,13 +748,14 @@
 		};
 		901BF9A22C29809A00C02FF9 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 51675E272CA2F0E800D8D08F /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"WatchDancingMarker Watch App/Preview Content\"";
-				DEVELOPMENT_TEAM = 2U3B7G3F2A;
+				DEVELOPMENT_TEAM = WTK65UP9RZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "WatchDancingMarker-Watch-App-Info.plist";
