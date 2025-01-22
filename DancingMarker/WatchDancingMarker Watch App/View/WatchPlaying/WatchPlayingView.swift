@@ -18,6 +18,8 @@ struct WatchPlayingView: View {
     var body: some View {
         
         VStack {
+            Text("기존 : \(viewModel.currentTime)")
+            Text("보완 : \(viewModel.elapsedTime)")
             HStack {
                 Text("\(viewModel.musicTitle)")
                     .font(.system(size: 12))

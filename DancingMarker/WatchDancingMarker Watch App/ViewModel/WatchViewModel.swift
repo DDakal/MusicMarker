@@ -6,6 +6,8 @@
 //
 import SwiftUI
 import SwiftData
+import WatchKit
+import MediaPlayer
 
 class WatchViewModel: ObservableObject {
     
@@ -28,8 +30,14 @@ class WatchViewModel: ObservableObject {
 
     private var timer: Timer?
     
+    @Published var elapsedTime: Double = 0.0 // Double 타입으로 유지
+    private var nowTimer: Timer?
+    
     init(connectivityManager: WatchConnectivityManager) {
         self.connectivityManager = connectivityManager
+        
+        startNowPlayingTimer()
+        
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(updateMarkers(_:)),
@@ -74,6 +82,7 @@ class WatchViewModel: ObservableObject {
         )
         self.musicList = UserDefaults.standard.getMusicList()
     }
+    
     convenience init() {
         self.init(connectivityManager: WatchConnectivityManager())
     }
@@ -142,7 +151,6 @@ class WatchViewModel: ObservableObject {
     func playToggle() {
         connectivityManager.sendPlayToggleToIOS()
     }
-    
     func playForward() {
         connectivityManager.sendForwardToIOS()
     }
@@ -157,9 +165,6 @@ class WatchViewModel: ObservableObject {
     }
     func originalPlaybckRate() {
         connectivityManager.sendOriginalPlaybackToIOS()
-    }
-    func requireMusicList() {
-        //        connectivityManager.
     }
     func sendUUID(id: String) {
         connectivityManager.sendUUIDPlayToIOS(id)
@@ -213,6 +218,35 @@ class WatchViewModel: ObservableObject {
         progress = currentTime / duration
         formattedProgress = formattedTime(currentTime)
     }
+    
+    private func startNowPlayingTimer() {
+        // Timer를 1초 간격으로 설정하여 재생 정보를 업데이트
+        nowTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            self?.updateNowPlayingInfo()
+        }
+    }
+    
+    private func updateNowPlayingInfo() {
+            if let nowPlayingInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo {
+                if let elapsed = nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] as? Double {
+                    self.elapsedTime = elapsed
+                } else {
+                    self.elapsedTime = 0.0
+                }
+            } else {
+                self.elapsedTime = 0.0
+            }
+        }
+
+        private func formatTime(_ time: Double) -> String {
+            let minutes = Int(time) / 60
+            let seconds = Int(time) % 60
+            return String(format: "%d:%02d", minutes, seconds)
+        }
+
+        deinit {
+            timer?.invalidate()
+        }
 }
 
 extension UserDefaults {
@@ -230,5 +264,27 @@ extension UserDefaults {
     
     func clearMusicList() {
         removeObject(forKey: Keys.musicList)
+    }
+}
+
+
+class WatchExtensionDelegate: NSObject, WKExtensionDelegate {
+    func handleRemoteNowPlayingActivity() {
+        // Now Playing 정보 처리
+        if let nowPlayingInfo = MPNowPlayingInfoCenter.default().nowPlayingInfo {
+            if let title = nowPlayingInfo[MPMediaItemPropertyTitle] as? String {
+                print("Title: \(title)")
+            }
+            if let artist = nowPlayingInfo[MPMediaItemPropertyArtist] as? String {
+                print("Artist: \(artist)")
+            }
+            if let elapsedTime = nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] as? Double {
+                let minutes = Int(elapsedTime) / 60
+                let seconds = Int(elapsedTime) % 60
+                print("Elapsed Time: \(minutes):\(seconds)")
+            }
+        } else {
+            print("No Now Playing info available.")
+        }
     }
 }
