@@ -10,7 +10,7 @@ struct WatchPlayingMarkerView: View {
             // MARK: 마커 1
             ZStack {
                 Rectangle()
-                    .fill(viewModel.markers[0] == "99:59" ? Color.gray.opacity(0.2) : .accentColor) // 마커 추가가 되었다면 ? .yellow : Color.gray.opacity(0.2)
+                    .fill(viewModel.markers[0] == "99:59" ? .gray.opacity(0.2) : .accentColor) // 마커 추가가 되었다면 ? .yellow : Color.gray.opacity(0.2)
                     .cornerRadius(4)
                     .frame(height: 52)
                 
@@ -36,7 +36,7 @@ struct WatchPlayingMarkerView: View {
             // MARK: 마커 2
             ZStack {
                 Rectangle()
-                    .fill(viewModel.markers[1] == "99:59" ? Color.gray.opacity(0.2) : .accentColor) // 마커 추가가 되었다면 ? .yellow : Color.gray.opacity(0.2)
+                    .fill(viewModel.markers[1] == "99:59" ? .gray.opacity(0.2) : .accentColor) // 마커 추가가 되었다면 ? .yellow : Color.gray.opacity(0.2)
                     .cornerRadius(4)
                     .frame(height: 52)
                 
@@ -62,7 +62,7 @@ struct WatchPlayingMarkerView: View {
             // MARK: 마커 3
             ZStack {
                 Rectangle()
-                    .fill(viewModel.markers[2] == "99:59" ? Color.gray.opacity(0.2) : .accentColor) // 마커 추가가 되었다면 ? .yellow : Color.gray.opacity(0.2)
+                    .fill(viewModel.markers[2] == "99:59" ? .gray.opacity(0.2) : .accentColor) // 마커 추가가 되었다면 ? .yellow : Color.gray.opacity(0.2)
                     .cornerRadius(4)
                     .frame(height: 52)
                 

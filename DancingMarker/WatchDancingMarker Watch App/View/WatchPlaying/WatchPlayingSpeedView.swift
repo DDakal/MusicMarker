@@ -12,11 +12,11 @@ struct WatchPlayingSpeedView: View {
                 Text("-")
                     .font(.system(size: 17, weight: .regular))
                     .fixedSize()
-                    .foregroundColor(viewModel.speed < 0.55 ? .inactiveGray : .white) // 0.5배가 되면 Gray색상으로
+                    .foregroundStyle(viewModel.speed < 0.55 ? .inactiveGray : .white) // 0.5배가 되면 Gray색상으로
             }
             .frame(maxWidth: .infinity)
             .frame(height: 52)
-            .background(Color.gray.opacity(0.2))
+            .background(.gray.opacity(0.2))
             .clipShape(RoundedCorner(radius: 4, corners: [.topLeft, .bottomLeft]))
             .onTapGesture {
                 print("Tapped: 배속 - 버튼눌렀습니다.")
@@ -32,7 +32,7 @@ struct WatchPlayingSpeedView: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 52)
-            .background(Color.gray.opacity(0.2))
+            .background(.gray.opacity(0.2))
             .onTapGesture {
                 print("Tapped: 원배 버튼눌렀습니다.")
                 viewModel.originalPlaybckRate()
@@ -43,11 +43,11 @@ struct WatchPlayingSpeedView: View {
                 Text("+")
                     .font(.system(size: 17, weight: .regular))
                     .fixedSize()
-                    .foregroundColor(viewModel.speed > 1.45 ? .inactiveGray : .white) // 1.5배가 되면 Gray색상으로
+                    .foregroundStyle(viewModel.speed > 1.45 ? .inactiveGray : .white) // 1.5배가 되면 Gray색상으로
             }
             .frame(maxWidth: .infinity)
             .frame(height: 52)
-            .background(Color.gray.opacity(0.2))
+            .background(.gray.opacity(0.2))
             .clipShape(RoundedCorner(radius: 4, corners: [.topRight, .bottomRight]))
             .onTapGesture {
                 print("Tapped: 배속 + 버튼눌렀습니다.")
@@ -74,6 +74,7 @@ struct RoundedCorner: Shape {
         return Path(path.cgPath)
     }
 }
+
 #Preview {
     WatchPlayingSpeedView()
 }

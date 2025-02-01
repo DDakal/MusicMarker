@@ -107,7 +107,7 @@ struct WatchMarkerEditView: View {
                         Image(systemName: "xmark.circle.fill")
                             .resizable()
                             .frame(width: 24, height: 24)
-                            .foregroundColor(.gray)
+                            .foregroundStyle(.gray)
                     }
                     .buttonStyle(PlainButtonStyle())
                 }

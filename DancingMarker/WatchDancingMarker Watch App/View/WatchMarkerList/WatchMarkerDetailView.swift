@@ -16,25 +16,25 @@ struct WatchMarkerDetailView: View {
                 .fixedSize()
                 .padding(.bottom)
             
-            Button(action: {
+            Button {
                 self.isShowingEditView.toggle()
-            }, label: {
+            } label: {
                 Text("수정하기")
                     .font(.system(size: 17, weight: .regular))
                     .fixedSize()
-            })
+            }
             .buttonStyle(EditButtonStyle())
             .fullScreenCover(isPresented: $isShowingEditView) {
                 WatchMarkerEditView(data: viewModel.timeintervalMarkers[index], isPresented: $isShowingEditView, index: index, navigationPath: $navigationPath)
             }
             
-            Button(action: {
+            Button {
                 self.isShownResetAlert.toggle()
-            }, label: {
+            } label: {
                 Text("지우기")
                     .font(.system(size: 17, weight: .regular))
                     .fixedSize()
-            })
+            }
             .buttonStyle(ResetButtonStyle())
             .fullScreenCover(isPresented: $isShownResetAlert) {
                 MarkerResetAlert(navigationPath: $navigationPath, index: index)
@@ -71,7 +71,6 @@ struct MarkerResetAlert: View {
                         .padding()
                         .padding(.bottom, 20)
                         .multilineTextAlignment(.center)
-//                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .frame(maxWidth: .infinity)
                 
@@ -95,7 +94,7 @@ struct MarkerResetAlert: View {
                         Image(systemName: "xmark.circle.fill")
                             .resizable()
                             .frame(width: 24, height: 24)
-                            .foregroundColor(.gray)
+                            .foregroundStyle(.gray)
                     }
                     .buttonStyle(PlainButtonStyle())
                 }
@@ -151,7 +150,7 @@ struct MarkerEditAlert: View {
                         Image(systemName: "xmark.circle.fill")
                             .resizable()
                             .frame(width: 24, height: 24)
-                            .foregroundColor(.gray)
+                            .foregroundStyle(.gray)
                     }
                     .buttonStyle(PlainButtonStyle())
                 }

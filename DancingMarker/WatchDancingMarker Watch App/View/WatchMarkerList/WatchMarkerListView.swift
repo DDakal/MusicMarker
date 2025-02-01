@@ -29,7 +29,7 @@ struct WatchMarkerListView: View {
                             } else{
                                 ZStack {
                                     Rectangle()
-                                        .fill(Color.gray.opacity(0.2))
+                                        .fill(.gray.opacity(0.2))
                                         .cornerRadius(4)
                                         .frame(height: 44)
                                     HStack {
@@ -84,7 +84,7 @@ struct WatchMarkerListCellView: View {
         Text("\(formattedTime(data))")
             .font(.system(size: 14, weight: .regular))
             .fixedSize()
-            .foregroundColor(.black)
+            .foregroundStyle(.black)
             .italic()
     }
     

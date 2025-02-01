@@ -98,7 +98,7 @@ struct WatchMusicListView: View {
                                 .frame(width:20)
                             }
                         }
-                        .frame(width:32, height:32)
+                        .frame(width: 32, height: 32)
                     }
                 }
             }
@@ -117,7 +117,7 @@ struct WatchMusicListView: View {
             }
             afterOnAppear = true
         }
-        .onChange(of: scenePhase) { newPhase in
+        .onChange(of: scenePhase) { oldPhase, newPhase in
             if newPhase == .active {
                 print("onActive")
                 DispatchQueue.main.async {
@@ -130,7 +130,7 @@ struct WatchMusicListView: View {
                 }
             }
         }
-        .onChange(of: afterOnAppear) { afterAppear in
+        .onChange(of: afterOnAppear) { beforeAppear, afterAppear in
             if afterAppear == true {
                 print("onAppear")
                 DispatchQueue.main.async {

@@ -16,7 +16,6 @@ struct WatchPlayingView: View {
     @State private var isIdle = true
     
     var body: some View {
-        
         VStack {
             HStack {
                 Text("\(viewModel.musicTitle)")
@@ -34,17 +33,17 @@ struct WatchPlayingView: View {
                 Spacer()
                 
                 Circle()
-                    .fill(Color.gray.opacity(0.2))
+                    .fill(.gray.opacity(0.2))
                     .cornerRadius(4)
                     .frame(height: 35)
                     .overlay(
-                        Button(action: {
+                        Button {
                             viewModel.playBackward()
-                        }, label: {
+                        } label: {
                             Image(systemName: "gobackward.5")
                                 .resizable()
                                 .frame(width: 20, height: 21)
-                        })
+                        }
                         .frame(width: 34, height: 35)
                         .buttonStyle(PlainButtonStyle())
                     )
@@ -53,7 +52,7 @@ struct WatchPlayingView: View {
                 
                 ZStack {
                     Circle()
-                        .fill(Color.gray.opacity(0.2))
+                        .fill(.gray.opacity(0.2))
                         .frame(height: 44)
                         .overlay(
                             Button {
@@ -62,9 +61,8 @@ struct WatchPlayingView: View {
                                     mixpanelPlayMusic()
                                 }
                             } label: {
-                                Image(systemName:
-                                        viewModel.isPlaying == true ? "pause.fill" : "play.fill"
-                                ) // 재생 on/off에 따라 이미지 변경
+                                // 재생 on/off에 따라 이미지 변경
+                                Image(systemName: viewModel.isPlaying == true ? "pause.fill" : "play.fill")
                                 .resizable()
                                 .frame(width: 18, height: 18)
                             }
@@ -79,7 +77,7 @@ struct WatchPlayingView: View {
                 Spacer()
                 
                 Circle()
-                    .fill(Color.gray.opacity(0.2))
+                    .fill(.gray.opacity(0.2))
                     .cornerRadius(4)
                     .frame(height: 35)
                     .overlay(
@@ -98,7 +96,8 @@ struct WatchPlayingView: View {
             
             HStack {
                 Text(viewModel.formattedProgress) // 현재 재생시간 데이터 넣어주기
-                    .font(.system(size: 10))
+                    .font(.system(size: 10, weight: .light))
+                    .fixedSize()
             }
             .padding(.bottom, 10)
         }
@@ -108,7 +107,7 @@ struct WatchPlayingView: View {
         .digitalCrownRotation(detent: $viewModel.crownVolume, from: 0, through: 60, by: 3, sensitivity: .low, isContinuous: false, isHapticFeedbackEnabled: true
         )
         .scrollIndicators(.hidden)
-        .onChange(of: viewModel.crownVolume) { newValue in
+        .onChange(of: viewModel.crownVolume) { oldValue, newValue in
             viewModel.handleCrownValueChange(newValue)
         }
         .toolbar {
@@ -131,7 +130,7 @@ struct WatchPlayingView: View {
         }
         .fullScreenCover(isPresented: $showMarkerListOverlay, content: {
             WatchMarkerListView()
-                .background{
+                .background {
                     Color.black
                 }
         })
@@ -152,10 +151,10 @@ struct CircleProgressView: View {
     var body: some View {
         ZStack {
             Circle()
-                .stroke(Color.gray.opacity(0.2), lineWidth: 4)
+                .stroke(.gray.opacity(0.2), lineWidth: 4)
             Circle()
                 .trim(from: 0.0, to: progress)
-                .stroke(Color.white, lineWidth: 3)
+                .stroke(.white, lineWidth: 3)
                 .rotationEffect(Angle(degrees: -90))
         }
     }
