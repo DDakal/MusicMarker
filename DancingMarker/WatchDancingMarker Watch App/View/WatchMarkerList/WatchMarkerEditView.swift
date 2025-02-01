@@ -48,7 +48,8 @@ struct WatchMarkerEditView: View {
                     
                     // MARK: 현재 마커 시간
                     Text("\(formattedTime(data))")
-                        .font(.system(size: 22))
+                        .font(.system(size: 22, weight: .regular))
+                        .fixedSize()
                     
                     Spacer()
                     
@@ -80,6 +81,8 @@ struct WatchMarkerEditView: View {
                         navigationPath.removeLast(navigationPath.count) // 루트로 이동
                     }, label: {
                         Text("저장하기")
+                            .font(.system(size: 17, weight: .regular))
+                            .fixedSize()
                             .foregroundColor(data != initialData ? .white : .inactiveGray) // 처음의 시간이 아니라면 색상으로 활성화/비활성화 여부
                     })
                     .buttonStyle(SaveButtonStyle())
@@ -88,7 +91,9 @@ struct WatchMarkerEditView: View {
             }
             .navigationTitle {
                 Text("수정하기")
-                    .fontWeight(.heavy)
+                    .font(.system(size: 14, weight: .semibold))
+                    .fixedSize()
+//                    .fontWeight(.heavy)
                     .foregroundStyle(.accent)
             }
             .toolbar {

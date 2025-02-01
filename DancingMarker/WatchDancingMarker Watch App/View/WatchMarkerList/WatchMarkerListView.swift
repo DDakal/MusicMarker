@@ -13,7 +13,8 @@ struct WatchMarkerListView: View {
                 ScrollView {
                     HStack {
                         Text("마커 관리")
-                            .fontWeight(.heavy)
+                            .font(.system(size: 14, weight: .bold))
+                            .fixedSize()
                             .padding([.leading, .bottom])
                         Spacer()
                     }
@@ -37,7 +38,8 @@ struct WatchMarkerListView: View {
                                             .frame(width: 12, height: 20)
                                             .padding()
                                         Text("없음")
-                                            .font(.system(size: 14))
+                                            .font(.system(size: 14, weight: .regular))
+                                            .fixedSize()
                                     }
                                 }
                             }
@@ -80,7 +82,8 @@ struct WatchMarkerListCellView: View {
     
     private func markerTime() -> some View {
         Text("\(formattedTime(data))")
-            .font(.system(size: 14))
+            .font(.system(size: 14, weight: .regular))
+            .fixedSize()
             .foregroundColor(.black)
             .italic()
     }

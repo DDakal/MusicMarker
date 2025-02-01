@@ -21,6 +21,7 @@ struct WatchMusicListView: View {
                 HStack{
                     Text("Music Marker")
                         .font(.system(size:14, weight:.semibold))
+                        .fixedSize()
                         .foregroundStyle(.accent)
                         .padding(.leading, 11)
                     Spacer()
@@ -32,6 +33,7 @@ struct WatchMusicListView: View {
                         Spacer()
                         Text("모바일 앱에서 음악을\n추가해주세요")
                             .font(.system(size: 16, weight: .regular))
+                            .fixedSize()
                             .multilineTextAlignment(.center)
                         Spacer()
                     }
@@ -40,13 +42,15 @@ struct WatchMusicListView: View {
                         LazyVGrid(columns: columns) {
                             ForEach(viewModel.musicList.indices, id:\.self) { index in
                                 if  viewModel.musicList[index][0] != ""{
-                                    Button(action: {
+                                    Button {
                                         DispatchQueue.main.async{
                                             viewModel.sendUUID(id: viewModel.musicList[index][1])
                                             navigationManager.push(to: .playing)
                                         }
-                                    }) {
+                                    } label: {
                                         Text(viewModel.musicList[index][0])
+                                            .font(.system(size: 17, weight: .regular))
+                                            .fixedSize()
                                             .lineLimit(1)
                                             .truncationMode(.tail)
                                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -63,9 +67,9 @@ struct WatchMusicListView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing){
                     if viewModel.musicTitle != "" {
-                        Button(action:{
+                        Button {
                             navigationManager.push(to: .playing)
-                        }, label:{
+                        } label: {
                             if viewModel.isPlaying {
                                 HStack(spacing:1.6) {
                                     bar(low: 0.4)
@@ -93,7 +97,7 @@ struct WatchMusicListView: View {
                                 }
                                 .frame(width:20)
                             }
-                        })
+                        }
                         .frame(width:32, height:32)
                     }
                 }

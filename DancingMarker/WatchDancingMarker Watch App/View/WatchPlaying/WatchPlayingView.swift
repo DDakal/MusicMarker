@@ -20,7 +20,8 @@ struct WatchPlayingView: View {
         VStack {
             HStack {
                 Text("\(viewModel.musicTitle)")
-                    .font(.system(size: 12))
+                    .font(.system(size: 12, weight: .regular))
+                    .fixedSize()
             }
             HStack {
                 TabView{

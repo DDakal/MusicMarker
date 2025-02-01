@@ -12,13 +12,16 @@ struct WatchMarkerDetailView: View {
     var body: some View {
         VStack(spacing: 10) {
             Text("\(viewModel.markers[index])")
-                .font(.system(size: 17))
+                .font(.system(size: 17, weight: .regular))
+                .fixedSize()
                 .padding(.bottom)
             
             Button(action: {
                 self.isShowingEditView.toggle()
             }, label: {
                 Text("수정하기")
+                    .font(.system(size: 17, weight: .regular))
+                    .fixedSize()
             })
             .buttonStyle(EditButtonStyle())
             .fullScreenCover(isPresented: $isShowingEditView) {
@@ -29,6 +32,8 @@ struct WatchMarkerDetailView: View {
                 self.isShownResetAlert.toggle()
             }, label: {
                 Text("지우기")
+                    .font(.system(size: 17, weight: .regular))
+                    .fixedSize()
             })
             .buttonStyle(ResetButtonStyle())
             .fullScreenCover(isPresented: $isShownResetAlert) {
@@ -62,10 +67,11 @@ struct MarkerResetAlert: View {
                 HStack {
                     Text("이 마커에 저장된\n정보를 지우시겠습니까?")
                         .font(.system(size: 14, weight: .regular))
+                        .fixedSize()
                         .padding()
                         .padding(.bottom, 20)
                         .multilineTextAlignment(.center)
-                        .fixedSize(horizontal: false, vertical: true)
+//                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .frame(maxWidth: .infinity)
                 
@@ -76,6 +82,8 @@ struct MarkerResetAlert: View {
                     navigationPath.removeLast(navigationPath.count) // 초기화 되면서 뷰 이동
                 }, label: {
                     Text("지우기")
+                        .font(.system(size: 17, weight: .regular))
+                        .fixedSize()
                 })
                 .buttonStyle(ResetButtonStyle())
             }

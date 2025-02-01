@@ -17,8 +17,9 @@ struct WatchPlayingMarkerView: View {
                 VStack {
                     Image(viewModel.markers[0] != "99:59" ? "addedMarker" : "emptyMarker")
                     Text(viewModel.markers[0] == "99:59" ? "추가" : viewModel.markers[0]) // 마커 추가가 되었다면 ? 마커 시간 : "추가"
-                        .foregroundColor(viewModel.markers[0] == "99:59" ? .white : .black)
-                        .font(.system(size: 12))
+                        .foregroundStyle(viewModel.markers[0] == "99:59" ? .white : .black)
+                        .font(.system(size: 12, weight: .regular))
+                        .fixedSize()
                         .italic()
                 }
             }
@@ -42,8 +43,9 @@ struct WatchPlayingMarkerView: View {
                 VStack {
                     Image(viewModel.markers[1] != "99:59" ? "addedMarker" : "emptyMarker")
                     Text(viewModel.markers[1] == "99:59" ? "추가" : viewModel.markers[1]) // 마커 추가가 되었다면 ? 마커 시간 : "추가"\
-                        .foregroundColor(viewModel.markers[1] == "99:59" ? .white : .black)
-                        .font(.system(size: 12))
+                        .foregroundStyle(viewModel.markers[1] == "99:59" ? .white : .black)
+                        .font(.system(size: 12, weight: .regular))
+                        .fixedSize()
                         .italic()
                 }
             }
@@ -67,8 +69,9 @@ struct WatchPlayingMarkerView: View {
                 VStack {
                     Image(viewModel.markers[2] != "99:59" ? "addedMarker" : "emptyMarker")
                     Text(viewModel.markers[2] == "99:59" ? "추가" : viewModel.markers[2]) // 마커 추가가 되었다면 ? 마커 시간 : "추가"
-                        .foregroundColor(viewModel.markers[2] == "99:59" ? .white : .black)
-                        .font(.system(size: 12))
+                        .foregroundStyle(viewModel.markers[2] == "99:59" ? .white : .black)
+                        .font(.system(size: 12, weight: .regular))
+                        .fixedSize()
                         .italic()
                 }
             }

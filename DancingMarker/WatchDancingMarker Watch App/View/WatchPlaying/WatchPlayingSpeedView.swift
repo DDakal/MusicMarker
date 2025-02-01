@@ -10,7 +10,8 @@ struct WatchPlayingSpeedView: View {
             // MARK: - 버튼
             HStack {
                 Text("-")
-                    .font(.system(size: 17))
+                    .font(.system(size: 17, weight: .regular))
+                    .fixedSize()
                     .foregroundColor(viewModel.speed < 0.55 ? .inactiveGray : .white) // 0.5배가 되면 Gray색상으로
             }
             .frame(maxWidth: .infinity)
@@ -26,7 +27,8 @@ struct WatchPlayingSpeedView: View {
             // MARK: 배속 Text & 원배로 돌아가는 버튼
             HStack {
                 Text(String(format: "%.1fx", viewModel.speed))
-                    .font(.system(size: 17))
+                    .font(.system(size: 17, weight: .regular))
+                    .fixedSize()
             }
             .frame(maxWidth: .infinity)
             .frame(height: 52)
@@ -39,7 +41,8 @@ struct WatchPlayingSpeedView: View {
             // MARK: + 버튼
             HStack {
                 Text("+")
-                    .font(.system(size: 17))
+                    .font(.system(size: 17, weight: .regular))
+                    .fixedSize()
                     .foregroundColor(viewModel.speed > 1.45 ? .inactiveGray : .white) // 1.5배가 되면 Gray색상으로
             }
             .frame(maxWidth: .infinity)
