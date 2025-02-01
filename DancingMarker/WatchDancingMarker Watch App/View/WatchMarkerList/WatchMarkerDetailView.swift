@@ -75,23 +75,23 @@ struct MarkerResetAlert: View {
                 }
                 .frame(maxWidth: .infinity)
                 
-                Button(action: {
+                Button {
                     viewModel.timeintervalMarkers[index] = -1
                     viewModel.markers[index] = "99:59"
                     viewModel.deletemarker(index: index)
                     navigationPath.removeLast(navigationPath.count) // 초기화 되면서 뷰 이동
-                }, label: {
+                } label: {
                     Text("지우기")
                         .font(.system(size: 17, weight: .regular))
                         .fixedSize()
-                })
+                }
                 .buttonStyle(ResetButtonStyle())
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(action: {
+                    Button {
                         presentationMode.wrappedValue.dismiss()
-                    }) {
+                    } label: {
                         Image(systemName: "xmark.circle.fill")
                             .resizable()
                             .frame(width: 24, height: 24)
@@ -124,26 +124,30 @@ struct MarkerEditAlert: View {
                 }
                 .frame(maxWidth: .infinity)
                 
-                Button(action: {
+                Button {
                     self.isPresented = false
                     presentationMode.wrappedValue.dismiss()
-                }, label: {
+                } label: {
                     Text("변경 사항 폐기")
-                })
+                        .font(.system(size: 17, weight: .regular))
+                        .fixedSize()
+                }
                 .buttonStyle(DiscardButtonStyle())
-                
-                Button(action: {
+               
+                Button {
                     presentationMode.wrappedValue.dismiss()
-                }, label: {
+                } label: {
                     Text("계속 수정하기")
-                })
+                        .font(.system(size: 17, weight: .regular))
+                        .fixedSize()
+                }
                 .buttonStyle(ContinueEditButtonStyle())
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(action: {
+                    Button {
                         presentationMode.wrappedValue.dismiss()
-                    }) {
+                    } label: {
                         Image(systemName: "xmark.circle.fill")
                             .resizable()
                             .frame(width: 24, height: 24)

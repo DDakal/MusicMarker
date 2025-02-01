@@ -74,17 +74,17 @@ struct WatchMarkerEditView: View {
                 
                 // MARK: 저장하기 버튼
                 HStack{
-                    Button(action: {
+                    Button {
                         // 마커 시간 수정한 후 저장하는 기능이 들어가면 됩니다.
                         viewModel.connectivityManager.sendMarkerEditSuccessToIOS(forEdit: [index, count])
                         presentationMode.wrappedValue.dismiss()
                         navigationPath.removeLast(navigationPath.count) // 루트로 이동
-                    }, label: {
+                    } label: {
                         Text("저장하기")
                             .font(.system(size: 17, weight: .regular))
                             .fixedSize()
                             .foregroundColor(data != initialData ? .white : .inactiveGray) // 처음의 시간이 아니라면 색상으로 활성화/비활성화 여부
-                    })
+                    }
                     .buttonStyle(SaveButtonStyle())
                     .disabled(data == initialData)
                 }
@@ -93,18 +93,17 @@ struct WatchMarkerEditView: View {
                 Text("수정하기")
                     .font(.system(size: 14, weight: .semibold))
                     .fixedSize()
-//                    .fontWeight(.heavy)
                     .foregroundStyle(.accent)
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(action: {
+                    Button {
                         if data != initialData {
                             showingAlert = true
                         } else {
                             presentationMode.wrappedValue.dismiss()
                         }
-                    }) {
+                    } label: {
                         Image(systemName: "xmark.circle.fill")
                             .resizable()
                             .frame(width: 24, height: 24)

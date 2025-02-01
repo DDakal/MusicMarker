@@ -56,18 +56,18 @@ struct WatchPlayingView: View {
                         .fill(Color.gray.opacity(0.2))
                         .frame(height: 44)
                         .overlay(
-                            Button(action: {
+                            Button {
                                 viewModel.playToggle()
                                 if viewModel.isPlaying != true {
                                     mixpanelPlayMusic()
                                 }
-                            }, label: {
+                            } label: {
                                 Image(systemName:
                                         viewModel.isPlaying == true ? "pause.fill" : "play.fill"
                                 ) // 재생 on/off에 따라 이미지 변경
                                 .resizable()
                                 .frame(width: 18, height: 18)
-                            })
+                            }
                             .frame(width: 44, height: 44)
                             .buttonBorderShape(.circle)
                             .buttonStyle(PlainButtonStyle())
@@ -83,13 +83,13 @@ struct WatchPlayingView: View {
                     .cornerRadius(4)
                     .frame(height: 35)
                     .overlay(
-                        Button(action: {
+                        Button {
                             viewModel.playForward()
-                        }, label: {
+                        } label: {
                             Image(systemName: "goforward.5")
                                 .resizable()
                                 .frame(width: 20, height: 21)
-                        })
+                        }
                         .frame(width: 34, height: 35)
                         .buttonStyle(PlainButtonStyle())
                     )
@@ -113,20 +113,17 @@ struct WatchPlayingView: View {
         }
         .toolbar {
             ToolbarItem(placement: .topBarLeading){
-                Button(action: {
+                Button {
                     self.presentationMode.wrappedValue.dismiss()
-                }) {
-                    HStack {
-                        Image(systemName: "chevron.left")
-                            .foregroundStyle(.accent)
-                        
-                    }
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .foregroundStyle(.accent)
                 }
             }
             ToolbarItem(placement: .topBarTrailing){
-                Button(action: {
+                Button {
                     showMarkerListOverlay = true
-                }) {
+                } label: {
                     Image(systemName: "list.bullet")
                         .foregroundStyle(.accent)
                 }
