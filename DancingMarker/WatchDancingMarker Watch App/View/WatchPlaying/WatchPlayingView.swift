@@ -58,7 +58,7 @@ struct WatchPlayingView: View {
                             Button {
                                 viewModel.playToggle()
                                 if viewModel.isPlaying != true {
-                                    mixpanelPlayMusic()
+                                    playMixpanelMarker()
                                 }
                             } label: {
                                 // 재생 on/off에 따라 이미지 변경
@@ -136,7 +136,7 @@ struct WatchPlayingView: View {
         })
     }
     
-    private func mixpanelPlayMusic() {
+    private func playMixpanelMarker() {
         Mixpanel.mainInstance().track(event: "노래 재생")
         Mixpanel.mainInstance().people.increment(property: "playMusic", by: 1)
     }
