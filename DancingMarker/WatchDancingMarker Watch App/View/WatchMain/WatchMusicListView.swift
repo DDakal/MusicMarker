@@ -4,16 +4,14 @@ import SwiftData
 struct WatchMusicListView: View {
     
     @State private var navigationManager = WatchNavigationManager()
+    @Environment(\.scenePhase) var scenePhase
     @EnvironmentObject var viewModel: WatchViewModel
+    
+    @State private var drawingHeight = true
+    @State private var afterOnAppear: Bool = true
     
     //    @Query var musicList: [watchMusic] = []
     let columns = [ GridItem(.flexible()) ]
-    
-    @State private var drawingHeight = true
-    
-    @Environment(\.scenePhase) var scenePhase
-    
-    @State private var afterOnAppear: Bool = true
     
     var body: some View {
         NavigationStack(path: $navigationManager.path) {
@@ -162,4 +160,3 @@ struct WatchMusicListView: View {
         return .linear(duration: 0.5).repeatForever()
     }
 }
-

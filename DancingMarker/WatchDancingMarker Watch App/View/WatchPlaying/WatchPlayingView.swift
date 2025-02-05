@@ -5,7 +5,7 @@ import Mixpanel
 
 struct WatchPlayingView: View {
     
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @Environment(\.dismiss) var dismiss
     @Environment(WatchNavigationManager.self) var navigationManager
     @EnvironmentObject var viewModel: WatchViewModel
     @Query var musicList: [Music] = []
@@ -104,16 +104,16 @@ struct WatchPlayingView: View {
         .focusable(true)
         .edgesIgnoringSafeArea(.bottom)
         .navigationBarBackButtonHidden(true)
+        .scrollIndicators(.hidden)
         .digitalCrownRotation(detent: $viewModel.crownVolume, from: 0, through: 60, by: 3, sensitivity: .low, isContinuous: false, isHapticFeedbackEnabled: true
         )
-        .scrollIndicators(.hidden)
         .onChange(of: viewModel.crownVolume) { oldValue, newValue in
             viewModel.handleCrownValueChange(newValue)
         }
         .toolbar {
             ToolbarItem(placement: .topBarLeading){
                 Button {
-                    self.presentationMode.wrappedValue.dismiss()
+                    dismiss()
                 } label: {
                     Image(systemName: "chevron.left")
                         .foregroundStyle(.accent)

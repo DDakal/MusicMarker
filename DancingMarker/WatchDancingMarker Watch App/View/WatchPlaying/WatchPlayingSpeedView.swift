@@ -4,7 +4,7 @@ import SwiftUI
 struct WatchPlayingSpeedView: View {
     
     @EnvironmentObject var viewModel: WatchViewModel
-
+    
     var body: some View {
         HStack(spacing: 0) {
             // MARK: - 버튼

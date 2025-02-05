@@ -3,9 +3,10 @@ import SwiftUI
 struct WatchMarkerDetailView: View {
     
     @Binding var navigationPath: NavigationPath
+    @EnvironmentObject var viewModel: WatchViewModel
+    
     @State private var isShowingEditView = false // 수정하기 Bool 변수
     @State private var isShownResetAlert = false // 초기화하기 Bool 변수
-    @EnvironmentObject var viewModel: WatchViewModel
     
     let index: Int
     
@@ -50,11 +51,10 @@ struct WatchMarkerDetailView: View {
     }
 }
 
-
 // MARK: 마커 초기화 Alert
 struct MarkerResetAlert: View {
     
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) var dismiss
     @Binding var navigationPath: NavigationPath
     @EnvironmentObject var viewModel: WatchViewModel
     
@@ -89,7 +89,7 @@ struct MarkerResetAlert: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
-                        presentationMode.wrappedValue.dismiss()
+                        dismiss()
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .resizable()
@@ -107,7 +107,7 @@ struct MarkerResetAlert: View {
 // MARK: 마커 수정 Alert
 struct MarkerEditAlert: View {
     
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) var dismiss
     @Binding var isPresented: Bool
     
     var body: some View {
@@ -125,7 +125,7 @@ struct MarkerEditAlert: View {
                 
                 Button {
                     self.isPresented = false
-                    presentationMode.wrappedValue.dismiss()
+                    dismiss()
                 } label: {
                     Text("변경 사항 폐기")
                         .font(.system(size: 17, weight: .regular))
@@ -134,7 +134,7 @@ struct MarkerEditAlert: View {
                 .buttonStyle(DiscardButtonStyle())
                
                 Button {
-                    presentationMode.wrappedValue.dismiss()
+                    dismiss()
                 } label: {
                     Text("계속 수정하기")
                         .font(.system(size: 17, weight: .regular))
@@ -145,7 +145,7 @@ struct MarkerEditAlert: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button {
-                        presentationMode.wrappedValue.dismiss()
+                        dismiss()
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .resizable()

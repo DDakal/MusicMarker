@@ -2,7 +2,10 @@ import SwiftUI
 
 struct WatchMarkerEditView: View {
     
+    @Binding var navigationPath: NavigationPath // 네비게이션 경로 관리 변수
+    @EnvironmentObject var viewModel: WatchViewModel
     @Environment(\.dismiss) var dismiss
+    
     @State private var isButtonEnabled = false // 저장하기 버튼 Enabled/Disabled
     
     @State var data: TimeInterval // 음악 시간 데이터
@@ -12,8 +15,6 @@ struct WatchMarkerEditView: View {
     
     @State private var showingAlert = false // EditAlert 띄우기
     @Binding var isPresented: Bool // modal 상태관리 변수
-    @Binding var navigationPath: NavigationPath // 네비게이션 경로 관리 변수
-    @EnvironmentObject var viewModel: WatchViewModel
     
     init(data: TimeInterval, isPresented: Binding<Bool>, index: Int, navigationPath: Binding<NavigationPath>) {
         self.data = data
@@ -125,7 +126,6 @@ struct WatchMarkerEditView: View {
             data += 1
             viewModel.connectivityManager.sendMarkerEditToIOS(forEdit: [index, count])
         }
-        
     }
     
     // 1초 감소 함수
