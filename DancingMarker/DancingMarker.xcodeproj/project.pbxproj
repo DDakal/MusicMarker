@@ -131,6 +131,7 @@
 		510D90152CA2F1A7002E82CC /* Application */ = {
 			isa = PBXGroup;
 			children = (
+				901BF9B52C2A533200C02FF9 /* WatchNavigationManager.swift */,
 				90A472302C450A68008577A2 /* WatchDancingMarkerApp.swift */,
 			);
 			path = Application;
@@ -296,7 +297,6 @@
 		901BF9932C29809900C02FF9 /* WatchDancingMarker Watch App */ = {
 			isa = PBXGroup;
 			children = (
-				901BF9B52C2A533200C02FF9 /* WatchNavigationManager.swift */,
 				510D90152CA2F1A7002E82CC /* Application */,
 				518D7F012CA2E1D700612544 /* ViewModel */,
 				901BF9B72C2A5F5D00C02FF9 /* View */,
