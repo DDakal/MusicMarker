@@ -4,18 +4,19 @@ import SwiftUI
 struct WatchPlayingSpeedView: View {
     
     @EnvironmentObject var viewModel: WatchViewModel
-
+    
     var body: some View {
         HStack(spacing: 0) {
             // MARK: - 버튼
             HStack {
                 Text("-")
-                    .font(.system(size: 17))
-                    .foregroundColor(viewModel.speed < 0.55 ? .inactiveGray : .white) // 0.5배가 되면 Gray색상으로
+                    .font(.system(size: 17, weight: .regular))
+                    .fixedSize()
+                    .foregroundStyle(viewModel.speed < 0.55 ? .inactiveGray : .white) // 0.5배가 되면 Gray색상으로
             }
             .frame(maxWidth: .infinity)
             .frame(height: 52)
-            .background(Color.gray.opacity(0.2))
+            .background(.gray.opacity(0.2))
             .clipShape(RoundedCorner(radius: 4, corners: [.topLeft, .bottomLeft]))
             .onTapGesture {
                 print("Tapped: 배속 - 버튼눌렀습니다.")
@@ -26,11 +27,12 @@ struct WatchPlayingSpeedView: View {
             // MARK: 배속 Text & 원배로 돌아가는 버튼
             HStack {
                 Text(String(format: "%.1fx", viewModel.speed))
-                    .font(.system(size: 17))
+                    .font(.system(size: 17, weight: .regular))
+                    .fixedSize()
             }
             .frame(maxWidth: .infinity)
             .frame(height: 52)
-            .background(Color.gray.opacity(0.2))
+            .background(.gray.opacity(0.2))
             .onTapGesture {
                 print("Tapped: 원배 버튼눌렀습니다.")
                 viewModel.originalPlaybckRate()
@@ -39,12 +41,13 @@ struct WatchPlayingSpeedView: View {
             // MARK: + 버튼
             HStack {
                 Text("+")
-                    .font(.system(size: 17))
-                    .foregroundColor(viewModel.speed > 1.45 ? .inactiveGray : .white) // 1.5배가 되면 Gray색상으로
+                    .font(.system(size: 17, weight: .regular))
+                    .fixedSize()
+                    .foregroundStyle(viewModel.speed > 1.45 ? .inactiveGray : .white) // 1.5배가 되면 Gray색상으로
             }
             .frame(maxWidth: .infinity)
             .frame(height: 52)
-            .background(Color.gray.opacity(0.2))
+            .background(.gray.opacity(0.2))
             .clipShape(RoundedCorner(radius: 4, corners: [.topRight, .bottomRight]))
             .onTapGesture {
                 print("Tapped: 배속 + 버튼눌렀습니다.")
@@ -71,6 +74,7 @@ struct RoundedCorner: Shape {
         return Path(path.cgPath)
     }
 }
+
 #Preview {
     WatchPlayingSpeedView()
 }
