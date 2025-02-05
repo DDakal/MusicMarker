@@ -41,7 +41,7 @@ struct WatchMarkerEditView: View {
                     }
                     .onTapGesture {
                         if data > 1 {
-                            decrementCount()
+                            decrementMarkerTime()
                         }
                     }
                     
@@ -65,7 +65,7 @@ struct WatchMarkerEditView: View {
                     }
                     .onTapGesture {
                         if self.data < self.viewModel.duration - 1 {
-                            incrementCount()
+                            incrementMarkerTime()
                         }
                     }
                 }
@@ -76,7 +76,7 @@ struct WatchMarkerEditView: View {
                 // MARK: 저장하기 버튼
                 HStack{
                     Button {
-                        // 마커 시간 수정한 후 저장하는 기능이 들어가면 됩니다.
+                        // 마커 시간 수정한 후 저장
                         viewModel.connectivityManager.sendMarkerEditSuccessToIOS(forEdit: [index, count])
                         dismiss()
                         navigationPath.removeLast(navigationPath.count) // 루트로 이동
@@ -124,7 +124,7 @@ struct WatchMarkerEditView: View {
     }
     
     // 1초 증가 함수
-    private func incrementCount() {
+    private func incrementMarkerTime() {
         DispatchQueue.main.async{
             count += 1
             data += 1
@@ -133,7 +133,7 @@ struct WatchMarkerEditView: View {
     }
     
     // 1초 감소 함수
-    private func decrementCount() {
+    private func decrementMarkerTime() {
         DispatchQueue.main.async{
             count -= 1
             data -= 1
