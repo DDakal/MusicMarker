@@ -12,6 +12,7 @@
 		1F32F5862C84835300D851E6 /* WatchDancingMarker-Watch-App-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 90A542372C6E1F0100B0F694 /* WatchDancingMarker-Watch-App-Info.plist */; };
 		1F3EEBC92C8207F600926178 /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 1F3EEBC82C8207F600926178 /* Mixpanel */; };
 		1FA08BAA2C8208B10082C266 /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 1FA08BA92C8208B10082C266 /* Mixpanel */; };
+		1FA811862D533EC5004B4807 /* CommonButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FA811852D533EC5004B4807 /* CommonButtonStyle.swift */; };
 		5104B7F62C3D67F2008E10E8 /* Music.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5104B7F52C3D67F2008E10E8 /* Music.swift */; };
 		5104B7F82C3D6C3F008E10E8 /* Music.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5104B7F52C3D67F2008E10E8 /* Music.swift */; };
 		510D901A2CA2F1C0002E82CC /* WatchMarkerDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510D90162CA2F1C0002E82CC /* WatchMarkerDetailView.swift */; };
@@ -72,6 +73,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1FA811852D533EC5004B4807 /* CommonButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonButtonStyle.swift; sourceTree = "<group>"; };
 		5104B7F52C3D67F2008E10E8 /* Music.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Music.swift; sourceTree = "<group>"; };
 		510D90162CA2F1C0002E82CC /* WatchMarkerDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchMarkerDetailView.swift; sourceTree = "<group>"; };
 		510D90172CA2F1C0002E82CC /* WatchMarkerEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchMarkerEditView.swift; sourceTree = "<group>"; };
@@ -131,6 +133,7 @@
 		1FA811842D53398B004B4807 /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				1FA811852D533EC5004B4807 /* CommonButtonStyle.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -494,6 +497,7 @@
 				5104B7F82C3D6C3F008E10E8 /* Music.swift in Sources */,
 				90A472312C450A68008577A2 /* WatchDancingMarkerApp.swift in Sources */,
 				901BF9B62C2A533200C02FF9 /* WatchNavigationManager.swift in Sources */,
+				1FA811862D533EC5004B4807 /* CommonButtonStyle.swift in Sources */,
 				510D90212CA2F1C0002E82CC /* WatchPlayingMarkerView.swift in Sources */,
 				510D90222CA2F1C0002E82CC /* WatchPlayingSpeedView.swift in Sources */,
 				510D90232CA2F1C0002E82CC /* WatchPlayingView.swift in Sources */,

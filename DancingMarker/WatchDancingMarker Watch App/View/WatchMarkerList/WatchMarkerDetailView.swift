@@ -24,7 +24,11 @@ struct WatchMarkerDetailView: View {
                     .font(.system(size: 17, weight: .regular))
                     .fixedSize()
             }
-            .buttonStyle(EditButtonStyle())
+            .buttonStyle(
+                CommonButtonStyle(
+                    backgroundColor: .gray.opacity(0.2),
+                    foregroundColor: .white)
+            )
             .fullScreenCover(isPresented: $isShowingEditView) {
                 WatchMarkerEditView(data: viewModel.timeintervalMarkers[index], isPresented: $isShowingEditView, index: index, navigationPath: $navigationPath)
             }
@@ -36,7 +40,11 @@ struct WatchMarkerDetailView: View {
                     .font(.system(size: 17, weight: .regular))
                     .fixedSize()
             }
-            .buttonStyle(ResetButtonStyle())
+            .buttonStyle(
+                CommonButtonStyle(
+                    backgroundColor: .red.opacity(0.4),
+                    foregroundColor: .red)
+            )
             .fullScreenCover(isPresented: $isShownResetAlert) {
                 MarkerResetAlert(navigationPath: $navigationPath, index: index)
             }
@@ -84,7 +92,11 @@ struct MarkerResetAlert: View {
                         .font(.system(size: 17, weight: .regular))
                         .fixedSize()
                 }
-                .buttonStyle(ResetButtonStyle())
+                .buttonStyle(
+                    CommonButtonStyle(
+                        backgroundColor: .red.opacity(0.4),
+                        foregroundColor: .red)
+                )
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -131,7 +143,11 @@ struct MarkerEditAlert: View {
                         .font(.system(size: 17, weight: .regular))
                         .fixedSize()
                 }
-                .buttonStyle(DiscardButtonStyle())
+                .buttonStyle(
+                    CommonButtonStyle(
+                        backgroundColor: .red.opacity(0.4),
+                        foregroundColor: .red)
+                )
                
                 Button {
                     dismiss()
@@ -140,7 +156,11 @@ struct MarkerEditAlert: View {
                         .font(.system(size: 17, weight: .regular))
                         .fixedSize()
                 }
-                .buttonStyle(ContinueEditButtonStyle())
+                .buttonStyle(
+                    CommonButtonStyle(
+                        backgroundColor: .gray.opacity(0.2),
+                        foregroundColor: .white)
+                )
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -157,61 +177,6 @@ struct MarkerEditAlert: View {
             }
             .padding()
         }
-    }
-}
-
-// MARK: 계속 수정하기 버튼 스타일
-struct ContinueEditButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .padding()
-            .frame(maxWidth: .infinity)
-            .frame(height: 44)
-            .bold()
-            .background(Color.gray.opacity(0.2))
-            .cornerRadius(9)
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
-    }
-}
-// MARK: 변경사항 폐기 버튼 스타일
-struct DiscardButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .padding()
-            .frame(maxWidth: .infinity)
-            .frame(height: 44)
-            .bold()
-            .background(Color.red.opacity(0.4))
-            .foregroundColor(.red)
-            .cornerRadius(9)
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
-    }
-}
-// MARK: 수정하기버튼 Button Style
-struct EditButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .padding()
-            .frame(maxWidth: .infinity)
-            .frame(height: 44)
-            .bold()
-            .background(Color.gray.opacity(0.2))
-            .cornerRadius(9)
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
-    }
-}
-// MARK: 지우기 Button Style
-struct ResetButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .padding()
-            .frame(maxWidth: .infinity)
-            .frame(height: 44)
-            .bold()
-            .background(Color.red.opacity(0.4))
-            .foregroundColor(.red)
-            .cornerRadius(9)
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
     }
 }
 

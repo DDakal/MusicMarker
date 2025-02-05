@@ -86,7 +86,11 @@ struct WatchMarkerEditView: View {
                             .fixedSize()
                             .foregroundColor(data != initialData ? .white : .inactiveGray) // 처음의 시간이 아니라면 색상으로 활성화/비활성화 여부
                     }
-                    .buttonStyle(SaveButtonStyle())
+                    .buttonStyle(
+                        CommonButtonStyle(
+                            backgroundColor: .gray.opacity(0.2),
+                            foregroundColor: .white)
+                    )
                     .disabled(data == initialData)
                 }
             }
@@ -141,19 +145,5 @@ struct WatchMarkerEditView: View {
         let minutes = Int(time) / 60
         let seconds = Int(time) % 60
         return String(format: "%02d:%02d", minutes, seconds)
-    }
-}
-
-// MARK: 저장하기 버튼 스타일
-struct SaveButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .padding()
-            .frame(maxWidth: .infinity)
-            .frame(height: 44)
-            .bold()
-            .background(Color.gray.opacity(0.2))
-            .cornerRadius(9)
-            .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
     }
 }
