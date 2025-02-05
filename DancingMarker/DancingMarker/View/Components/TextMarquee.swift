@@ -23,7 +23,7 @@ struct TextMarquee: View {
 
     // 타이머 설정
     @State private var timer: Timer? = nil
-    @State private var stepSize: CGFloat = 1.0   // 매 프레임 이동 픽셀 수 (speedPerSecond 기반 계산)
+    @State private var stepSize: CGFloat = 0.5   // 매 프레임 이동 픽셀 수 (speedPerSecond 기반 계산)
 
     var body: some View {
         GeometryReader { geo in
