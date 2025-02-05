@@ -2,7 +2,7 @@ import SwiftUI
 
 struct WatchMarkerEditView: View {
     
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) var dismiss
     @State private var isButtonEnabled = false // 저장하기 버튼 Enabled/Disabled
     
     @State var data: TimeInterval // 음악 시간 데이터
@@ -77,7 +77,7 @@ struct WatchMarkerEditView: View {
                     Button {
                         // 마커 시간 수정한 후 저장하는 기능이 들어가면 됩니다.
                         viewModel.connectivityManager.sendMarkerEditSuccessToIOS(forEdit: [index, count])
-                        presentationMode.wrappedValue.dismiss()
+                        dismiss()
                         navigationPath.removeLast(navigationPath.count) // 루트로 이동
                     } label: {
                         Text("저장하기")
@@ -101,7 +101,7 @@ struct WatchMarkerEditView: View {
                         if data != initialData {
                             showingAlert = true
                         } else {
-                            presentationMode.wrappedValue.dismiss()
+                            dismiss()
                         }
                     } label: {
                         Image(systemName: "xmark.circle.fill")
