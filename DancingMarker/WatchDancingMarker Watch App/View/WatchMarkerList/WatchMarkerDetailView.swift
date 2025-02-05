@@ -200,7 +200,7 @@ struct EditButtonStyle: ButtonStyle {
             .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
     }
 }
-// MARK: 초기화버튼 Button Style
+// MARK: 지우기 Button Style
 struct ResetButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label

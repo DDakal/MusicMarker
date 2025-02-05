@@ -128,6 +128,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1FA811842D53398B004B4807 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
 		510D90152CA2F1A7002E82CC /* Application */ = {
 			isa = PBXGroup;
 			children = (
@@ -298,6 +305,7 @@
 			isa = PBXGroup;
 			children = (
 				510D90152CA2F1A7002E82CC /* Application */,
+				1FA811842D53398B004B4807 /* Common */,
 				518D7F012CA2E1D700612544 /* ViewModel */,
 				901BF9B72C2A5F5D00C02FF9 /* View */,
 				518D7F162CA2E52700612544 /* Resource */,
