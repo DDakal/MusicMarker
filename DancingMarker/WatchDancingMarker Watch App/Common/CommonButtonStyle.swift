@@ -18,7 +18,7 @@ struct CommonButtonStyle: ButtonStyle {
             .frame(maxWidth: .infinity)
             .frame(height: 44)
             .background(backgroundColor)
-            .foregroundColor(foregroundColor)
+            .foregroundStyle(foregroundColor)
             .cornerRadius(9)
             .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
     }
