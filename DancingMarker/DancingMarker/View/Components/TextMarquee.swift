@@ -8,74 +8,87 @@
 import SwiftUI
 
 struct TextMarquee: View {
-    @State var storedSize: CGSize = .zero
-    @State var offset: CGFloat = 0
-    @State var text: String
+    let originalTitle: String
+    
+    // 폰트, 멈춤 시간
     var font: UIFont
-    var animationSpeed: Double = 0.06  // 포인트당 걸리는 시간
     var delayTime: Double = 0.5        // 멈추는 시간 (초)
+    var speedPerSecond: CGFloat = 30.0 // ✅ 1초 동안 이동할 픽셀 수 (일정한 속도)
     
-    @Environment(\.colorScheme) var scheme
+    // 내부 상태
+    @State private var textWidth: CGFloat = 0    // 원본 텍스트의 너비
+    @State private var offset: CGFloat = 0       // 현재 이동 상태
     
+    // 타이머 설정
+    @State private var timer: Timer? = nil
+    @State private var stepSize: CGFloat = 1.0   // 매 프레임 이동 픽셀 수 (speedPerSecond 기반 계산)
+
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            Text(text)
-                .font(Font(font))
-                .offset(x: offset)
-        }
-        .overlay(
-            HStack {
-                let color: Color = .nowPlayingGray
+        GeometryReader { geo in
+            HStack(spacing: 0) {
+                // ✅ 동일한 텍스트 2개 배치 (연속적인 흐름)
+                Text(originalTitle)
+                    .font(.init(font))
+                    .lineLimit(1)   // ✅ 줄바꿈 방지
+                    .fixedSize()    // ✅ "..." 제거 (크기 자동 줄어드는 문제 해결)
+                    .background(
+                        GeometryReader { textGeo in
+                            Color.clear.onAppear {
+                                textWidth = textGeo.size.width
+                                setupMarquee()
+                            }
+                        }
+                    )
                 
-                LinearGradient(colors: [color, color.opacity(0.7), color.opacity(0.5), color.opacity(0.3)], startPoint: .leading, endPoint: .trailing)
-                    .frame(width: 10)
-                
-                Spacer()
-                
-                LinearGradient(colors: [color, color.opacity(0.7), color.opacity(0.5), color.opacity(0.3)].reversed(), startPoint: .leading, endPoint: .trailing)
-                    .frame(width: 10)
+                Text(originalTitle)  // ✅ 두 번째 텍스트 (연결 효과)
+                    .font(.init(font))
+                    .lineLimit(1)
+                    .fixedSize()
             }
-        )
-        .disabled(true)
+            .offset(x: offset)
+            .clipped()
+            .frame(width: geo.size.width, height: geo.size.height, alignment: .leading)
+        }
         .onAppear {
-            let baseText = text
-            
-            // 텍스트와 텍스트 사이의 공백 추가
-            (1...15).forEach { _ in
-                text.append(" ")
-            }
-            
-            storedSize = textSize()
-            text.append(baseText)
-            
-            // 약간의 초기 지연 후 애니메이션 시작
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                startMarqueeAnimation()
-            }
+            startMarquee()
+        }
+        .onDisappear {
+            stopMarquee()
+        }
+    }
+}
+
+// MARK: - Marquee Core Logic
+extension TextMarquee {
+    /// 마키 텍스트 초기화
+    private func setupMarquee() {
+        stepSize = speedPerSecond / 60.0  // 1/60초당 이동할 픽셀 수
+        offset = 0  // ✅ 초기 위치를 첫 번째 텍스트의 시작점으로 설정
+    }
+    
+    /// 마키 애니메이션 시작
+    private func startMarquee() {
+        stopMarquee() // 기존 타이머 중지
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { _ in
+            updateMarquee()
         }
     }
     
-    func startMarqueeAnimation() {
-        // 텍스트가 스크롤되어야 할 거리 만큼의 애니메이션 시간 계산
-        let timing = animationSpeed * storedSize.width
-        
-        // 텍스트를 왼쪽으로 애니메이션하여 스크롤 효과 적용
-        withAnimation(.linear(duration: timing)) {
-            offset = -storedSize.width
-        }
-        
-        // 애니메이션이 끝난 후, delayTime 만큼 멈춘 후에
-        DispatchQueue.main.asyncAfter(deadline: .now() + timing) {
-            DispatchQueue.main.asyncAfter(deadline: .now() + delayTime) {
-                offset = 0
-                startMarqueeAnimation()
-            }
-        }
+    /// 마키 애니메이션을 멈춤
+    private func stopMarquee() {
+        timer?.invalidate()
+        timer = nil
     }
     
-    func textSize() -> CGSize {
-        let attributes = [NSAttributedString.Key.font: font]
-        let size = (text as NSString).size(withAttributes: attributes)
-        return size
+    /// 매 프레임마다 실행되는 함수 (offset을 이동)
+    private func updateMarquee() {
+        if offset <= -textWidth {
+            // ✅ 자연스럽게 이어지도록 위치를 다시 오른쪽으로 이동
+            offset += textWidth
+        } else {
+            // ✅ 일정 속도로 이동
+            offset -= stepSize
+        }
     }
 }
