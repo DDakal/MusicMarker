@@ -63,6 +63,7 @@ struct MusicListView: View {
                             Text(music.artist)
                                 .font(.body)
                         }
+                        .lineLimit(1)
                         .contextMenu {
                             musicContextMenu(music: music)
                         }

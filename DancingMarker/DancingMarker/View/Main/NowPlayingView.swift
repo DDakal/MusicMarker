@@ -40,6 +40,7 @@ struct NowPlayingView: View {
                         Text(music.artist)
                             .font(.body)
                     }
+                    .lineLimit(1)
                     Spacer()
                     
                 } else {
