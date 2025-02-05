@@ -29,14 +29,12 @@ struct NowPlayingView: View {
                                     .resizable()
                                     .padding()
                                     .scaledToFit()
-                                    .foregroundColor(.gray)
+                                    .foregroundStyle(.gray)
                             }
                     }
                     
                     VStack(alignment: .leading, spacing: 12) {
-                        Text(music.title)
-                            .font(.title3)
-                            .bold()
+                        TextMarquee(text: music.title, font: UIFont.boldSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .title3).pointSize))
                         Text(music.artist)
                             .font(.body)
                     }
@@ -53,7 +51,7 @@ struct NowPlayingView: View {
                                 .resizable()
                                 .padding()
                                 .scaledToFit()
-                                .foregroundColor(.gray)
+                                .foregroundStyle(.gray)
                         }
                     Spacer()
                 }
@@ -66,7 +64,6 @@ struct NowPlayingView: View {
                 }
                 navigationManager.push(to: .playing)
             }
-
             .padding(.bottom, 8)
             
             /// 슬라이더
