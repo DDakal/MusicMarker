@@ -35,8 +35,7 @@ struct NowPlayingView: View {
                     
                     VStack(alignment: .leading, spacing: 12) {
                         TextMarquee(originalTitle: music.title, font: UIFont.boldSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .title3).pointSize))
-                        Text(music.artist)
-                            .font(.body)
+                        TextMarquee(originalTitle: music.artist, font: UIFont.systemFont(ofSize: UIFont.preferredFont(forTextStyle: .body).pointSize))
                     }
                     .lineLimit(1)
                     Spacer()
