@@ -33,12 +33,12 @@ struct NowPlayingView: View {
                             }
                     }
                     
-                    VStack(alignment: .leading, spacing: 0) {
+                    VStack(alignment: .leading, spacing: 12) {
                         TextMarquee(originalTitle: music.title, font: UIFont.boldSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .title3).pointSize))
                         TextMarquee(originalTitle: music.artist, font: UIFont.systemFont(ofSize: UIFont.preferredFont(forTextStyle: .body).pointSize))
                     }
                     .lineLimit(1)
-                    Spacer()
+                    .border(Color.green, width: 1)
                     
                 } else {
                     // 음악이 없는 경우
@@ -63,17 +63,17 @@ struct NowPlayingView: View {
                 }
                 navigationManager.push(to: .playing)
             }
-            .padding(.bottom, 8)
+            .padding(.vertical, 8)
             
             /// 슬라이더
             VStack() {
                 GeometryReader { geometry in
                     ZStack(alignment: .leading) {
                         Rectangle()
-                            .foregroundColor(.inactiveGray)
+                            .foregroundStyle(.inactiveGray)
                         
                         Rectangle()
-                            .foregroundColor(.white)
+                            .foregroundStyle(.white)
                             .frame(width: geometry.size.width * CGFloat(playerModel.progress), height: geometry.size.height)
                     }
                     .cornerRadius(12)
@@ -89,7 +89,7 @@ struct NowPlayingView: View {
                             }
                         }))
                 }
-                .frame(height: 5)
+                .frame(height: 8)
                 .padding(.bottom, 3)
                 
                 HStack {
@@ -97,6 +97,8 @@ struct NowPlayingView: View {
                     Spacer()
                     Text("\(playerModel.formattedDuration)")
                 }
+                .font(.caption)
+                
             }
             
             /// 제어 버튼
@@ -148,7 +150,7 @@ struct NowPlayingView: View {
                     )
                     .padding(.trailing, 28)
             }
-            .padding(.bottom, 14)
+            .padding(.bottom, 20)
         }
         .padding(.horizontal, 16)
         
