@@ -14,6 +14,10 @@ struct TextMarquee: View {
     var font: UIFont
     var delayTime: Double = 0.5        // ✅ 공백을 지난 후 멈추는 시간
     var speedPerSecond: CGFloat = 30.0 // ✅ 1초 동안 이동할 픽셀 수 (일정한 속도)
+    private let spaceCount = 5
+    private var spacedTitle: String {
+        originalTitle + String(repeating: " ", count: spaceCount)
+    }
     
     // 내부 상태
     @State private var textWidth: CGFloat = 0    // 원본 텍스트의 너비 + 공백
@@ -28,15 +32,15 @@ struct TextMarquee: View {
     var body: some View {
         GeometryReader { geo in
             HStack(spacing: 0) {
-                Text(originalTitle + "     " + originalTitle)
+                Text(spacedTitle + originalTitle) // ✅ 공백 포함된 문자열 사용
                     .font(.init(font))
                     .lineLimit(1)
                     .fixedSize()
                     .background(
                         GeometryReader { textGeo in
                             Color.clear.onAppear {
-                                textWidth = measureTextWidth(originalTitle + "     ")
-                                fullWidth = textGeo.size.width  // ✅ 공백 포함한 전체 길이 저장
+                                textWidth = measureTextWidth(spacedTitle) // ✅ 동일한 공백 포함
+                                fullWidth = textGeo.size.width
                                 setupMarquee()
                             }
                         }
@@ -45,7 +49,7 @@ struct TextMarquee: View {
             .offset(x: offset)
             .clipped()
             .frame(width: geo.size.width, height: geo.size.height, alignment: .leading)
-
+            
         }
         .onAppear {
             startMarquee()
