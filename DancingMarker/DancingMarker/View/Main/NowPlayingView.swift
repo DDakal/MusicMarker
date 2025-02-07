@@ -37,8 +37,6 @@ struct NowPlayingView: View {
                         TextMarquee(originalTitle: music.title, font: UIFont.boldSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .title3).pointSize))
                         TextMarquee(originalTitle: music.artist, font: UIFont.systemFont(ofSize: UIFont.preferredFont(forTextStyle: .body).pointSize))
                     }
-                    .lineLimit(1)
-                    .border(Color.green, width: 1)
                     
                 } else {
                     // 음악이 없는 경우
@@ -157,11 +155,7 @@ struct NowPlayingView: View {
     }
 }
 
-// TODO: - artist에도 TextMarquee 적용하기
 // TODO: - title과 artist의 애니메이션을 동기화하기
 //        - 두 개의 애니메이션 중 나중에 끝나는 애니메이션 기준으로 동기화
 //        - 즉, 두 애니메이션이 모두 끝난 후 다음 애니메이션이 시작되도록 구현
-// TODO: - 화면 가로 길이를 초과하지 않는 경우 애니메이션 비활성화
-//        - title과 artist 각각 길이를 측정
-//        - 화면 크기보다 짧으면 정적인 텍스트로 표시
 // TODO: - 그라데이션 효과 추가
