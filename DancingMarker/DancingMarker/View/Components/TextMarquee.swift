@@ -8,127 +8,184 @@
 import SwiftUI
 
 struct TextMarquee: View {
-    let originalTitle: String
+    let title: String
+    let artist: String
+    let titleFont: UIFont
+    let artistFont: UIFont
+    var delayTime: Double = 1.2
+    var speedPerSecond: CGFloat = 30.0
 
-    // 폰트, 애니메이션 설정
-    var font: UIFont
-    var delayTime: Double = 1.2        // ✅ 공백을 지난 후 멈추는 시간
-    var speedPerSecond: CGFloat = 30.0 // ✅ 1초 동안 이동할 픽셀 수 (일정한 속도)
-    
     private let spaceCount = 7
-    private var spacedTitle: String {
-        originalTitle + String(repeating: " ", count: spaceCount)
-    }
+    private var spacedTitle: String { title + String(repeating: " ", count: spaceCount) }
+    private var spacedArtist: String { artist + String(repeating: " ", count: spaceCount) }
 
-    // 내부 상태
-    @State private var textWidth: CGFloat = 0    // 원본 텍스트의 너비 + 공백
-    @State private var fullWidth: CGFloat = 0    // ✅ 공백 포함한 전체 길이
-    @State private var offset: CGFloat = 0       // 현재 이동 상태
-    @State private var isPaused: Bool = false    // ✅ 멈춤 상태 여부
-    @State private var shouldAnimate: Bool = true // ✅ 애니메이션 여부
+    @State private var titleOffset: CGFloat = 0
+    @State private var artistOffset: CGFloat = 0
+    @State private var titleWidth: CGFloat = 0
+    @State private var artistWidth: CGFloat = 0
+    @State private var titleFullWidth: CGFloat = 0
+    @State private var artistFullWidth: CGFloat = 0
+    @State private var shouldAnimateTitle: Bool = true
+    @State private var shouldAnimateArtist: Bool = true
 
-    // 타이머 설정
-    @State private var timer: Timer? = nil
-    @State private var stepSize: CGFloat = 0.5   // 매 프레임 이동 픽셀 수 (speedPerSecond 기반 계산)
+    @State private var titleTimer: Timer? = nil
+    @State private var artistTimer: Timer? = nil
+    @State private var titleStepSize: CGFloat = 0.5
+    @State private var artistStepSize: CGFloat = 0.5
+
+    @State private var isTitlePaused: Bool = false
+    @State private var isArtistPaused: Bool = false
 
     var body: some View {
         GeometryReader { geo in
-            if shouldAnimate {
-                HStack(spacing: 0) {
-                    Text(spacedTitle + originalTitle) // ✅ 공백 포함된 문자열 사용
-                        .font(.init(font))
-                        .lineLimit(1)
-                        .fixedSize()
-                        .background(
-                            GeometryReader { textGeo in
-                                Color.clear.onAppear {
-                                    textWidth = measureTextWidth(spacedTitle) // ✅ 동일한 공백 포함
-                                    fullWidth = textGeo.size.width
-                                    checkIfShouldAnimate(containerWidth: geo.size.width)
+            VStack(alignment: .leading, spacing: 12) {
+                if shouldAnimateTitle {
+                    HStack(spacing: 0) {
+                        Text(spacedTitle + title)
+                            .font(.init(titleFont))
+                            .lineLimit(1)
+                            .fixedSize()
+                            .background(
+                                GeometryReader { titleGeo in
+                                    Color.clear.onAppear {
+                                        titleWidth = measureTextWidth(spacedTitle, font: titleFont)
+                                        titleFullWidth = titleGeo.size.width // ✅ 실제 렌더링된 텍스트 너비
+                                        checkIfShouldAnimateTitle(containerWidth: geo.size.width)
+                                    }
                                 }
-                            }
-                        )
-                }
-                .offset(x: offset)
-                .clipped()
-                .onAppear { startMarquee() }
-                .onDisappear { stopMarquee() }
-            } else {
-                // ✅ 짧은 텍스트일 경우 정지 상태로 표시
-                Text(originalTitle)
-                    .font(.init(font))
-                    .lineLimit(1)
-                    .onAppear {
-                        checkIfShouldAnimate(containerWidth: geo.size.width)
+                            )
                     }
+                    .offset(x: titleOffset)
+                    .clipped()
+                    .onAppear { startMarqueeTitle() }
+                    .onDisappear { stopMarqueeTitle() }
+                } else {
+                    Text(title)
+                        .font(.init(titleFont))
+                        .lineLimit(1)
+                        .onAppear {
+                            checkIfShouldAnimateTitle(containerWidth: geo.size.width)
+                        }
+                }
+
+                if shouldAnimateArtist {
+                    HStack(spacing: 0) {
+                        Text(spacedArtist + artist)
+                            .font(.init(artistFont))
+                            .lineLimit(1)
+                            .fixedSize()
+                            .background(
+                                GeometryReader { artistGeo in
+                                    Color.clear.onAppear {
+                                        artistWidth = measureTextWidth(spacedArtist, font: artistFont)
+                                        artistFullWidth = artistGeo.size.width // ✅ 실제 렌더링된 텍스트 너비
+                                        checkIfShouldAnimateArtist(containerWidth: geo.size.width)
+                                    }
+                                }
+                            )
+                    }
+                    .offset(x: artistOffset)
+                    .clipped()
+                    .onAppear { startMarqueeArtist() }
+                    .onDisappear { stopMarqueeArtist() }
+                } else {
+                    Text(artist)
+                        .font(.init(artistFont))
+                        .lineLimit(1)
+                        .onAppear {
+                            checkIfShouldAnimateArtist(containerWidth: geo.size.width)
+                        }
+                }
             }
         }
-        .onChange(of: originalTitle) { _ in restartMarquee() }
-        .frame(height: 20)
+        .onChange(of: title) { _ in restartMarqueeTitle() }
+        .onChange(of: artist) { _ in restartMarqueeArtist() }
     }
 }
 
 // MARK: - Marquee Logic
 extension TextMarquee {
-    /// 📌 **텍스트가 화면보다 작으면 애니메이션 비활성화**
-    private func checkIfShouldAnimate(containerWidth: CGFloat) {
-        let threshold = containerWidth * 0.85 // ✅ 컨테이너 크기의 85%보다 작으면 정적 표시
-        shouldAnimate = textWidth > threshold
-
-        if shouldAnimate {
-            stepSize = speedPerSecond / 60.0
-            startMarquee()
-        } else {
-            offset = 0
-            stopMarquee()
-        }
+    private func checkIfShouldAnimateTitle(containerWidth: CGFloat) {
+        let threshold = containerWidth * 0.85
+        shouldAnimateTitle = titleFullWidth > threshold
+        titleStepSize = speedPerSecond / 60.0
     }
 
-    /// ✅ **제목이 바뀔 때 애니메이션 리셋 후 다시 시작**
-    private func restartMarquee() {
-        stopMarquee()
-        offset = 0
-        shouldAnimate = true // ✅ 항상 다시 체크하게 설정
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            checkIfShouldAnimate(containerWidth: UIScreen.main.bounds.width)
-        }
+    private func checkIfShouldAnimateArtist(containerWidth: CGFloat) {
+        let threshold = containerWidth * 0.85
+        shouldAnimateArtist = artistFullWidth > threshold
+        artistStepSize = speedPerSecond / 60.0
     }
 
-    /// 마키 애니메이션 시작
-    private func startMarquee() {
-        if !shouldAnimate { return }
-        
-        stopMarquee()
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { _ in
-            if !isPaused {
-                updateMarquee()
+    private func restartMarqueeTitle() {
+        stopMarqueeTitle()
+        titleOffset = 0
+        shouldAnimateTitle = true
+    }
+
+    private func restartMarqueeArtist() {
+        stopMarqueeArtist()
+        artistOffset = 0
+        shouldAnimateArtist = true
+    }
+
+    private func startMarqueeTitle() {
+        guard shouldAnimateTitle else { return }
+        stopMarqueeTitle()
+        titleTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { _ in
+            if !isTitlePaused {
+                updateMarqueeTitle()
             }
         }
     }
 
-    /// 마키 애니메이션 정지
-    private func stopMarquee() {
-        timer?.invalidate()
-        timer = nil
-        isPaused = false
+    private func startMarqueeArtist() {
+        guard shouldAnimateArtist else { return }
+        stopMarqueeArtist()
+        artistTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { _ in
+            if !isArtistPaused {
+                updateMarqueeArtist()
+            }
+        }
     }
 
-    /// 매 프레임마다 실행되는 애니메이션 업데이트
-    private func updateMarquee() {
-        if offset <= -textWidth {
-            offset += textWidth
-            
-            isPaused = true
+    private func stopMarqueeTitle() {
+        titleTimer?.invalidate()
+        titleTimer = nil
+        isTitlePaused = false
+    }
+
+    private func stopMarqueeArtist() {
+        artistTimer?.invalidate()
+        artistTimer = nil
+        isArtistPaused = false
+    }
+
+    private func updateMarqueeTitle() {
+        if titleOffset <= -titleWidth {
+            titleOffset += titleWidth
+            isTitlePaused = true
             DispatchQueue.main.asyncAfter(deadline: .now() + delayTime) {
-                isPaused = false
+                isTitlePaused = false
             }
         } else {
-            offset -= stepSize
+            titleOffset -= titleStepSize
         }
     }
 
-    /// 📌 **텍스트 길이 측정 함수**
-    private func measureTextWidth(_ text: String) -> CGFloat {
+    private func updateMarqueeArtist() {
+        if artistOffset <= -artistWidth {
+            artistOffset += artistWidth
+            isArtistPaused = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + delayTime) {
+                isArtistPaused = false
+            }
+        } else {
+            artistOffset -= artistStepSize
+        }
+    }
+
+    private func measureTextWidth(_ text: String, font: UIFont) -> CGFloat {
         let attributes: [NSAttributedString.Key: Any] = [
             .font: font
         ]
