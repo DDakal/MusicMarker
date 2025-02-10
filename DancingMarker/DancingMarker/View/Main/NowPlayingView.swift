@@ -95,7 +95,6 @@ struct NowPlayingView: View {
                     Text("\(playerModel.formattedDuration)")
                 }
                 .font(.caption)
-                
             }
             
             /// 제어 버튼
@@ -150,6 +149,27 @@ struct NowPlayingView: View {
             .padding(.bottom, 20)
         }
         .padding(.horizontal, 16)
+        .overlay {
+            HStack(spacing: 0) {
+                //let color: Color = .nowPlayingGray
+//                
+//                LinearGradient(colors: [color, color.opacity(0.99), color.opacity(0.98)], startPoint: .leading, endPoint: .trailing)
+//                    .frame(width: 10)
+                
+                Spacer()
+                
+                Color.nowPlayingGray
+                    .frame(width: 16)
+                    .overlay(
+                        // 왼쪽에 블러 효과 추가
+                        LinearGradient(colors: [Color.clear, Color.nowPlayingGray], startPoint: .leading, endPoint: .trailing)
+                            .blur(radius: 5)
+                    )
+                    .mask(
+                        LinearGradient(colors: [Color.clear, .black], startPoint: .leading, endPoint: .trailing) // 블러가 왼쪽에만 보이도록 마스킹
+                    )
+            }
+        }
         
     }
 }
