@@ -73,7 +73,7 @@ struct TextMarquee: View {
                     .onAppear { startMarqueeTitle() }
                     .onDisappear { stopMarqueeTitle() }
                     .padding(.bottom, 6)
-                    .border(Color.green, width: 1)
+                    //.border(Color.green, width: 1)
                 } else {
                     Text(title)
                         .font(.init(titleFont))
@@ -120,7 +120,7 @@ struct TextMarquee: View {
                     .onAppear { startMarqueeArtist() }
                     .onDisappear { stopMarqueeArtist() }
                     .padding(.bottom, 6)
-                    .border(Color.blue, width: 1)
+                    //.border(Color.blue, width: 1)
                 } else {
                     Text(artist)
                         .font(.init(artistFont))
@@ -142,7 +142,7 @@ struct TextMarquee: View {
             .onChange(of: title) { _ in restartMarqueeTitle() }
             .onChange(of: artist) { _ in restartMarqueeArtist() }
         }
-        .border(Color.red, width: 1)
+        
     }
 }
 

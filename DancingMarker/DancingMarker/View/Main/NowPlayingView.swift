@@ -36,6 +36,9 @@ struct NowPlayingView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         TextMarquee(title: music.title, artist: music.artist, titleFont: UIFont.boldSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .title3).pointSize), artistFont: UIFont.systemFont(ofSize: UIFont.preferredFont(forTextStyle: .body).pointSize))
                     }
+                    .overlay(
+                        overlayForMarquee(title: music.title, artist: music.artist)
+                    )
                     
                 } else {
                     // 음악이 없는 경우
@@ -149,29 +152,88 @@ struct NowPlayingView: View {
             .padding(.bottom, 20)
         }
         .padding(.horizontal, 16)
-        .overlay {
-            HStack(spacing: 0) {
-                //let color: Color = .nowPlayingGray
-//                
-//                LinearGradient(colors: [color, color.opacity(0.99), color.opacity(0.98)], startPoint: .leading, endPoint: .trailing)
-//                    .frame(width: 10)
-                
-                Spacer()
-                
-                Color.nowPlayingGray
-                    .frame(width: 16)
-                    .overlay(
-                        // 왼쪽에 블러 효과 추가
-                        LinearGradient(colors: [Color.clear, Color.nowPlayingGray], startPoint: .leading, endPoint: .trailing)
-                            .blur(radius: 5)
-                    )
-                    .mask(
-                        LinearGradient(colors: [Color.clear, .black], startPoint: .leading, endPoint: .trailing) // 블러가 왼쪽에만 보이도록 마스킹
-                    )
+    }
+    
+    // MARK: - Mask Logic
+    private func overlayForMarquee(title: String, artist: String) -> some View {
+        GeometryReader { geo in
+            VStack(spacing: 12) {
+                // Title Overlay
+                HStack(spacing: 0) {
+                    if needsMask(for: title, font: UIFont.boldSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .title3).pointSize)) {
+                        LinearGradient(
+                            gradient: Gradient(colors: [Color.nowPlayingGray, Color.clear]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                        .frame(width: 10)
+                    }
+
+                    Spacer()
+                        .frame(width: geo.size.width + 10)
+
+                    if needsMask(for: title, font: UIFont.boldSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .title3).pointSize)) {
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                .init(color: Color.clear, location: 0),
+                                .init(color: Color.nowPlayingGray.opacity(0.5), location: 0.1),
+                                .init(color: Color.nowPlayingGray, location: 0.2),
+                                .init(color: Color.nowPlayingGray, location: 1)
+                            ]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                        .frame(width: 20)
+                    }
+                }
+                .frame(height: geo.size.height / 2)
+                .offset(x: -4)
+
+                // Artist Overlay
+                HStack(spacing: 0) {
+                    if needsMask(for: artist, font: UIFont.boldSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .title3).pointSize)) {
+                        LinearGradient(
+                            gradient: Gradient(colors: [Color.nowPlayingGray, Color.clear]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                        .frame(width: 10)
+                    }
+
+                    Spacer()
+                        .frame(width: geo.size.width + 10)
+
+                    if needsMask(for: artist, font: UIFont.boldSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .title3).pointSize)) {
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                .init(color: Color.clear, location: 0),
+                                .init(color: Color.nowPlayingGray.opacity(0.5), location: 0.1),
+                                .init(color: Color.nowPlayingGray, location: 0.2),
+                                .init(color: Color.nowPlayingGray, location: 1)
+                            ]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                        .frame(width: 20)
+                    }
+                }
+                .frame(height: geo.size.height / 2)
+                .offset(x: -4)
             }
         }
-        
     }
+        
+        // MARK: - Text Length Check
+        private func needsMask(for text: String, font: UIFont) -> Bool {
+            let textWidth = measureTextWidth(text, font: font)
+            return textWidth > UIScreen.main.bounds.width * 0.85
+        }
+
+        // MARK: - Text Width Measurement
+        private func measureTextWidth(_ text: String, font: UIFont) -> CGFloat {
+            let attributes: [NSAttributedString.Key: Any] = [.font: font]
+            return (text as NSString).size(withAttributes: attributes).width
+        }
 }
 
 // TODO: - title과 artist의 애니메이션을 동기화하기
