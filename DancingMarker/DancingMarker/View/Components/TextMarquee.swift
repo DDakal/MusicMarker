@@ -229,9 +229,7 @@ extension TextMarquee {
         if titleOffset <= -titleWidth {
             titleOffset += titleWidth
             isTitlePaused = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + delayTime) {
-                isTitlePaused = false
-            }
+            checkAndResumeMarquees() // 두 텍스트 모두 멈췄는지 확인
         } else {
             titleOffset -= titleStepSize
         }
@@ -241,9 +239,7 @@ extension TextMarquee {
         if artistOffset <= -artistWidth {
             artistOffset += artistWidth
             isArtistPaused = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + delayTime) {
-                isArtistPaused = false
-            }
+            checkAndResumeMarquees() // 두 텍스트 모두 멈췄는지 확인
         } else {
             artistOffset -= artistStepSize
         }
@@ -254,5 +250,14 @@ extension TextMarquee {
             .font: font
         ]
         return (text as NSString).size(withAttributes: attributes).width
+    }
+    
+    private func checkAndResumeMarquees() {
+        if isTitlePaused && isArtistPaused {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delayTime) {
+                isTitlePaused = false
+                isArtistPaused = false
+            }
+        }
     }
 }
