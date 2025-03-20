@@ -15,6 +15,9 @@ struct MusicListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query var musicList: [Music] = []
     @State private var isFileImporterPresented: Bool = false
+    @State private var isMusicEditViewPresented: Bool = false
+    @State private var selectedFileURL: URL? = nil
+    @State private var didSaveMusic: Bool = false
     @EnvironmentObject var playerModel: PlayerModel
     
     var body: some View {
@@ -52,7 +55,7 @@ struct MusicListView: View {
                                         .resizable()
                                         .padding()
                                         .scaledToFit()
-                                        .foregroundColor(.gray)
+                                        .foregroundStyle(.gray)
                                 }
                         }
                         
@@ -128,7 +131,6 @@ struct MusicListView: View {
                         )
                 }
             }
-            
         }
         .navigationTitle("내 음악")
         .toolbar {
@@ -142,22 +144,33 @@ struct MusicListView: View {
             }
         }
         .fileImporter(
-            isPresented: $isFileImporterPresented,
-            allowedContentTypes: [.audio],
-            allowsMultipleSelection: false
-        ) { result in
-            switch result {
-            case .success(let urls):
-                if let url = urls.first {
-                    Task {
-                        await addMusic(from: url)
+                    isPresented: $isFileImporterPresented,
+                    allowedContentTypes: [.audio],
+                    allowsMultipleSelection: false
+                ) { result in
+                    switch result {
+                    case .success(let urls):
+                        if let url = urls.first {
+                            selectedFileURL = url
+                            isMusicEditViewPresented = true
+                            didSaveMusic = false  // 새로운 파일을 선택할 때마다 초기화
+                        }
+                    case .failure(let error):
+                        print("Failed to import file: \(error.localizedDescription)")
                     }
                 }
-            case .failure(let error):
-                print("Failed to import file: \(error.localizedDescription)")
-            }
-        }
-        .edgesIgnoringSafeArea(.bottom)
+                .sheet(isPresented: $isMusicEditViewPresented, onDismiss: {
+                    if !didSaveMusic {
+                        isFileImporterPresented = true  // 저장하지 않고 닫으면 FileImporter 다시 열기
+                    }
+                }) {
+                    if let fileURL = selectedFileURL {
+                        NavigationStack {
+                            MusicEditView(fileURL: fileURL, didSaveMusic: $didSaveMusic)
+                        }
+                    }
+                }
+                .edgesIgnoringSafeArea(.bottom)
     }
     
     @ViewBuilder
@@ -165,60 +178,13 @@ struct MusicListView: View {
         TipButtonView()
     }
     
-    private func fetchMusicMetadata(from url: URL) async throws -> (String, String, Data?) {
-        let asset = AVAsset(url: url)
-        let metadata = try await asset.load(.commonMetadata)
-        
-        var title: String = "Unknown Title"
-        var artist: String = "Unknown Artist"
-        var albumArt: Data? = nil
-        
-        for item in metadata {
-            if item.commonKey == .commonKeyTitle {
-                title = try await item.load(.stringValue) ?? "Unknown Title"
-            }
-            if item.commonKey == .commonKeyArtist {
-                artist = try await item.load(.stringValue) ?? "Unknown Artist"
-            }
-            if item.commonKey == .commonKeyArtwork {
-                albumArt = try await item.load(.dataValue)
-            }
-        }
-        
-        return (title, artist, albumArt)
+    private func addEditedMusic(_ music: Music) {
+        modelContext.insert(music)
+        try? modelContext.save()
+        playerModel.sendMusicListToWatch(with: musicList)
     }
     
-    private func addMusic(from url: URL) async {
-        // 보안 범위 설정 시작
-        guard url.startAccessingSecurityScopedResource() else {
-            print("Failed to start accessing security scoped resource at \(url)")
-            return
-        }
-        
-        do {
-            let (title, artist, albumArt) = try await fetchMusicMetadata(from: url)
-            let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-            
-            let uniqueFileURL = documentsDirectory.appendingUniquePathComponent(url.lastPathComponent)
-            
-            try FileManager.default.copyItem(at: url, to: uniqueFileURL)
-            
-            let newMusic = Music(
-                title: title,
-                artist: artist,
-                fileName: uniqueFileURL.lastPathComponent,
-                markers: [-1, -1, -1],
-                albumArt: albumArt
-            )
-            
-            modelContext.insert(newMusic)
-            try modelContext.save()
-            
-            playerModel.sendMusicListToWatch(with: musicList)
-        } catch {
-            print("Failed to fetch music metadata: \(error.localizedDescription)")
-        }
-    }
+
     
     private func musicContextMenu(music: Music) -> some View {
         Group {
