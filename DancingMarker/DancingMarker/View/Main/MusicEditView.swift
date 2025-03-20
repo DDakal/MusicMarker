@@ -18,6 +18,7 @@ struct MusicEditView: View {
     @Query var musicList: [Music] = []
     @Binding var didSaveMusic: Bool
     
+    @State private var selectedImgData: Data?
     @State private var title: String = ""
     @State private var artist: String = ""
     @State private var albumArt: UIImage? = nil
@@ -141,8 +142,13 @@ struct MusicEditView: View {
                 }
             }}
         .sheet(isPresented: $isImagePickerPresented) {
-            // ImagePicker 구현 (예: ImagePicker(selectedImage: $albumArt))
-            Text("ImagePicker 구현 필요")
+            // ImagePicker 구현
+            SelectGalleryView(selectedImgData: $selectedImgData)
+        }
+        .onChange(of: selectedImgData) {
+            if let data = selectedImgData, let image = UIImage(data: data) {
+                albumArt = image 
+            }
         }
         .onAppear {
             Task {
