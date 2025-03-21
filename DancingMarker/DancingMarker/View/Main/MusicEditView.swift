@@ -10,12 +10,17 @@ import SwiftData
 import AVFoundation
 
 struct MusicEditView: View {
-    @Environment(NavigationManager.self) var navigationManager
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var playerModel: PlayerModel
-    let fileURL: URL  // 파일 URL
+    
     @Query var musicList: [Music] = []
+    
+    // 편집 모드: 기존 음원 수정 시 music이 전달되고,
+    // 새 음원 추가 시에는 fileURL이 전달됩니다.
+    let music: Music?
+    let fileURL: URL?
+    // 새 음원 추가용 binding (기존 음원 수정 시엔 사용하지 않음)
     @Binding var didSaveMusic: Bool
     
     @State private var selectedImgData: Data?
@@ -23,6 +28,25 @@ struct MusicEditView: View {
     @State private var artist: String = ""
     @State private var albumArt: UIImage? = nil
     @State private var isImagePickerPresented: Bool = false
+    
+    init(music: Music) {
+        self.music = music
+        self.fileURL = nil
+        // 기존 음원 수정에서는 didSaveMusic binding은 사용하지 않음
+        self._didSaveMusic = .constant(false)
+        _title = State(initialValue: music.title)
+        _artist = State(initialValue: music.artist)
+        if let artData = music.albumArt, let image = UIImage(data: artData) {
+            _albumArt = State(initialValue: image)
+        }
+    }
+    
+    init(fileURL: URL, didSaveMusic: Binding<Bool>) {
+        self.music = nil
+        self.fileURL = fileURL
+        self._didSaveMusic = didSaveMusic
+        // 초기값은 onAppear에서 fileURL 기반으로 불러옵니다.
+    }
     
     var body: some View {
         ZStack {
@@ -49,6 +73,7 @@ struct MusicEditView: View {
                             }
                         
                     }
+                    
                     Button("커버이미지 변경하기") {
                         isImagePickerPresented = true
                     }
@@ -105,14 +130,26 @@ struct MusicEditView: View {
                     }
                     
                 }
-                
                 Spacer()
                 
                 Button("저장하기") {
                     Task {
-                        await addMusic(from: fileURL)
-                        didSaveMusic = true  // 저장 여부 설정
-                        dismiss()  // Sheet 닫기 (FileImporter 열리지 않음)
+                        if let existingMusic = music {
+                            // 기존 음원 수정: Music 객체 업데이트
+                            existingMusic.title = title
+                            existingMusic.artist = artist
+                            existingMusic.albumArt = albumArt?.pngData()
+                            do {
+                                try modelContext.save()
+                            } catch {
+                                print("음원 수정 실패: \(error.localizedDescription)")
+                            }
+                        } else if let fileURL = fileURL {
+                            // 새 음원 추가: 파일 복사 후 새 Music 객체 생성
+                            await addMusic(from: fileURL)
+                            didSaveMusic = true
+                        }
+                        dismiss()
                     }
                 }
                 .fontWeight(.bold)
@@ -121,7 +158,7 @@ struct MusicEditView: View {
                 .background(title.isEmpty || artist.isEmpty ? Color.gray.opacity(0.3) : Color.accentColor)
                 .foregroundStyle(title.isEmpty || artist.isEmpty ? Color.white : Color.black)
                 .cornerRadius(12)
-                .disabled(title.isEmpty || artist.isEmpty)  // ✅ 비활성화 상태 적용
+                .disabled(title.isEmpty || artist.isEmpty) 
                 .padding(.bottom, 53)
                 
             }
@@ -142,7 +179,6 @@ struct MusicEditView: View {
                 }
             }}
         .sheet(isPresented: $isImagePickerPresented) {
-            // ImagePicker 구현
             SelectGalleryView(selectedImgData: $selectedImgData)
         }
         .onChange(of: selectedImgData) {
@@ -151,25 +187,20 @@ struct MusicEditView: View {
             }
         }
         .onAppear {
-            Task {
-                do {
-                    let success = fileURL.startAccessingSecurityScopedResource()  // ✅ 반환 값을 변수에 저장
-                    if !success {
-                        print("보안 접근 권한을 얻는 데 실패했습니다.")
-                    }
-                    defer { fileURL.stopAccessingSecurityScopedResource() }
-                    
-                    let (metaTitle, metaArtist, metaAlbumArtData) = try await fetchMusicMetadata(from: fileURL)
-                    
-                    await MainActor.run {
-                        if title.isEmpty { title = metaTitle }
-                        if artist.isEmpty { artist = metaArtist }
-                        if albumArt == nil, let data = metaAlbumArtData, let image = UIImage(data: data) {
-                            albumArt = image
+            if music == nil, let fileURL = fileURL {
+                Task {
+                    do {
+                        let (metaTitle, metaArtist, metaAlbumArtData) = try await fetchMusicMetadata(from: fileURL)
+                        await MainActor.run {
+                            if title.isEmpty { title = metaTitle }
+                            if artist.isEmpty { artist = metaArtist }
+                            if albumArt == nil, let data = metaAlbumArtData, let image = UIImage(data: data) {
+                                albumArt = image
+                            }
                         }
+                    } catch {
+                        print("메타데이터 로드 실패: \(error.localizedDescription)")
                     }
-                } catch {
-                    print("메타데이터 로드 실패: \(error.localizedDescription)")
                 }
             }
         }

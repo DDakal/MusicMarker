@@ -13,12 +13,15 @@ import MediaPlayer
 struct MusicListView: View {
     @Environment(NavigationManager.self) var navigationManager
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject var playerModel: PlayerModel
+
     @Query var musicList: [Music] = []
+
     @State private var isFileImporterPresented: Bool = false
     @State private var isMusicEditViewPresented: Bool = false
     @State private var selectedFileURL: URL? = nil
     @State private var didSaveMusic: Bool = false
-    @EnvironmentObject var playerModel: PlayerModel
+    @State private var selectedMusic: Music? = nil
     
     var body: some View {
         VStack {
@@ -76,9 +79,9 @@ struct MusicListView: View {
                     //MARK: - 코드 정리 필요
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        let selectedMusic = music
+                        let tappedMusic = music
                         
-                        if playerModel.music == nil || playerModel.music?.id != selectedMusic.id {
+                        if playerModel.music == nil || playerModel.music?.id != tappedMusic.id {
                             // 새로운 곡이 선택되었거나 처음 재생하는 경우
                             playerModel.stopAudio()
                             playerModel.stopTimer()
@@ -86,8 +89,8 @@ struct MusicListView: View {
                             // 오디오 세션 활성화
                             try? AVAudioSession.sharedInstance().setActive(true)
                             
-                            playerModel.music = selectedMusic
-                            playerModel.initAudioPlayer(for: selectedMusic)
+                            playerModel.music = tappedMusic
+                            playerModel.initAudioPlayer(for: tappedMusic)
                             playerModel.isPlaying = true
                             playerModel.playAudio()
                             
@@ -144,33 +147,39 @@ struct MusicListView: View {
             }
         }
         .fileImporter(
-                    isPresented: $isFileImporterPresented,
-                    allowedContentTypes: [.audio],
-                    allowsMultipleSelection: false
-                ) { result in
-                    switch result {
-                    case .success(let urls):
-                        if let url = urls.first {
-                            selectedFileURL = url
-                            isMusicEditViewPresented = true
-                            didSaveMusic = false  // 새로운 파일을 선택할 때마다 초기화
-                        }
-                    case .failure(let error):
-                        print("Failed to import file: \(error.localizedDescription)")
-                    }
+            isPresented: $isFileImporterPresented,
+            allowedContentTypes: [.audio],
+            allowsMultipleSelection: false
+        ) { result in
+            switch result {
+            case .success(let urls):
+                if let url = urls.first {
+                    selectedFileURL = url
+                    isMusicEditViewPresented = true
+                    didSaveMusic = false  // 새로운 파일을 선택할 때마다 초기화
                 }
-                .sheet(isPresented: $isMusicEditViewPresented, onDismiss: {
-                    if !didSaveMusic {
-                        isFileImporterPresented = true  // 저장하지 않고 닫으면 FileImporter 다시 열기
-                    }
-                }) {
-                    if let fileURL = selectedFileURL {
-                        NavigationStack {
-                            MusicEditView(fileURL: fileURL, didSaveMusic: $didSaveMusic)
-                        }
-                    }
+            case .failure(let error):
+                print("Failed to import file: \(error.localizedDescription)")
+            }
+        }
+        .sheet(isPresented: $isMusicEditViewPresented, onDismiss: {
+            if !didSaveMusic, selectedMusic == nil {
+                isFileImporterPresented = true  // 저장하지 않고 닫으면 FileImporter 다시 열기
+            }
+            // 초기화
+            selectedMusic = nil
+        }) {
+            NavigationStack {
+                if let selectedMusic = selectedMusic {
+                    // 기존 음원 수정
+                    MusicEditView(music: selectedMusic)
+                } else if let fileURL = selectedFileURL {
+                    // 새 음원 추가
+                    MusicEditView(fileURL: fileURL, didSaveMusic: $didSaveMusic)
                 }
-                .edgesIgnoringSafeArea(.bottom)
+            }
+        }
+        .edgesIgnoringSafeArea(.bottom)
     }
     
     @ViewBuilder
@@ -184,16 +193,15 @@ struct MusicListView: View {
         playerModel.sendMusicListToWatch(with: musicList)
     }
     
-
-    
     private func musicContextMenu(music: Music) -> some View {
         Group {
-//            Button(action: {
-//                // 수정 기능
-//            }) {
-//                Text("수정하기")
-//                Image(systemName: "pencil")
-//            }
+            Button(action: {
+                selectedMusic = music
+                isMusicEditViewPresented = true
+            }) {
+                Text("수정하기")
+                Image(systemName: "pencil")
+            }
             Button(role: .destructive, action: {
                 DispatchQueue.main.async {
                     if let index = self.musicList.firstIndex(of: music) {
@@ -204,7 +212,7 @@ struct MusicListView: View {
                             playerModel.music = nil       // 음악을 nil로 설정
                             playerModel.updateNowPlayingControlCenter() // Now Playing 정보 업데이트
                         }
-
+                        
                         // 음원 리스트에서 삭제
                         modelContext.delete(musicList[index])
                         do {
@@ -213,7 +221,7 @@ struct MusicListView: View {
                             print("Failed to fetch music metadata: \(error.localizedDescription)")
                         }
                     }
-
+                    
                     // 워치로 업데이트된 음악 리스트 전송
                     playerModel.sendMusicListToWatch(with: musicList)
                 }
@@ -221,7 +229,7 @@ struct MusicListView: View {
                 Text("삭제하기")
                 Image(systemName: "trash")
             }
-
+            
         }
     }
 }
