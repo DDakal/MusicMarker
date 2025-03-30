@@ -159,9 +159,6 @@ struct MusicListView: View {
                             await addMusic(from: url)
                             didSaveMusic = true
                         }
-                        // MusicEditView를 띄우지 않음
-                        // selectedFileURL = url
-                        // isMusicEditViewPresented = true
                     }
                 case .failure(let error):
                     print("Failed to import file: \(error.localizedDescription)")
@@ -171,7 +168,6 @@ struct MusicListView: View {
                 if !didSaveMusic, selectedMusic == nil {
                     isFileImporterPresented = true  // 저장하지 않고 닫으면 FileImporter 다시 열기
                 }
-                // 초기화
                 selectedMusic = nil
             }) {
                 NavigationStack {
@@ -179,10 +175,6 @@ struct MusicListView: View {
                         // 기존 음원 수정
                         MusicEditView(music: selectedMusic)
                     }
-                    // 새 음원 추가용 MusicEditView 부분 제거
-                    // else if let fileURL = selectedFileURL {
-                    //     MusicEditView(fileURL: fileURL, didSaveMusic: $didSaveMusic)
-                    // }
                 }
                 .id(selectedFileURL?.absoluteString ?? UUID().uuidString)
             }
@@ -281,23 +273,35 @@ struct MusicListView: View {
         let asset = AVAsset(url: url)
         let metadata = try await asset.load(.commonMetadata)
         
-        var title: String = "Unknown Title"
-        var artist: String = "Unknown Artist"
+        var title: String? = nil
+        var artist: String? = nil
         var albumArt: Data? = nil
         
         for item in metadata {
-            if item.commonKey == .commonKeyTitle {
-                title = try await item.load(.stringValue) ?? "Unknown Title"
+            if item.commonKey == .commonKeyTitle,
+               let loadedTitle = try await item.load(.stringValue) {
+                title = loadedTitle
             }
-            if item.commonKey == .commonKeyArtist {
-                artist = try await item.load(.stringValue) ?? "Unknown Artist"
+            if item.commonKey == .commonKeyArtist,
+               let loadedArtist = try await item.load(.stringValue) {
+                artist = loadedArtist
             }
             if item.commonKey == .commonKeyArtwork {
                 albumArt = try await item.load(.dataValue)
             }
         }
         
-        return (title, artist, albumArt)
+        // title이 없거나 "Unknown Title"인 경우 파일 이름(확장자 제외)을 사용
+        if title == nil || title == "Unknown Title" {
+            title = url.deletingPathExtension().lastPathComponent
+        }
+        
+        // artist는 메타데이터가 없을 경우 기본값 유지하거나 다른 처리를 할 수 있음
+        if artist == nil || artist == "Unknown Artist" {
+            artist = "Unknown Artist"
+        }
+        
+        return (title!, artist!, albumArt)
     }
 }
 
