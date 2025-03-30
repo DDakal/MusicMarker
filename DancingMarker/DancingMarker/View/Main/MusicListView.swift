@@ -184,6 +184,7 @@ struct MusicListView: View {
                     //     MusicEditView(fileURL: fileURL, didSaveMusic: $didSaveMusic)
                     // }
                 }
+                .id(selectedFileURL?.absoluteString ?? UUID().uuidString)
             }
         .edgesIgnoringSafeArea(.bottom)
     }
