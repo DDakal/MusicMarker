@@ -30,9 +30,12 @@
 		510D90312CA2F1C8002E82CC /* PlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510D902E2CA2F1C8002E82CC /* PlayingView.swift */; };
 		510D90322CA2F1C8002E82CC /* TipPopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510D902F2CA2F1C8002E82CC /* TipPopupView.swift */; };
 		510D90352CA2F1C8002E82CC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510D90332CA2F1C8002E82CC /* ContentView.swift */; };
+		512224C02D8C685E00AABC82 /* UIImage+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 512224BF2D8C685500AABC82 /* UIImage+.swift */; };
+		512224C22D8C68D100AABC82 /* SelectGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 512224C12D8C68C900AABC82 /* SelectGalleryView.swift */; };
 		51675E282CA2F0E800D8D08F /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 51675E272CA2F0E800D8D08F /* Secrets.xcconfig */; };
 		51675E292CA2F0E800D8D08F /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 51675E272CA2F0E800D8D08F /* Secrets.xcconfig */; };
 		516D95502D533F5D00AA8EAA /* TextMarquee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516D954F2D533F5D00AA8EAA /* TextMarquee.swift */; };
+		51EF633C2D99716400967EC8 /* View+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51EF633B2D99715C00967EC8 /* View+.swift */; };
 		901BF9812C29804A00C02FF9 /* DancingMarkerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 901BF9802C29804A00C02FF9 /* DancingMarkerApp.swift */; };
 		901BF9852C29804B00C02FF9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 901BF9842C29804B00C02FF9 /* Assets.xcassets */; };
 		901BF9882C29804B00C02FF9 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 901BF9872C29804B00C02FF9 /* Preview Assets.xcassets */; };
@@ -93,8 +96,11 @@
 		510D902E2CA2F1C8002E82CC /* PlayingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayingView.swift; sourceTree = "<group>"; };
 		510D902F2CA2F1C8002E82CC /* TipPopupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipPopupView.swift; sourceTree = "<group>"; };
 		510D90332CA2F1C8002E82CC /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		512224BF2D8C685500AABC82 /* UIImage+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+.swift"; sourceTree = "<group>"; };
+		512224C12D8C68C900AABC82 /* SelectGalleryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectGalleryView.swift; sourceTree = "<group>"; };
 		51675E272CA2F0E800D8D08F /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		516D954F2D533F5D00AA8EAA /* TextMarquee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextMarquee.swift; sourceTree = "<group>"; };
+		51EF633B2D99715C00967EC8 /* View+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+.swift"; sourceTree = "<group>"; };
 		51FD01772C3BC6B1003F99B5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		901BF97D2C29804A00C02FF9 /* DancingMarker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DancingMarker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		901BF9802C29804A00C02FF9 /* DancingMarkerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DancingMarkerApp.swift; sourceTree = "<group>"; };
@@ -194,6 +200,7 @@
 		510D902A2CA2F1C8002E82CC /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				512224C12D8C68C900AABC82 /* SelectGalleryView.swift */,
 				510D90272CA2F1C8002E82CC /* MusicEditView.swift */,
 				510D90282CA2F1C8002E82CC /* MusicListView.swift */,
 				510D90292CA2F1C8002E82CC /* NowPlayingView.swift */,
@@ -216,6 +223,15 @@
 				510D90332CA2F1C8002E82CC /* ContentView.swift */,
 			);
 			path = Content;
+			sourceTree = "<group>";
+		};
+		512224BE2D8C682E00AABC82 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				51EF633B2D99715C00967EC8 /* View+.swift */,
+				512224BF2D8C685500AABC82 /* UIImage+.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		513303FF2C4CD65400CC5F22 /* Resource */ = {
@@ -309,6 +325,7 @@
 		901BF97F2C29804A00C02FF9 /* DancingMarker */ = {
 			isa = PBXGroup;
 			children = (
+				512224BE2D8C682E00AABC82 /* Extensions */,
 				90E28F552C2D092E009098BE /* NavigationManager.swift */,
 				518D7F022CA2E24100612544 /* Application */,
 				518D7F042CA2E27B00612544 /* View */,
@@ -502,10 +519,13 @@
 				510D902B2CA2F1C8002E82CC /* MusicEditView.swift in Sources */,
 				510D902C2CA2F1C8002E82CC /* MusicListView.swift in Sources */,
 				510D902D2CA2F1C8002E82CC /* NowPlayingView.swift in Sources */,
+				512224C22D8C68D100AABC82 /* SelectGalleryView.swift in Sources */,
 				901BF9812C29804A00C02FF9 /* DancingMarkerApp.swift in Sources */,
 				902077082C464CB800988D2B /* PlayerModel.swift in Sources */,
+				512224C02D8C685E00AABC82 /* UIImage+.swift in Sources */,
 				90A4722F2C450867008577A2 /* WCManager.swift in Sources */,
 				5104B7F62C3D67F2008E10E8 /* Music.swift in Sources */,
+				51EF633C2D99716400967EC8 /* View+.swift in Sources */,
 				90E28F562C2D092E009098BE /* NavigationManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -673,7 +693,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2025032113;
 				DEVELOPMENT_ASSET_PATHS = "\"DancingMarker/Preview Content\"";
 				DEVELOPMENT_TEAM = 2U3B7G3F2A;
 				ENABLE_PREVIEWS = YES;
@@ -694,7 +714,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.test.DancingMarker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -717,7 +737,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2025032113;
 				DEVELOPMENT_ASSET_PATHS = "\"DancingMarker/Preview Content\"";
 				DEVELOPMENT_TEAM = 2U3B7G3F2A;
 				ENABLE_PREVIEWS = YES;
@@ -738,7 +758,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.test.DancingMarker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
