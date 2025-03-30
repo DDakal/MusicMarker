@@ -93,7 +93,7 @@ struct MusicEditView: View {
                     HStack {
                         TextField("음원의 제목을 입력해주세요", text: $title)
                             .frame(height: 34)
-                            .background(Color.clear)
+                            .background(.clear)
                             .autocorrectionDisabled(true)
                             .textInputAutocapitalization(.never)
                         
@@ -128,7 +128,6 @@ struct MusicEditView: View {
                             .buttonStyle(.plain)
                         }
                     }
-                    
                 }
                 Spacer()
                 
@@ -168,7 +167,6 @@ struct MusicEditView: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(title.isEmpty || artist.isEmpty)
-                
             }
             .padding(.horizontal, 16)
             .navigationTitle("음악 수정하기")
