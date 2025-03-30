@@ -132,7 +132,8 @@ struct MusicEditView: View {
                 }
                 Spacer()
                 
-                Button("저장하기") {
+                Button(action: {
+                    guard !title.isEmpty, !artist.isEmpty else { return }
                     Task {
                         if let existingMusic = music {
                             // 기존 음원 수정: Music 객체 업데이트
@@ -151,15 +152,22 @@ struct MusicEditView: View {
                         }
                         dismiss()
                     }
+                }) {
+                    HStack {
+                        Spacer()
+                        Text("저장하기")
+                            .fontWeight(.bold)
+                        Spacer()
+                    }
+                    .frame(height: 49)
+                    .frame(maxWidth: .infinity)
+                    .background(title.isEmpty || artist.isEmpty ? Color.gray.opacity(0.3) : Color.accentColor)
+                    .foregroundColor(title.isEmpty || artist.isEmpty ? Color.white : Color.black)
+                    .cornerRadius(12)
+                    .padding(.bottom, 53)
                 }
-                .fontWeight(.bold)
-                .frame(height: 49)
-                .frame(maxWidth: .infinity)
-                .background(title.isEmpty || artist.isEmpty ? Color.gray.opacity(0.3) : Color.accentColor)
-                .foregroundStyle(title.isEmpty || artist.isEmpty ? Color.white : Color.black)
-                .cornerRadius(12)
-                .disabled(title.isEmpty || artist.isEmpty) 
-                .padding(.bottom, 53)
+                .buttonStyle(.plain)
+                .disabled(title.isEmpty || artist.isEmpty)
                 
             }
             .padding(.horizontal, 16)
@@ -168,10 +176,7 @@ struct MusicEditView: View {
             .navigationBarBackButtonHidden(true)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    HStack {
-                        Image(systemName: "chevron.left").bold()
-                        Text("뒤로가기")
-                    }
+                    Text("취소하기")
                     .foregroundStyle(.accent)
                     .onTapGesture {
                         dismiss()
