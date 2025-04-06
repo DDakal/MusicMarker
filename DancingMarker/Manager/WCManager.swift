@@ -10,7 +10,7 @@ import WatchConnectivity
 class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
     
     private let session: WCSession = WCSession.default
-    var isReachable = false
+    @Published var isReachable = false
     
     static var shared = WatchConnectivityManager()
 
@@ -39,8 +39,13 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
     
     func sessionReachabilityDidChange(_ session: WCSession) {
         DispatchQueue.main.async {
-            self.isReachable = session.isReachable
-        }
+                   self.isReachable = session.isReachable
+                   print("Reachability changed: \(self.isReachable)")
+                   if !self.isReachable {
+                       print("Session is not reachable, attempting to reactivate...")
+                       self.session.activate() // 재활성화 시도
+                   }
+               }
     }
     
     #if os(iOS)
@@ -237,6 +242,21 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
             replyHandler(["success": false])
         }
         
+        if let action = message["action"] as? String,
+           action == "ChangeVolume" {
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(
+                    name: .changeVolume,
+                    object: message["volume"]
+                )
+                replyHandler(["success": true])
+            }
+        } else {
+            replyHandler(["success": false])
+        }
+        
+        
+        
         
         #elseif os(watchOS)
         
@@ -323,6 +343,19 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
         } else {
             replyHandler(["success": false])
         }
+        
+        if let action = message["action"] as? String,
+           action == "SendSystemVolume" {
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(
+                    name: .sendSystemVolume,
+                    object: message["volume"]
+                )
+                replyHandler(["success": true])
+            }
+        } else {
+            replyHandler(["success": false])
+        }
         #endif
     }
     
@@ -399,6 +432,19 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
         let message = [
             "action": "SendMusicTitle",
             "musicTitle": musictitle
+        ] as [String : Any]
+
+        session.sendMessage(message) { replyHandler in
+            print(replyHandler)
+        } errorHandler: { error in
+            print(error.localizedDescription)
+        }
+    }
+    
+    func sendSystemVolumeToWatch(_ volume: Float) {
+        let message = [
+            "action": "SendSystemVolume",
+            "volume": volume
         ] as [String : Any]
 
         session.sendMessage(message) { replyHandler in
@@ -593,6 +639,19 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
             print(error.localizedDescription)
         }
     }
+    
+    func sendVolumeChangeToIOS(_ volume: Float) {
+        let message = [
+            "action": "ChangeVolume",
+            "volume": volume
+        ] as [String : Any]
+
+        session.sendMessage(message) { replyHandler in
+            print(replyHandler)
+        } errorHandler: { error in
+            print(error.localizedDescription)
+        }
+    }
 }
 
 extension Notification.Name {
@@ -611,6 +670,7 @@ extension Notification.Name {
     static let markerDelete = Notification.Name("MarkerDelete")
     static let markerEdit = Notification.Name("MarkerEdit")
     static let markerEditSuccess = Notification.Name("MarkerEditSuccess")
+    static let changeVolume = Notification.Name("ChangeVolume")
 
     static let sendMarkers = Notification.Name("SendMarkers")
     static let sendSpeed = Notification.Name("SendSpeed")
@@ -618,5 +678,5 @@ extension Notification.Name {
     static let sendPlayingTimes = Notification.Name("SendPlayingTimes")
     static let sendMusicList = Notification.Name("SendMusicList")
     static let sendMusicTitle = Notification.Name("SendMusicTitle")
-
+    static let sendSystemVolume = Notification.Name("SendSystemVolume")
 }

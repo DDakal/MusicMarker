@@ -1,4 +1,4 @@
-
+*.xcconfig
 .DS_Store
 ### macOS ###
 # General

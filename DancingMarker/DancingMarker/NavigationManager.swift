@@ -9,8 +9,7 @@ import SwiftUI
 
 enum PathType: Hashable {
     case musicList
-    case musicadd
-    case musicedit
+    case musicedit(fileURL: URL, didSaveMusic: Bool)  
     case playing
     case nowplaying
 }
@@ -21,16 +20,10 @@ extension PathType {
         switch self {
         case .musicList:
             MusicListView()
-            
-        case .musicadd:
-            MusicAddView()
-            
-        case .musicedit:
-            MusicEditView()
-            
+        case .musicedit(let fileURL, let didSaveMusic):
+            MusicEditView(fileURL: fileURL, didSaveMusic: .constant(didSaveMusic))
         case .playing:
             PlayingView()
-            
         case .nowplaying:
             NowPlayingView()
         }
