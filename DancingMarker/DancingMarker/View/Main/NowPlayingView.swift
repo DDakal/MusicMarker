@@ -160,7 +160,7 @@ struct NowPlayingView: View {
             VStack(spacing: 12) {
                 // Title Overlay
                 HStack(spacing: 0) {
-                    if needsMask(for: title, font: UIFont.boldSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .title3).pointSize)) {
+                    if needsMask(for: title, availableWidth: geo.size.width, font: UIFont.boldSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .title3).pointSize)) {
                         LinearGradient(
                             gradient: Gradient(colors: [Color.nowPlayingGray, Color.clear]),
                             startPoint: .leading,
@@ -168,11 +168,11 @@ struct NowPlayingView: View {
                         )
                         .frame(width: 10)
                     }
-
+                    
                     Spacer()
                         .frame(width: geo.size.width + 10)
-
-                    if needsMask(for: title, font: UIFont.boldSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .title3).pointSize)) {
+                    
+                    if needsMask(for: title, availableWidth: geo.size.width, font: UIFont.boldSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .title3).pointSize)) {
                         LinearGradient(
                             gradient: Gradient(stops: [
                                 .init(color: Color.clear, location: 0),
@@ -188,10 +188,10 @@ struct NowPlayingView: View {
                 }
                 .frame(height: geo.size.height / 2)
                 .offset(x: -4)
-
+                
                 // Artist Overlay
                 HStack(spacing: 0) {
-                    if needsMask(for: artist, font: UIFont.boldSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .title3).pointSize)) {
+                    if needsMask(for: artist, availableWidth: geo.size.width, font: UIFont.boldSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .title3).pointSize)) {
                         LinearGradient(
                             gradient: Gradient(colors: [Color.nowPlayingGray, Color.clear]),
                             startPoint: .leading,
@@ -199,11 +199,11 @@ struct NowPlayingView: View {
                         )
                         .frame(width: 10)
                     }
-
+                    
                     Spacer()
                         .frame(width: geo.size.width + 10)
-
-                    if needsMask(for: artist, font: UIFont.boldSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .title3).pointSize)) {
+                    
+                    if needsMask(for: artist, availableWidth: geo.size.width, font: UIFont.boldSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .title3).pointSize)) {
                         LinearGradient(
                             gradient: Gradient(stops: [
                                 .init(color: Color.clear, location: 0),
@@ -222,21 +222,17 @@ struct NowPlayingView: View {
             }
         }
     }
-        
-        // MARK: - Text Length Check
-        private func needsMask(for text: String, font: UIFont) -> Bool {
-            let textWidth = measureTextWidth(text, font: font)
-            return textWidth > UIScreen.main.bounds.width * 0.85
-        }
 
-        // MARK: - Text Width Measurement
-        private func measureTextWidth(_ text: String, font: UIFont) -> CGFloat {
-            let attributes: [NSAttributedString.Key: Any] = [.font: font]
-            return (text as NSString).size(withAttributes: attributes).width
-        }
+    // MARK: - Text Length Check
+    private func needsMask(for text: String, availableWidth: CGFloat, font: UIFont) -> Bool {
+        let textWidth = measureTextWidth(text, font: font)
+        // availableWidth에서 약간의 여유(10포인트)를 뺀 값보다 텍스트가 길면 마스킹이 필요함
+        return textWidth > (availableWidth - 10)
+    }
+
+    // MARK: - Text Width Measurement
+    private func measureTextWidth(_ text: String, font: UIFont) -> CGFloat {
+        let attributes: [NSAttributedString.Key: Any] = [.font: font]
+        return (text as NSString).size(withAttributes: attributes).width
+    }
 }
-
-// TODO: - title과 artist의 애니메이션을 동기화하기
-//        - 두 개의 애니메이션 중 나중에 끝나는 애니메이션 기준으로 동기화
-//        - 즉, 두 애니메이션이 모두 끝난 후 다음 애니메이션이 시작되도록 구현
-// TODO: - 그라데이션 효과 추가
