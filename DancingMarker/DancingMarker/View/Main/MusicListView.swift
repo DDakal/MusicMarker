@@ -165,18 +165,27 @@ struct MusicListView: View {
                 }
             }
             .sheet(isPresented: $isMusicEditViewPresented, onDismiss: {
-                if !didSaveMusic, selectedMusic == nil {
-                    isFileImporterPresented = true  // 저장하지 않고 닫으면 FileImporter 다시 열기
-                }
                 selectedMusic = nil
+                if !didSaveMusic && selectedFileURL != nil {
+                    isFileImporterPresented = true
+                }
+                selectedFileURL = nil
             }) {
                 NavigationStack {
                     if let selectedMusic = selectedMusic {
-                        // 기존 음원 수정
-                        MusicEditView(music: selectedMusic)
+                        // Existing music
+                        MusicEditView(
+                            music: selectedMusic,
+                            didSaveMusic: $didSaveMusic
+                        )
+                    } else if let url = selectedFileURL {
+                        // New music from URL
+                        MusicEditView(
+                            fileURL: url,
+                            didSaveMusic: $didSaveMusic
+                        )
                     }
                 }
-                .id(selectedFileURL?.absoluteString ?? UUID().uuidString)
             }
         .edgesIgnoringSafeArea(.bottom)
     }

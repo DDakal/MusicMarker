@@ -29,11 +29,10 @@ struct MusicEditView: View {
     @State private var albumArt: UIImage? = nil
     @State private var isImagePickerPresented: Bool = false
     
-    init(music: Music) {
+    init(music: Music, didSaveMusic: Binding<Bool>) {
         self.music = music
         self.fileURL = nil
-        // 기존 음원 수정에서는 didSaveMusic binding은 사용하지 않음
-        self._didSaveMusic = .constant(false)
+        self._didSaveMusic = didSaveMusic
         _title = State(initialValue: music.title)
         _artist = State(initialValue: music.artist)
         if let artData = music.albumArt, let image = UIImage(data: artData) {
