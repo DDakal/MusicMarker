@@ -187,6 +187,7 @@ struct PlayingView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle("")
         .navigationBarBackButtonHidden(true)
+        .enableSwipeBack()
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 HStack {
@@ -212,9 +213,8 @@ struct PlayingView: View {
                 
                 tipButton()
             }
-            .padding(.vertical, 12)
             
-            VStack {
+            VStack(spacing: 16) {
                 if let music = playerModel.music {
                     ForEach(0..<3, id: \.self) { index in
                         if music.markers[index] != -1{
@@ -247,6 +247,7 @@ struct TipButtonView: View {
         }) {
             Image(systemName: "questionmark.circle")
                 .foregroundStyle(.markerPurple)
+                .padding([.top, .bottom, .leading], 10)
         }
         .fullScreenCover(isPresented: $isTipButtonPresented) {
             TipPopupView(isTipButtonPresented: $isTipButtonPresented)

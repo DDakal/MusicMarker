@@ -5,7 +5,7 @@ import Mixpanel
 
 struct WatchPlayingView: View {
     
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @Environment(\.dismiss) var dismiss
     @Environment(WatchNavigationManager.self) var navigationManager
     @EnvironmentObject var viewModel: WatchViewModel
     @Query var musicList: [Music] = []
@@ -16,11 +16,11 @@ struct WatchPlayingView: View {
     @State private var isIdle = true
     
     var body: some View {
-        
         VStack {
             HStack {
                 Text("\(viewModel.musicTitle)")
-                    .font(.system(size: 12))
+                    .font(.system(size: 12, weight: .regular))
+                    .fixedSize()
             }
             HStack {
                 TabView{
@@ -33,17 +33,17 @@ struct WatchPlayingView: View {
                 Spacer()
                 
                 Circle()
-                    .fill(Color.gray.opacity(0.2))
+                    .fill(.gray.opacity(0.2))
                     .cornerRadius(4)
                     .frame(height: 35)
                     .overlay(
-                        Button(action: {
+                        Button {
                             viewModel.playBackward()
-                        }, label: {
+                        } label: {
                             Image(systemName: "gobackward.5")
                                 .resizable()
                                 .frame(width: 20, height: 21)
-                        })
+                        }
                         .frame(width: 34, height: 35)
                         .buttonStyle(PlainButtonStyle())
                     )
@@ -52,21 +52,20 @@ struct WatchPlayingView: View {
                 
                 ZStack {
                     Circle()
-                        .fill(Color.gray.opacity(0.2))
+                        .fill(.gray.opacity(0.2))
                         .frame(height: 44)
                         .overlay(
-                            Button(action: {
+                            Button {
                                 viewModel.playToggle()
                                 if viewModel.isPlaying != true {
-                                    mixpanelPlayMusic()
+                                    playMixpanelMarker()
                                 }
-                            }, label: {
-                                Image(systemName:
-                                        viewModel.isPlaying == true ? "pause.fill" : "play.fill"
-                                ) // 재생 on/off에 따라 이미지 변경
+                            } label: {
+                                // 재생 on/off에 따라 이미지 변경
+                                Image(systemName: viewModel.isPlaying == true ? "pause.fill" : "play.fill")
                                 .resizable()
                                 .frame(width: 18, height: 18)
-                            })
+                            }
                             .frame(width: 44, height: 44)
                             .buttonBorderShape(.circle)
                             .buttonStyle(PlainButtonStyle())
@@ -78,17 +77,17 @@ struct WatchPlayingView: View {
                 Spacer()
                 
                 Circle()
-                    .fill(Color.gray.opacity(0.2))
+                    .fill(.gray.opacity(0.2))
                     .cornerRadius(4)
                     .frame(height: 35)
                     .overlay(
-                        Button(action: {
+                        Button {
                             viewModel.playForward()
-                        }, label: {
+                        } label: {
                             Image(systemName: "goforward.5")
                                 .resizable()
                                 .frame(width: 20, height: 21)
-                        })
+                        }
                         .frame(width: 34, height: 35)
                         .buttonStyle(PlainButtonStyle())
                     )
@@ -97,35 +96,33 @@ struct WatchPlayingView: View {
             
             HStack {
                 Text(viewModel.formattedProgress) // 현재 재생시간 데이터 넣어주기
-                    .font(.system(size: 10))
+                    .font(.system(size: 10, weight: .light))
+                    .fixedSize()
             }
             .padding(.bottom, 10)
         }
         .focusable(true)
         .edgesIgnoringSafeArea(.bottom)
         .navigationBarBackButtonHidden(true)
+        .scrollIndicators(.hidden)
         .digitalCrownRotation(detent: $viewModel.crownVolume, from: 0, through: 60, by: 3, sensitivity: .low, isContinuous: false, isHapticFeedbackEnabled: true
         )
-        .scrollIndicators(.hidden)
-        .onChange(of: viewModel.crownVolume) { newValue in
+        .onChange(of: viewModel.crownVolume) { oldValue, newValue in
             viewModel.handleCrownValueChange(newValue)
         }
         .toolbar {
             ToolbarItem(placement: .topBarLeading){
-                Button(action: {
-                    self.presentationMode.wrappedValue.dismiss()
-                }) {
-                    HStack {
-                        Image(systemName: "chevron.left")
-                            .foregroundStyle(.accent)
-                        
-                    }
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .foregroundStyle(.accent)
                 }
             }
             ToolbarItem(placement: .topBarTrailing){
-                Button(action: {
+                Button {
                     showMarkerListOverlay = true
-                }) {
+                } label: {
                     Image(systemName: "list.bullet")
                         .foregroundStyle(.accent)
                 }
@@ -133,13 +130,13 @@ struct WatchPlayingView: View {
         }
         .fullScreenCover(isPresented: $showMarkerListOverlay, content: {
             WatchMarkerListView()
-                .background{
+                .background {
                     Color.black
                 }
         })
     }
     
-    private func mixpanelPlayMusic() {
+    private func playMixpanelMarker() {
         Mixpanel.mainInstance().track(event: "노래 재생")
         Mixpanel.mainInstance().people.increment(property: "playMusic", by: 1)
     }
@@ -154,10 +151,10 @@ struct CircleProgressView: View {
     var body: some View {
         ZStack {
             Circle()
-                .stroke(Color.gray.opacity(0.2), lineWidth: 4)
+                .stroke(.gray.opacity(0.2), lineWidth: 4)
             Circle()
                 .trim(from: 0.0, to: progress)
-                .stroke(Color.white, lineWidth: 3)
+                .stroke(.white, lineWidth: 3)
                 .rotationEffect(Angle(degrees: -90))
         }
     }
