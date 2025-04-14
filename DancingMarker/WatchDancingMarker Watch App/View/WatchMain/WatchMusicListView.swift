@@ -48,14 +48,12 @@ struct WatchMusicListView: View {
                                     } label: {
                                         Text(viewModel.musicList[index][0])
                                             .font(.system(size: 17, weight: .regular))
-                                            .fixedSize()
                                             .lineLimit(1)
                                             .truncationMode(.tail)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .padding()
                                     }
                                     .buttonBorderShape(.roundedRectangle)
-                                    .frame(maxWidth: .infinity)
                                     .frame(height: 40)
                                     .padding(.bottom, 5)
                                 }
