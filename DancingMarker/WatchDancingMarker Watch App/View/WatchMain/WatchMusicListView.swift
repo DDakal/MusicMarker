@@ -16,15 +16,15 @@ struct WatchMusicListView: View {
     var body: some View {
         NavigationStack(path: $navigationManager.path) {
             VStack {
-                HStack{
-                    Text("Music Marker")
-                        .font(.system(size:14, weight:.semibold))
-                        .fixedSize()
-                        .foregroundStyle(.accent)
-                        .padding(.leading, 11)
-                    Spacer()
-                }
-                .padding(.top, 0)
+//                HStack{
+//                    Text("Music Marker")
+//                        .font(.system(size:14, weight:.semibold))
+//                        .fixedSize()
+//                        .foregroundStyle(.accent)
+//                        .padding(.leading, 11)
+//                    Spacer()
+//                }
+//                .padding(.top, 0)
                 
                 if viewModel.musicList.filter{ $0 != ["",""] }.count == 0 {
                     VStack {
