@@ -7,38 +7,55 @@
 
 import SwiftUI
 
-struct SwipeBackModifier: UIViewControllerRepresentable {
+struct EnableSwipeBack: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .background(EnableSwipeBackRepresentable())
+    }
+}
+
+private struct EnableSwipeBackRepresentable: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
-        let viewController = UIViewController()
+        let controller = UIViewController()
         DispatchQueue.main.async {
-            if let navController = viewController.navigationController {
-                navController.interactivePopGestureRecognizer?.delegate = context.coordinator
-                navController.interactivePopGestureRecognizer?.isEnabled = true
+            if let nav = controller.parentNavigationController {
+                nav.interactivePopGestureRecognizer?.delegate = context.coordinator
+                nav.interactivePopGestureRecognizer?.isEnabled = true
             }
         }
-        return viewController
+        return controller
     }
-    
-    func updateUIViewController(_ uiViewController: UIViewController, context: Context) { }
-    
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+
     func makeCoordinator() -> Coordinator {
         Coordinator()
     }
-    
+
     class Coordinator: NSObject, UIGestureRecognizerDelegate {
         func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+            // 뒤로가기 제스처가 항상 동작하도록 허용
             return true
         }
-        
-        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-            return otherGestureRecognizer is UIPanGestureRecognizer &&
-            !(gestureRecognizer is UIScreenEdgePanGestureRecognizer)
+    }
+}
+
+// UINavigationController를 안전하게 찾는 extension
+private extension UIViewController {
+    var parentNavigationController: UINavigationController? {
+        var parentVC = self.parent
+        while parentVC != nil {
+            if let nav = parentVC as? UINavigationController {
+                return nav
+            }
+            parentVC = parentVC?.parent
         }
+        return nil
     }
 }
 
 extension View {
     func enableSwipeBack() -> some View {
-        self.background(SwipeBackModifier())
+        self.modifier(EnableSwipeBack())
     }
 }
