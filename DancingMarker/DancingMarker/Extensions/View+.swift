@@ -29,6 +29,11 @@ struct SwipeBackModifier: UIViewControllerRepresentable {
         func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
             return true
         }
+        
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+            return otherGestureRecognizer is UIPanGestureRecognizer &&
+            !(gestureRecognizer is UIScreenEdgePanGestureRecognizer)
+        }
     }
 }
 
