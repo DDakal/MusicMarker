@@ -77,7 +77,7 @@ struct PlayingView: View {
                         }) {
                             Text(String(format: "x%.1f", playerModel.playbackRate))
                                 .font(.title3)
-                                .foregroundColor(.white)
+                                .foregroundStyle(.white)
                         }
                         Spacer()
                         
@@ -101,13 +101,14 @@ struct PlayingView: View {
                 GeometryReader { geometry in
                     ZStack(alignment: .leading) {
                         Rectangle()
-                            .foregroundColor(.inactiveGray)
+                            .foregroundStyle(.inactiveGray)
                         
                         Rectangle()
-                            .foregroundColor(.white)
+                            .foregroundStyle(.white)
                             .frame(width: geometry.size.width * CGFloat(playerModel.progress), height: geometry.size.height)
                     }
                     .cornerRadius(12)
+                    .background(Color.red.opacity(0.2))
                     .gesture(DragGesture(minimumDistance: 0)
                         .onChanged({ value in
                             DispatchQueue.main.async {
@@ -120,7 +121,7 @@ struct PlayingView: View {
                             }
                         }))
                 }
-                .frame(height: 5)
+                .frame(height: 8)
                 .padding(.bottom, 3)
                 
                 HStack {
