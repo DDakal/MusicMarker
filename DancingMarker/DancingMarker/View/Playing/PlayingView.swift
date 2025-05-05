@@ -108,18 +108,23 @@ struct PlayingView: View {
                             .frame(width: geometry.size.width * CGFloat(playerModel.progress), height: geometry.size.height)
                     }
                     .cornerRadius(12)
-                    .background(Color.red.opacity(0.2))
-                    .gesture(DragGesture(minimumDistance: 0)
-                        .onChanged({ value in
-                            DispatchQueue.main.async {
-                                let newProgress = min(max(0, Double(value.location.x / geometry.size.width)), 1.0)
-                                playerModel.progress = newProgress
-                                let newTime = newProgress * playerModel.duration
-                                playerModel.currentTime = newTime
-                                playerModel.formattedProgress = playerModel.formattedTime(newTime)
-                                playerModel.updateAudioPlayer(with: newTime)
-                            }
-                        }))
+                    .contentShape(
+                        Rectangle()
+                            .inset(by: -6)
+                    )
+                    .highPriorityGesture(
+                        DragGesture(minimumDistance: 0)
+                            .onChanged({ value in
+                                DispatchQueue.main.async {
+                                    let newProgress = min(max(0, Double(value.location.x / geometry.size.width)), 1.0)
+                                    playerModel.progress = newProgress
+                                    let newTime = newProgress * playerModel.duration
+                                    playerModel.currentTime = newTime
+                                    playerModel.formattedProgress = playerModel.formattedTime(newTime)
+                                    playerModel.updateAudioPlayer(with: newTime)
+                                }
+                            })
+                    )
                 }
                 .frame(height: 8)
                 .padding(.bottom, 3)
