@@ -7,11 +7,6 @@
 
 import SwiftUI
 
-enum MarqueeType {
-    case title
-    case artist
-}
-
 struct TextMarquee: View {
     let title: String
     let artist: String
@@ -19,32 +14,33 @@ struct TextMarquee: View {
     let artistFont: UIFont
     var delayTime: Double = 1.2
     var speedPerSecond: CGFloat = 30.0
-
+    
+    // MARK: - Private Properties
     private let spaceCount = 7
     private var spacedTitle: String { title + String(repeating: " ", count: spaceCount) }
     private var spacedArtist: String { artist + String(repeating: " ", count: spaceCount) }
-
+    
+    // MARK: - State Variables
     @State private var titleOffset: CGFloat = 0
     @State private var artistOffset: CGFloat = 0
-    @State private var titleWidth: CGFloat = 0
-    @State private var artistWidth: CGFloat = 0
-    @State private var titleFullWidth: CGFloat = 0
-    @State private var artistFullWidth: CGFloat = 0
-    @State private var shouldAnimateTitle: Bool = true
-    @State private var shouldAnimateArtist: Bool = true
-
+    @State private var titleContentWidth: CGFloat = 0
+    @State private var artistContentWidth: CGFloat = 0
+    @State private var shouldAnimateTitle: Bool = false
+    @State private var shouldAnimateArtist: Bool = false
+    @State private var isTitlePaused: Bool = false
+    @State private var isArtistPaused: Bool = false
+    
+    // Animation control
     @State private var titleTimer: Timer? = nil
     @State private var artistTimer: Timer? = nil
     @State private var titleStepSize: CGFloat = 0.5
     @State private var artistStepSize: CGFloat = 0.5
-
-    @State private var isTitlePaused: Bool = false
-    @State private var isArtistPaused: Bool = false
-
+    
     var body: some View {
         GeometryReader { geo in
-            VStack(alignment: .leading) {
-                Spacer()
+            VStack(alignment: .leading, spacing: 6) {
+                Spacer().frame(height: 6)
+                // Title marquee
                 if shouldAnimateTitle {
                     HStack(spacing: 0) {
                         Text(spacedTitle + title)
@@ -52,18 +48,9 @@ struct TextMarquee: View {
                             .lineLimit(1)
                             .fixedSize()
                             .background(
-                                GeometryReader { titleGeo in
+                                GeometryReader { textGeo in
                                     Color.clear.onAppear {
-                                        titleWidth = measureTextWidth(spacedTitle, font: titleFont)
-                                        titleFullWidth = titleGeo.size.width // ✅ 실제 렌더링된 텍스트 너비
-                                        checkIfShouldAnimate(
-                                            for: .title,
-                                            fullWidth: titleFullWidth,
-                                            offset: &titleOffset,
-                                            shouldAnimate: &shouldAnimateTitle,
-                                            start: { startMarqueeTitle() },
-                                            stop: { stopMarqueeTitle() }
-                                        )
+                                        titleContentWidth = measureTextWidth(title, font: titleFont)
                                     }
                                 }
                             )
@@ -73,24 +60,14 @@ struct TextMarquee: View {
                     .onAppear { startMarqueeTitle() }
                     .onDisappear { stopMarqueeTitle() }
                     .padding(.bottom, 6)
-                    //.border(Color.green, width: 1)
                 } else {
                     Text(title)
                         .font(.init(titleFont))
                         .lineLimit(1)
-                        .onAppear {
-                            checkIfShouldAnimate(
-                                for: .title,
-                                fullWidth: titleFullWidth,
-                                offset: &titleOffset,
-                                shouldAnimate: &shouldAnimateTitle,
-                                start: { startMarqueeTitle() },
-                                stop: { stopMarqueeTitle() }
-                            )
-                        }
                         .padding(.bottom, 6)
                 }
-
+                
+                // Artist marquee
                 if shouldAnimateArtist {
                     HStack(spacing: 0) {
                         Text(spacedArtist + artist)
@@ -98,19 +75,9 @@ struct TextMarquee: View {
                             .lineLimit(1)
                             .fixedSize()
                             .background(
-                                GeometryReader { artistGeo in
+                                GeometryReader { textGeo in
                                     Color.clear.onAppear {
-                                        artistWidth = measureTextWidth(spacedArtist, font: artistFont)
-                                        artistFullWidth = artistGeo.size.width // ✅ 실제 렌더링된 텍스트 너비
-                                        
-                                        checkIfShouldAnimate(
-                                            for: .artist,
-                                            fullWidth: artistFullWidth,
-                                            offset: &artistOffset,
-                                            shouldAnimate: &shouldAnimateArtist,
-                                            start: { startMarqueeArtist() },
-                                            stop: { stopMarqueeArtist() }
-                                        )
+                                        artistContentWidth = measureTextWidth(artist, font: artistFont)
                                     }
                                 }
                             )
@@ -120,135 +87,122 @@ struct TextMarquee: View {
                     .onAppear { startMarqueeArtist() }
                     .onDisappear { stopMarqueeArtist() }
                     .padding(.bottom, 6)
-                    //.border(Color.blue, width: 1)
                 } else {
                     Text(artist)
                         .font(.init(artistFont))
                         .lineLimit(1)
-                        .onAppear {
-                            checkIfShouldAnimate(
-                                for: .artist,
-                                fullWidth: artistFullWidth,
-                                offset: &artistOffset,
-                                shouldAnimate: &shouldAnimateArtist,
-                                start: { startMarqueeArtist() },
-                                stop: { stopMarqueeArtist() }
-                            )
-                        }
                         .padding(.bottom, 6)
                 }
-                Spacer()
             }
-            .onChange(of: title) { _ in restartMarqueeTitle() }
-            .onChange(of: artist) { _ in restartMarqueeArtist() }
+            .onAppear {
+                // 화면 너비에 맞게 텍스트 길이 체크
+                checkIfShouldAnimate(geo.size.width)
+            }
+            .onChange(of: title) { _ in resetAndCheckAnimation(geo.size.width) }
+            .onChange(of: artist) { _ in resetAndCheckAnimation(geo.size.width) }
         }
-        
     }
 }
 
 // MARK: - Marquee Logic
 extension TextMarquee {
-    private func checkIfShouldAnimate(for type: MarqueeType, fullWidth: CGFloat, offset: inout CGFloat, shouldAnimate: inout Bool, start: () -> Void, stop: () -> Void) {
-        let fixedWidth: CGFloat = UIScreen.main.bounds.width * 0.85
-        shouldAnimate = fullWidth > fixedWidth
-        if shouldAnimate {
-            titleStepSize = speedPerSecond / 60.0
-            start()
-        } else {
-            offset = 0
-            stop()
-        }
-    }
-
-    private func restartMarqueeTitle() {
-        stopMarqueeTitle()
-        titleOffset = 0
-        shouldAnimateTitle = true
+    private func checkIfShouldAnimate(_ availableWidth: CGFloat) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            checkIfShouldAnimate(
-                for: .title,
-                fullWidth: titleFullWidth,
-                offset: &titleOffset,
-                shouldAnimate: &shouldAnimateTitle,
-                start: { startMarqueeTitle() },
-                stop: { stopMarqueeTitle() }
-            )
-        }
-    }
-
-    private func restartMarqueeArtist() {
-        stopMarqueeArtist()
-        artistOffset = 0
-        shouldAnimateArtist = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            // 텍스트 길이 측정
+            titleContentWidth = measureTextWidth(title, font: titleFont)
+            artistContentWidth = measureTextWidth(artist, font: artistFont)
             
-            checkIfShouldAnimate(
-                for: .artist,
-                fullWidth: artistFullWidth,
-                offset: &artistOffset,
-                shouldAnimate: &shouldAnimateArtist,
-                start: { startMarqueeArtist() },
-                stop: { stopMarqueeArtist() }
-            )
+            // 애니메이션이 필요한지 체크 (약간의 여유를 두고)
+            let threshold = availableWidth - 10
+            shouldAnimateTitle = titleContentWidth > threshold
+            shouldAnimateArtist = artistContentWidth > threshold
+            
+            // 스텝 크기 설정
+            titleStepSize = speedPerSecond / 60.0
+            artistStepSize = speedPerSecond / 60.0
+            
+            // 필요한 경우에만 애니메이션 시작
+            if shouldAnimateTitle {
+                startMarqueeTitle()
+            }
+            
+            if shouldAnimateArtist {
+                startMarqueeArtist()
+            }
         }
     }
-
+    
+    private func resetAndCheckAnimation(_ availableWidth: CGFloat) {
+        // 애니메이션 멈추고 오프셋 초기화
+        stopMarqueeTitle()
+        stopMarqueeArtist()
+        titleOffset = 0
+        artistOffset = 0
+        
+        // 다시 체크
+        checkIfShouldAnimate(availableWidth)
+    }
+    
     private func startMarqueeTitle() {
         guard shouldAnimateTitle else { return }
         stopMarqueeTitle()
+        
         titleTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { _ in
             if !isTitlePaused {
                 updateMarqueeTitle()
             }
         }
     }
-
+    
     private func startMarqueeArtist() {
         guard shouldAnimateArtist else { return }
         stopMarqueeArtist()
+        
         artistTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { _ in
             if !isArtistPaused {
                 updateMarqueeArtist()
             }
         }
     }
-
+    
     private func stopMarqueeTitle() {
         titleTimer?.invalidate()
         titleTimer = nil
         isTitlePaused = false
     }
-
+    
     private func stopMarqueeArtist() {
         artistTimer?.invalidate()
         artistTimer = nil
         isArtistPaused = false
     }
-
+    
     private func updateMarqueeTitle() {
-        if titleOffset <= -titleWidth {
-            titleOffset += titleWidth
+        let spacerWidth = measureTextWidth(String(repeating: " ", count: spaceCount), font: titleFont)
+        
+        if titleOffset <= -titleContentWidth - spacerWidth {
+            titleOffset = 0
             isTitlePaused = true
-            checkAndResumeMarquees() // 두 텍스트 모두 멈췄는지 확인
+            checkAndResumeMarquees()
         } else {
             titleOffset -= titleStepSize
         }
     }
-
+    
     private func updateMarqueeArtist() {
-        if artistOffset <= -artistWidth {
-            artistOffset += artistWidth
+        let spacerWidth = measureTextWidth(String(repeating: " ", count: spaceCount), font: artistFont)
+        
+        if artistOffset <= -artistContentWidth - spacerWidth {
+            artistOffset = 0
             isArtistPaused = true
-            checkAndResumeMarquees() // 두 텍스트 모두 멈췄는지 확인
+            checkAndResumeMarquees()
         } else {
             artistOffset -= artistStepSize
         }
     }
-
+    
     private func measureTextWidth(_ text: String, font: UIFont) -> CGFloat {
-        let attributes: [NSAttributedString.Key: Any] = [
-            .font: font
-        ]
+        let attributes: [NSAttributedString.Key: Any] = [.font: font]
         return (text as NSString).size(withAttributes: attributes).width
     }
     
@@ -256,6 +210,16 @@ extension TextMarquee {
         if isTitlePaused && isArtistPaused {
             DispatchQueue.main.asyncAfter(deadline: .now() + delayTime) {
                 isTitlePaused = false
+                isArtistPaused = false
+            }
+        } else if isTitlePaused && !shouldAnimateArtist {
+            // 아티스트가 애니메이션이 필요없는 경우, 타이틀만 지연 후 재개
+            DispatchQueue.main.asyncAfter(deadline: .now() + delayTime) {
+                isTitlePaused = false
+            }
+        } else if isArtistPaused && !shouldAnimateTitle {
+            // 타이틀이 애니메이션이 필요없는 경우, 아티스트만 지연 후 재개
+            DispatchQueue.main.asyncAfter(deadline: .now() + delayTime) {
                 isArtistPaused = false
             }
         }

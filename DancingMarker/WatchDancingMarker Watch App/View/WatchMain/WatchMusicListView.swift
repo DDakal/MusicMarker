@@ -16,15 +16,15 @@ struct WatchMusicListView: View {
     var body: some View {
         NavigationStack(path: $navigationManager.path) {
             VStack {
-                HStack{
-                    Text("Music Marker")
-                        .font(.system(size:14, weight:.semibold))
-                        .fixedSize()
-                        .foregroundStyle(.accent)
-                        .padding(.leading, 11)
-                    Spacer()
-                }
-                .padding(.top, 0)
+//                HStack{
+//                    Text("Music Marker")
+//                        .font(.system(size:14, weight:.semibold))
+//                        .fixedSize()
+//                        .foregroundStyle(.accent)
+//                        .padding(.leading, 11)
+//                    Spacer()
+//                }
+//                .padding(.top, 0)
                 
                 if viewModel.musicList.filter{ $0 != ["",""] }.count == 0 {
                     VStack {
@@ -48,14 +48,14 @@ struct WatchMusicListView: View {
                                     } label: {
                                         Text(viewModel.musicList[index][0])
                                             .font(.system(size: 17, weight: .regular))
-                                            .fixedSize()
                                             .lineLimit(1)
                                             .truncationMode(.tail)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .padding()
                                     }
                                     .buttonBorderShape(.roundedRectangle)
-                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 40)
+                                    .padding(.bottom, 5)
                                 }
                             }
                         }
