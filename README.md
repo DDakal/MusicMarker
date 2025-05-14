@@ -114,7 +114,7 @@
 
 <br>
 
-##### 📱 WatchOS
+##### 📱 watchOS
 <table>
   <tbody>
     <tr>
