@@ -1,0 +1,27 @@
+/* 
+  Localizable.strings
+  DancingMarker
+
+  Created by 이상도 on 5/25/25.
+  
+*/
+
+"Local_TitleList" = "내 음악";
+"Local_Add" = "추가하기";
+"Local_Edit" = "수정하기";
+"Local_Delete" = "삭제하기";
+"Local_Back" = "뒤로가기";
+"Local_Cancel" = "취소하기";
+"Local_Done" = "저장하기";
+"Local_MusicTitle" = "음원제목";
+"Local_MusicArtist" = "아티스트";
+"Local_ChangeCorverImage" = "커버이미지 변경";
+"Local_MarkerList" = "마커리스트";
+"Local_MarkerAdd" = "추가";
+"Local_MarkerEdit" = "수정하기";
+"Local_MarkerReset" = "지우기";
+"Local_TipViewClose" = "닫기";
+"Local_TipViewMessage1" = "마커를 수정하거나 삭제하고 싶을 때는";
+"Local_TipViewMessage2" = "마커를 꾹 눌러주세요.";
+"Local_EmptyMusic" = "추가된 음악이 없어요.";
+"Local_EditMusicNavigationTitle" = "음악 수정하기";

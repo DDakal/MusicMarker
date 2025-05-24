@@ -317,7 +317,7 @@ class PlayerModel: ObservableObject {
         }) {
             HStack(spacing: 8) {
                 Image("emptyMarker")
-                Text("추가")
+                Text("Local_MarkerAdd")
                     .font(.title3)
                     .foregroundColor(.white)
             }
@@ -368,13 +368,13 @@ class PlayerModel: ObservableObject {
                     self.editingIndex = index
                     self.editingMarker = marker
                 }) {
-                    Text("수정하기")
+                    Text("Local_MarkerEdit")
                     Image(systemName: "pencil")
                 }
                 Button(role: .destructive, action: {
                     self.deleteMarker(at: index)
                 }) {
-                    Text("지우기")
+                    Text("Local_MarkerReset")
                     Image(systemName: "eraser")
                 }
             }

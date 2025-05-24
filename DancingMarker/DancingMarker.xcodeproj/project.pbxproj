@@ -11,6 +11,8 @@
 		1F32F5852C84835300D851E6 /* WatchDancingMarker-Watch-App-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 90A542372C6E1F0100B0F694 /* WatchDancingMarker-Watch-App-Info.plist */; };
 		1F32F5862C84835300D851E6 /* WatchDancingMarker-Watch-App-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 90A542372C6E1F0100B0F694 /* WatchDancingMarker-Watch-App-Info.plist */; };
 		1F3EEBC92C8207F600926178 /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 1F3EEBC82C8207F600926178 /* Mixpanel */; };
+		1F9385782DE228D50093725C /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1F9385762DE228D50093725C /* Localizable.strings */; };
+		1F9385792DE228D50093725C /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1F9385762DE228D50093725C /* Localizable.strings */; };
 		1FA08BAA2C8208B10082C266 /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 1FA08BA92C8208B10082C266 /* Mixpanel */; };
 		1FA811862D533EC5004B4807 /* CommonButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FA811852D533EC5004B4807 /* CommonButtonStyle.swift */; };
 		1FA811892D534029004B4807 /* MarkerResetAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FA811882D534029004B4807 /* MarkerResetAlert.swift */; };
@@ -79,6 +81,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1F9385772DE228D50093725C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		1F93857A2DE2294B0093725C /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
 		1FA811852D533EC5004B4807 /* CommonButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonButtonStyle.swift; sourceTree = "<group>"; };
 		1FA811882D534029004B4807 /* MarkerResetAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkerResetAlert.swift; sourceTree = "<group>"; };
 		1FA8118A2D534047004B4807 /* MarkerEditAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkerEditAlert.swift; sourceTree = "<group>"; };
@@ -304,6 +308,7 @@
 		901BF9742C29804A00C02FF9 = {
 			isa = PBXGroup;
 			children = (
+				1F9385762DE228D50093725C /* Localizable.strings */,
 				51675E272CA2F0E800D8D08F /* Secrets.xcconfig */,
 				90A4722D2C450837008577A2 /* Manager */,
 				901BF97F2C29804A00C02FF9 /* DancingMarker */,
@@ -465,6 +470,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ko,
 			);
 			mainGroup = 901BF9742C29804A00C02FF9;
 			packageReferences = (
@@ -486,6 +492,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				901BF9882C29804B00C02FF9 /* Preview Assets.xcassets in Resources */,
+				1F9385782DE228D50093725C /* Localizable.strings in Resources */,
 				51675E282CA2F0E800D8D08F /* Secrets.xcconfig in Resources */,
 				1F32F5852C84835300D851E6 /* WatchDancingMarker-Watch-App-Info.plist in Resources */,
 				90A542362C6E1ECC00B0F694 /* Assets.xcassets in Resources */,
@@ -498,6 +505,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				901BF99C2C29809A00C02FF9 /* Preview Assets.xcassets in Resources */,
+				1F9385792DE228D50093725C /* Localizable.strings in Resources */,
 				51675E292CA2F0E800D8D08F /* Secrets.xcconfig in Resources */,
 				1F32F5862C84835300D851E6 /* WatchDancingMarker-Watch-App-Info.plist in Resources */,
 				1F18C8A12C5679A3003972E3 /* Assets.xcassets in Resources */,
@@ -562,6 +570,18 @@
 		};
 /* End PBXTargetDependency section */
 
+/* Begin PBXVariantGroup section */
+		1F9385762DE228D50093725C /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1F9385772DE228D50093725C /* en */,
+				1F93857A2DE2294B0093725C /* ko */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
 		901BF9892C29804B00C02FF9 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -569,6 +589,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -633,6 +654,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -695,7 +717,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_ASSET_PATHS = "\"DancingMarker/Preview Content\"";
-				DEVELOPMENT_TEAM = 2U3B7G3F2A;
+				DEVELOPMENT_TEAM = WTK65UP9RZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DancingMarker/Info.plist;
@@ -740,7 +762,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_ASSET_PATHS = "\"DancingMarker/Preview Content\"";
-				DEVELOPMENT_TEAM = 2U3B7G3F2A;
+				DEVELOPMENT_TEAM = WTK65UP9RZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = DancingMarker/Info.plist;
@@ -783,7 +805,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_ASSET_PATHS = "\"WatchDancingMarker Watch App/Preview Content\"";
-				DEVELOPMENT_TEAM = 2U3B7G3F2A;
+				DEVELOPMENT_TEAM = WTK65UP9RZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "WatchDancingMarker-Watch-App-Info.plist";
@@ -817,7 +839,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_ASSET_PATHS = "\"WatchDancingMarker Watch App/Preview Content\"";
-				DEVELOPMENT_TEAM = 2U3B7G3F2A;
+				DEVELOPMENT_TEAM = WTK65UP9RZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "WatchDancingMarker-Watch-App-Info.plist";
