@@ -20,7 +20,7 @@ struct WatchMarkerDetailView: View {
             Button {
                 self.isShowingEditView.toggle()
             } label: {
-                Text("수정하기")
+                Text("Local_MarkerEdit")
                     .font(.system(size: 17, weight: .regular))
                     .fixedSize()
             }
@@ -36,7 +36,7 @@ struct WatchMarkerDetailView: View {
             Button {
                 self.isShownResetAlert.toggle()
             } label: {
-                Text("지우기")
+                Text("Local_MarkerReset")
                     .font(.system(size: 17, weight: .regular))
                     .fixedSize()
             }

@@ -19,7 +19,7 @@ struct MarkerEditAlert: View {
             VStack {
                 Spacer()
                 HStack {
-                    Text("이 변경 사항을\n폐기하시겠습니까?")
+                    Text("Local_Watch_EditMarkerBackup")
                         .font(.system(size: 14))
                         .padding()
                         .multilineTextAlignment(.center)
@@ -31,7 +31,7 @@ struct MarkerEditAlert: View {
                     self.isPresented = false
                     dismiss()
                 } label: {
-                    Text("변경 사항 폐기")
+                    Text("Local_Watch_ClearEditTimeMarker")
                         .font(.system(size: 17, weight: .regular))
                         .fixedSize()
                 }
@@ -44,7 +44,7 @@ struct MarkerEditAlert: View {
                 Button {
                     dismiss()
                 } label: {
-                    Text("계속 수정하기")
+                    Text("Local_Watch_ContinueEdit")
                         .font(.system(size: 17, weight: .regular))
                         .fixedSize()
                 }

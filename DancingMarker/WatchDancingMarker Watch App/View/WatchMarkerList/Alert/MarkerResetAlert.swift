@@ -22,7 +22,7 @@ struct MarkerResetAlert: View {
             VStack {
                 Spacer()
                 HStack {
-                    Text("이 마커에 저장된\n정보를 지우시겠습니까?")
+                    Text("Local_Watch_ClearMarkerMessage")
                         .font(.system(size: 14, weight: .regular))
                         .fixedSize()
                         .padding()
@@ -37,7 +37,7 @@ struct MarkerResetAlert: View {
                     viewModel.deletemarker(index: index)
                     navigationPath.removeLast(navigationPath.count) // 초기화 되면서 뷰 이동
                 } label: {
-                    Text("지우기")
+                    Text("Local_MarkerReset")
                         .font(.system(size: 17, weight: .regular))
                         .fixedSize()
                 }

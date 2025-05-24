@@ -81,7 +81,7 @@ struct WatchMarkerEditView: View {
                         dismiss()
                         navigationPath.removeLast(navigationPath.count) // 루트로 이동
                     } label: {
-                        Text("저장하기")
+                        Text("Local_Done")
                             .font(.system(size: 17, weight: .regular))
                             .fixedSize()
                             .foregroundColor(data != initialData ? .white : .inactiveGray) // 처음의 시간이 아니라면 색상으로 활성화/비활성화 여부
@@ -95,7 +95,7 @@ struct WatchMarkerEditView: View {
                 }
             }
             .navigationTitle {
-                Text("수정하기")
+                Text("Local_MarkerEdit")
                     .font(.system(size: 14, weight: .semibold))
                     .fixedSize()
                     .foregroundStyle(.accent)
