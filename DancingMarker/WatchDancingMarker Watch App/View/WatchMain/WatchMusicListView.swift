@@ -29,7 +29,7 @@ struct WatchMusicListView: View {
                 if viewModel.musicList.filter{ $0 != ["",""] }.count == 0 {
                     VStack {
                         Spacer()
-                        Text("모바일 앱에서 음악을\n추가해주세요")
+                        Text("Local_Watch_FirstAtMobileMessage")
                             .font(.system(size: 16, weight: .regular))
                             .fixedSize()
                             .multilineTextAlignment(.center)

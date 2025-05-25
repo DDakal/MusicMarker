@@ -34,7 +34,7 @@ struct MusicListView: View {
                         .scaledToFit()
                         .frame(width: 332)
                         .padding(.bottom, 20)
-                    Text("추가된 음악이 없어요.")
+                    Text("Local_EmptyMusic")
                     
                     Spacer(minLength: 250)
                 }
@@ -135,13 +135,13 @@ struct MusicListView: View {
                 }
             }
         }
-        .navigationTitle("내 음악")
+        .navigationTitle("Local_TitleList")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: {
                         isFileImporterPresented.toggle()
                     }) {
-                        Text("추가하기")
+                        Text("Local_Add")
                             .foregroundStyle(.accent)
                     }
                 }
@@ -207,7 +207,7 @@ struct MusicListView: View {
                 selectedMusic = music
                 isMusicEditViewPresented = true
             }) {
-                Text("수정하기")
+                Text("Local_Edit")
                 Image(systemName: "pencil")
             }
             Button(role: .destructive, action: {
@@ -234,7 +234,7 @@ struct MusicListView: View {
                     playerModel.sendMusicListToWatch(with: musicList)
                 }
             }) {
-                Text("삭제하기")
+                Text("Local_Delete")
                 Image(systemName: "trash")
             }
             
