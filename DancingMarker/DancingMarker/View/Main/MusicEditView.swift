@@ -73,7 +73,7 @@ struct MusicEditView: View {
                         
                     }
                     
-                    Button("커버이미지 변경하기") {
+                    Button("Local_ChangeCoverImage") {
                         isImagePickerPresented = true
                     }
                     .font(.caption)
@@ -85,12 +85,12 @@ struct MusicEditView: View {
                 .padding(.bottom, 43)
                 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("음원 제목")
+                    Text("Local_MusicTitle")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)  // 제목 스타일
                     
                     HStack {
-                        TextField("음원의 제목을 입력해주세요", text: $title)
+                        TextField("Local_EnterMusicTitleMessage", text: $title)
                             .frame(height: 34)
                             .background(.clear)
                             .autocorrectionDisabled(true)
@@ -108,12 +108,12 @@ struct MusicEditView: View {
                 .padding(.bottom, 16)
                 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("아티스트")
+                    Text("Local_MusicArtist")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)  // 제목 스타일
                     
                     HStack {
-                        TextField("아티스트 정보를 입력해주세요", text: $artist)
+                        TextField("Local_EnterMusicArtistMessage", text: $artist)
                             .frame(height: 34)
                             .background(Color.clear)
                             .autocorrectionDisabled(true)
@@ -153,7 +153,7 @@ struct MusicEditView: View {
                 }) {
                     HStack {
                         Spacer()
-                        Text("저장하기")
+                        Text("Local_Done")
                             .fontWeight(.bold)
                         Spacer()
                     }
@@ -168,12 +168,12 @@ struct MusicEditView: View {
                 .disabled(title.isEmpty || artist.isEmpty)
             }
             .padding(.horizontal, 16)
-            .navigationTitle("음악 수정하기")
+            .navigationTitle("Local_EditMusicNavigationTitle")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Text("취소하기")
+                    Text("Local_Cancel")
                     .foregroundStyle(.accent)
                     .onTapGesture {
                         dismiss()

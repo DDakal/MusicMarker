@@ -22,7 +22,8 @@ struct TipPopupView: View {
                         Button(action: {
                             isTipButtonPresented = false
                         }) {
-                            Text("닫기")
+                            // 닫기
+                            Text("Local_TipViewClose")
                                 .foregroundStyle(.accent)
                                 .padding(.vertical, 11)
                                 .padding(.trailing, 16)
@@ -34,8 +35,8 @@ struct TipPopupView: View {
                         .padding(.top, 23)
                     
                     VStack(spacing: 4) {
-                        Text("마커를 수정하거나 삭제하고 싶을 때는")
-                        Text("마커를 꾹 눌러주세요.")
+                        Text("Local_TipViewMessage1")
+                        Text("Local_TipViewMessage2")
                     }
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)

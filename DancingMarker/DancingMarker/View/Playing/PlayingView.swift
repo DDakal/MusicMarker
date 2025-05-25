@@ -199,7 +199,7 @@ struct PlayingView: View {
                 HStack {
                     Image(systemName: "chevron.left")
                         .bold()
-                    Text("뒤로가기") // "뒤로가기" 텍스트
+                    Text("Local_Back")
                 }
                 .foregroundStyle(.accent) // 색상 지정
                 .onTapGesture {
@@ -213,7 +213,7 @@ struct PlayingView: View {
     func MarkerListView() -> some View {
         VStack {
             HStack {
-                Text("마커리스트")
+                Text("Local_MarkerList")
                     .font(.headline)
                 Spacer()
                 

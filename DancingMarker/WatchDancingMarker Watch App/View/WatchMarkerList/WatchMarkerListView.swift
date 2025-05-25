@@ -12,7 +12,7 @@ struct WatchMarkerListView: View {
             VStack {
                 ScrollView {
                     HStack {
-                        Text("마커 관리")
+                        Text("Local_Watch_ManagementMarker")
                             .font(.system(size: 14, weight: .bold))
                             .fixedSize()
                             .padding([.leading, .bottom])
@@ -37,7 +37,7 @@ struct WatchMarkerListView: View {
                                             .resizable()
                                             .frame(width: 12, height: 20)
                                             .padding()
-                                        Text("없음")
+                                        Text("Local_Watch_MarkerNone")
                                             .font(.system(size: 14, weight: .regular))
                                             .fixedSize()
                                     }

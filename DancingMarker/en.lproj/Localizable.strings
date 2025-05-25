@@ -1,0 +1,38 @@
+/* 
+  Localizable.strings
+  DancingMarker
+
+  Created by 이상도 on 5/25/25.
+  
+*/
+
+"Local_TitleList" = "My Music";
+"Local_Add" = "Add";
+"Local_Edit" = "Edit";
+"Local_Delete" = "Delete";
+"Local_Back" = "Back";
+"Local_Cancel" = "Cancel";
+"Local_Done" = "Done";
+"Local_MusicTitle" = "Music Title";
+"Local_MusicArtist" = "Artist";
+"Local_ChangeCoverImage" = "Change Cover Image";
+"Local_MarkerList" = "Marker List";
+"Local_MarkerAdd" = "Add";
+"Local_MarkerEdit" = "Edit";
+"Local_MarkerReset" = "Reset";
+"Local_TipViewClose" = "Close";
+"Local_TipViewMessage1" = "Long press a marker";
+"Local_TipViewMessage2" = "to edit or delete it.";
+"Local_EmptyMusic" = "There is no added music.";
+"Local_EnterMusicTitleMessage" = "Please enter the music title.";
+"Local_EnterMusicArtistMessage" = "Please enter the music artist.";
+"Local_EditMusicNavigationTitle" = "Edit Music";
+
+// Watch OS
+"Local_Watch_FirstAtMobileMessage" = "Please add music\nthe mobile app.";
+"Local_Watch_ManagementMarker" = "Manage Marker";
+"Local_Watch_MarkerNone" = "None";
+"Local_Watch_ClearMarkerMessage" = "Clear the Marker?";
+"Local_Watch_EditMarkerBackup" = "Discard the changes?";
+"Local_Watch_ClearEditTimeMarker" = "Discard Changes";
+"Local_Watch_ContinueEdit" = "Continue Edit";
