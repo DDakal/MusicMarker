@@ -81,6 +81,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1F0157E82DE4AA0B009D88DD /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		1F9385772DE228D50093725C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		1F93857A2DE2294B0093725C /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
 		1FA811852D533EC5004B4807 /* CommonButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonButtonStyle.swift; sourceTree = "<group>"; };
@@ -471,6 +472,7 @@
 				en,
 				Base,
 				ko,
+				ja,
 			);
 			mainGroup = 901BF9742C29804A00C02FF9;
 			packageReferences = (
@@ -576,6 +578,7 @@
 			children = (
 				1F9385772DE228D50093725C /* en */,
 				1F93857A2DE2294B0093725C /* ko */,
+				1F0157E82DE4AA0B009D88DD /* ja */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
