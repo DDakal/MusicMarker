@@ -31,8 +31,8 @@
 // Watch OS
 "Local_Watch_FirstAtMobileMessage" = "Please add music\nthe mobile app.";
 "Local_Watch_ManagementMarker" = "Manage Marker";
-"Local_Watch_MarkerNone" = "None";
+"Local_Watch_MarkerNone" = "Empty";
 "Local_Watch_ClearMarkerMessage" = "Clear the Marker?";
 "Local_Watch_EditMarkerBackup" = "Discard the changes?";
 "Local_Watch_ClearEditTimeMarker" = "Discard Changes";
-"Local_Watch_ContinueEdit" = "Continue Edit";
+"Local_Watch_ContinueEdit" = "Keep Editing";

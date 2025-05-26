@@ -15,7 +15,7 @@
 "Local_Done" = "저장하기";
 "Local_MusicTitle" = "음원제목";
 "Local_MusicArtist" = "아티스트";
-"Local_ChangeCorverImage" = "커버이미지 변경";
+"Local_ChangeCoverImage" = "커버이미지 변경";
 "Local_MarkerList" = "마커리스트";
 "Local_MarkerAdd" = "추가";
 "Local_MarkerEdit" = "수정하기";

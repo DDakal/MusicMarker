@@ -1,0 +1,38 @@
+/* 
+  Localizable.strings
+  DancingMarker
+
+  Created by 이상도 on 5/25/25.
+  
+*/
+
+"Local_TitleList" = "ライブラリ";
+"Local_Add" = "曲の追加";
+"Local_Edit" = "曲の編集";
+"Local_Delete" = "曲の削除";
+"Local_Back" = "戻る";
+"Local_Cancel" = "キャンセル";
+"Local_Done" = "保存する";
+"Local_MusicTitle" = "タイトル";
+"Local_MusicArtist" = "アーティスト";
+"Local_ChangeCoverImage" = "カバー画像を変更";
+"Local_MarkerList" = "マーカー一覧";
+"Local_MarkerAdd" = "追加";
+"Local_MarkerEdit" = "編集";
+"Local_MarkerReset" = "リセット";
+"Local_TipViewClose" = "閉じる";
+"Local_TipViewMessage1" = "マーカーを編集・削除したい場合は、";
+"Local_TipViewMessage2" = "マーカーを長押ししてください。";
+"Local_EmptyMusic" = "ライブラリに音楽がありません。";
+"Local_EnterMusicTitleMessage" = "曲名を入力してください。";
+"Local_EnterMusicArtistMessage" = "アーティスト情報を入力してください。";
+"Local_EditMusicNavigationTitle" = "曲を編集する";
+
+// Watch OS
+"Local_Watch_FirstAtMobileMessage" = "モバイルアプリで曲を\n追加してください。";
+"Local_Watch_ManagementMarker" = "マーカー管理";
+"Local_Watch_MarkerNone" = "なし";
+"Local_Watch_ClearMarkerMessage" = "このマーカーの情報を\n削除してもいいですか？";
+"Local_Watch_EditMarkerBackup" = "変更を破棄しますか？";
+"Local_Watch_ClearEditTimeMarker" = "変更を破棄";
+"Local_Watch_ContinueEdit" = "編集を続ける";
