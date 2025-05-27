@@ -76,44 +76,11 @@ struct MusicListView: View {
                         Spacer()
                         
                     }
-                    //MARK: - 코드 정리 필요
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        let tappedMusic = music
-                        
-                        if playerModel.music == nil || playerModel.music?.id != tappedMusic.id {
-                            // 새로운 곡이 선택되었거나 처음 재생하는 경우
-                            playerModel.stopAudio()
-                            playerModel.stopTimer()
-                            
-                            // 오디오 세션 활성화
-                            try? AVAudioSession.sharedInstance().setActive(true)
-                            
-                            playerModel.music = tappedMusic
-                            playerModel.initAudioPlayer(for: tappedMusic)
-                            playerModel.isPlaying = true
-                            playerModel.playAudio()
-                            
-                            // Now Playing 정보 설정 및 업데이트
-                            playerModel.updateNowPlayingControlCenter()
-                            
-                            print("음원 \(playerModel.music?.title)으로 바뀜")
-                        } else if !playerModel.isPlaying {
-                            // 동일한 곡이지만 정지된 상태에서 재생을 눌렀을 때
-                            playerModel.isPlaying = true
-                            playerModel.playAudio()
-                            
-                            // Now Playing 정보 업데이트
-                            playerModel.updateNowPlayingControlCenter()
-                            
-                            print("음원 \(playerModel.music?.title) 재생됨")
-                        } else {
-                            // 동일한 곡이 이미 재생 중인 경우
-                            print("이미 재생 중인 음원 \(playerModel.music?.title)")
-                        }
-                        
-                        // 재생 정보를 보내고, PlayingView로 이동
-                        playerModel.sendPlayingInformation()
+                        //  PlayerModel에 위임하여 코드 대폭 단순화
+                        // 1. PlayerModel의 play 함수를 호출하여 재생 로직을 모두 위임합니다.
+                        playerModel.play(music: music)
                         navigationManager.push(to: .playing)
                     }
 
