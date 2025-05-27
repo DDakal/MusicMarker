@@ -509,6 +509,7 @@ class PlayerModel: ObservableObject {
     func updateAudioPlayer(with time: TimeInterval) {
         guard let audioPlayer = audioPlayer else { return }
         audioPlayer.currentTime = time
+        updateNowPlayingControlCenter()
         connectivityManager.sendPlayingTimesToWatch([currentTime, duration])
     }
     
@@ -559,7 +560,7 @@ class PlayerModel: ObservableObject {
         updateNowPlayingControlCenter() // 상태 변경 후 컨트롤 센터 업데이트
         print("▶️ Playing audio. isPlaying = \(isPlaying)")
     }
-
+    
     // 일시정지
     func pauseAudio() {
         audioPlayer?.pause()
@@ -583,97 +584,97 @@ class PlayerModel: ObservableObject {
     /// iOS 제어 센터와 잠금 화면에서의 음악 재생 제어를 설정합니다.
     /// 재생/일시정지, 5초 앞/뒤로 이동, 재생 위치 변경 등의 기능을 제공합니다.
     private func setupControlCenterControls() {
-            let commandCenter = MPRemoteCommandCenter.shared()
-            
-            commandCenter.playCommand.removeTarget(nil)
-            commandCenter.pauseCommand.removeTarget(nil)
-            commandCenter.togglePlayPauseCommand.removeTarget(nil)
-            commandCenter.skipBackwardCommand.removeTarget(nil)
-            commandCenter.skipForwardCommand.removeTarget(nil)
-            commandCenter.changePlaybackPositionCommand.removeTarget(nil)
-            
-            commandCenter.playCommand.addTarget { [weak self] _ in
-                guard let self = self else { return .commandFailed }
-                if !self.isPlaying {
-                    self.playAudio() // playAudio() 호출
-                }
-                return .success
+        let commandCenter = MPRemoteCommandCenter.shared()
+        
+        commandCenter.playCommand.removeTarget(nil)
+        commandCenter.pauseCommand.removeTarget(nil)
+        commandCenter.togglePlayPauseCommand.removeTarget(nil)
+        commandCenter.skipBackwardCommand.removeTarget(nil)
+        commandCenter.skipForwardCommand.removeTarget(nil)
+        commandCenter.changePlaybackPositionCommand.removeTarget(nil)
+        
+        commandCenter.playCommand.addTarget { [weak self] _ in
+            guard let self = self else { return .commandFailed }
+            if !self.isPlaying {
+                self.playAudio() // playAudio() 호출
             }
-            
-            commandCenter.pauseCommand.addTarget { [weak self] _ in
-                guard let self = self else { return .commandFailed }
-                if self.isPlaying {
-                    self.pauseAudio()
-                }
-                return .success
-            }
-            
-            commandCenter.togglePlayPauseCommand.addTarget { [weak self] _ in
-                guard let self = self else { return .commandFailed }
-                self.togglePlayback()
-                return .success
-            }
-            
-            commandCenter.skipBackwardCommand.addTarget { [weak self] _ in
-                guard let self = self else { return .commandFailed }
-                self.backward5Sec()
-                return .success
-            }
-            
-            commandCenter.skipForwardCommand.addTarget { [weak self] _ in
-                guard let self = self else { return .commandFailed }
-                self.forward5Sec()
-                return .success
-            }
-            
-            commandCenter.changePlaybackPositionCommand.addTarget { [weak self] event in
-                guard let self = self else { return .commandFailed }
-                if let positionEvent = event as? MPChangePlaybackPositionCommandEvent {
-                    self.seekToTime(to: positionEvent.positionTime) // seekToTime으로 변경
-                    return .success
-                }
-                return .commandFailed
-            }
-            
-            commandCenter.skipBackwardCommand.preferredIntervals = [5]
-            commandCenter.skipForwardCommand.preferredIntervals = [5]
-            
-            commandCenter.playCommand.isEnabled = true
-            commandCenter.pauseCommand.isEnabled = true
-            commandCenter.togglePlayPauseCommand.isEnabled = true
-            commandCenter.skipBackwardCommand.isEnabled = true
-            commandCenter.skipForwardCommand.isEnabled = true
-            commandCenter.changePlaybackPositionCommand.isEnabled = true
+            return .success
         }
+        
+        commandCenter.pauseCommand.addTarget { [weak self] _ in
+            guard let self = self else { return .commandFailed }
+            if self.isPlaying {
+                self.pauseAudio()
+            }
+            return .success
+        }
+        
+        commandCenter.togglePlayPauseCommand.addTarget { [weak self] _ in
+            guard let self = self else { return .commandFailed }
+            self.togglePlayback()
+            return .success
+        }
+        
+        commandCenter.skipBackwardCommand.addTarget { [weak self] _ in
+            guard let self = self else { return .commandFailed }
+            self.backward5Sec()
+            return .success
+        }
+        
+        commandCenter.skipForwardCommand.addTarget { [weak self] _ in
+            guard let self = self else { return .commandFailed }
+            self.forward5Sec()
+            return .success
+        }
+        
+        commandCenter.changePlaybackPositionCommand.addTarget { [weak self] event in
+            guard let self = self else { return .commandFailed }
+            if let positionEvent = event as? MPChangePlaybackPositionCommandEvent {
+                self.seekToTime(to: positionEvent.positionTime) // seekToTime으로 변경
+                return .success
+            }
+            return .commandFailed
+        }
+        
+        commandCenter.skipBackwardCommand.preferredIntervals = [5]
+        commandCenter.skipForwardCommand.preferredIntervals = [5]
+        
+        commandCenter.playCommand.isEnabled = true
+        commandCenter.pauseCommand.isEnabled = true
+        commandCenter.togglePlayPauseCommand.isEnabled = true
+        commandCenter.skipBackwardCommand.isEnabled = true
+        commandCenter.skipForwardCommand.isEnabled = true
+        commandCenter.changePlaybackPositionCommand.isEnabled = true
+    }
     
     func initAudioPlayer(for music: Music) {
-            audioPlayer?.stop()
-            audioPlayer = nil
-            
-            let musicFileURL = music.fileURL
-            guard FileManager.default.fileExists(atPath: musicFileURL.path) else {
-                print("🚨 File not found at path: \(musicFileURL.path)")
-                return
-            }
-            
-            do {
-                audioPlayer = try AVAudioPlayer(contentsOf: musicFileURL)
-                guard let audioPlayer = self.audioPlayer else { return }
-                
-                audioPlayer.prepareToPlay()
-                audioPlayer.enableRate = true
-                audioPlayer.numberOfLoops = -1
-                
-                duration = audioPlayer.duration
-                formattedDuration = formattedTime(audioPlayer.duration)
-                
-                remoteControlCenterInfo() // Now Playing 정보 설정
-                startTimer()
-                
-            } catch {
-                print("🚨 Error initializing audio player: \(error.localizedDescription)")
-            }
+        audioPlayer?.stop()
+        audioPlayer = nil
+        
+        let musicFileURL = music.fileURL
+        guard FileManager.default.fileExists(atPath: musicFileURL.path) else {
+            print("🚨 File not found at path: \(musicFileURL.path)")
+            return
         }
+        
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: musicFileURL)
+            guard let audioPlayer = self.audioPlayer else { return }
+            
+            audioPlayer.prepareToPlay()
+            audioPlayer.enableRate = true
+            audioPlayer.numberOfLoops = -1
+            
+            duration = audioPlayer.duration
+            formattedDuration = formattedTime(audioPlayer.duration)
+            
+            remoteControlCenterInfo() // Now Playing 정보 설정
+            startTimer()
+            
+        } catch {
+            print("🚨 Error initializing audio player: \(error.localizedDescription)")
+        }
+    }
     
     func togglePlayback() {
         guard let audioPlayer = self.audioPlayer else {
@@ -691,10 +692,6 @@ class PlayerModel: ObservableObject {
         
         // 백그라운드, 워치에 반영하기
         self.updateNowPlayingControlCenter()
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            self.updateNowPlayingControlCenter()
-        }
     }
     
     func startTimer() {
@@ -783,7 +780,7 @@ class PlayerModel: ObservableObject {
     func setPlayerVolume(_ volume: Float) {
         MPVolumeView.setVolume(volume)
     }
-
+    
     /// LiveActivity 함수 (백그라운드 재생, 정지, 5초 앞뒤로)
     private func remoteControlCenterInfo() {
         let nowPlayingInfoCenter = MPNowPlayingInfoCenter.default()
@@ -811,12 +808,12 @@ class PlayerModel: ObservableObject {
             // 음악이 없을 경우 모든 정보 초기화
             nowPlayingInfo.removeAll()
         }
-
+        
         nowPlayingInfo[MPMediaItemPropertyTitle] = self.music?.title
         nowPlayingInfo[MPMediaItemPropertyArtist] = self.music?.artist
         nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = self.duration
         nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = self.currentTime
-
+        
         nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
     }
     
@@ -828,18 +825,18 @@ class PlayerModel: ObservableObject {
         }
         
         var nowPlayingInfo = nowPlayingInfoCenter.nowPlayingInfo ?? [String: Any]()
-
+        
         // 현재 재생 시간과 재생 속도 업데이트
-            nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = audioPlayer.currentTime
-            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = self.isPlaying ? NSNumber(value: self.playbackRate) : NSNumber(value: 0)
-            
-            // 재생 상태를 명시적으로 설정
-            if self.isPlaying {
-                nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = NSNumber(value: self.playbackRate)
-            } else {
-                nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = NSNumber(value: 0)
-            }
-
+        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = audioPlayer.currentTime
+        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = self.isPlaying ? NSNumber(value: self.playbackRate) : NSNumber(value: 0)
+        
+        // 재생 상태를 명시적으로 설정
+        if self.isPlaying {
+            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = NSNumber(value: self.playbackRate)
+        } else {
+            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = NSNumber(value: 0)
+        }
+        
         nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
         
         // 워치에 재생 정보 반영
@@ -857,7 +854,7 @@ class PlayerModel: ObservableObject {
         
         // 백그라운드 재생 정보 업데이트
         updateNowPlayingControlCenter()
-
+        
         print("Playback position changed to \(position)")
     }
 }
@@ -887,7 +884,6 @@ func liveActivityPlaceholderArtwork() -> UIImage {
     
     return image ?? UIImage()
 }
-
 
 extension MPVolumeView {
     static func setVolume(_ volume: Float) -> Void {
