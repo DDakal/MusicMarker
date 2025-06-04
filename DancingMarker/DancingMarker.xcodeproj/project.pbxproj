@@ -34,6 +34,12 @@
 		510D90352CA2F1C8002E82CC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510D90332CA2F1C8002E82CC /* ContentView.swift */; };
 		512224C02D8C685E00AABC82 /* UIImage+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 512224BF2D8C685500AABC82 /* UIImage+.swift */; };
 		512224C22D8C68D100AABC82 /* SelectGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 512224C12D8C68C900AABC82 /* SelectGalleryView.swift */; };
+		512CED492DF08E59001A800B /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 512CED482DF08E59001A800B /* Errors.swift */; };
+		512CED4A2DF08E59001A800B /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 512CED482DF08E59001A800B /* Errors.swift */; };
+		512CED4C2DF08EAF001A800B /* AudioPlayable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 512CED4B2DF08EAF001A800B /* AudioPlayable.swift */; };
+		512CED4E2DF08EC6001A800B /* MarkerManageable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 512CED4D2DF08EC6001A800B /* MarkerManageable.swift */; };
+		512CED502DF08ED3001A800B /* WatchConnectivityManageable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 512CED4F2DF08ED3001A800B /* WatchConnectivityManageable.swift */; };
+		512CED522DF08EDF001A800B /* ControlCenterManageable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 512CED512DF08EDF001A800B /* ControlCenterManageable.swift */; };
 		51675E282CA2F0E800D8D08F /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 51675E272CA2F0E800D8D08F /* Secrets.xcconfig */; };
 		51675E292CA2F0E800D8D08F /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 51675E272CA2F0E800D8D08F /* Secrets.xcconfig */; };
 		516D95502D533F5D00AA8EAA /* TextMarquee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516D954F2D533F5D00AA8EAA /* TextMarquee.swift */; };
@@ -103,6 +109,11 @@
 		510D90332CA2F1C8002E82CC /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		512224BF2D8C685500AABC82 /* UIImage+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+.swift"; sourceTree = "<group>"; };
 		512224C12D8C68C900AABC82 /* SelectGalleryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectGalleryView.swift; sourceTree = "<group>"; };
+		512CED482DF08E59001A800B /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
+		512CED4B2DF08EAF001A800B /* AudioPlayable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayable.swift; sourceTree = "<group>"; };
+		512CED4D2DF08EC6001A800B /* MarkerManageable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkerManageable.swift; sourceTree = "<group>"; };
+		512CED4F2DF08ED3001A800B /* WatchConnectivityManageable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchConnectivityManageable.swift; sourceTree = "<group>"; };
+		512CED512DF08EDF001A800B /* ControlCenterManageable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlCenterManageable.swift; sourceTree = "<group>"; };
 		51675E272CA2F0E800D8D08F /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		516D954F2D533F5D00AA8EAA /* TextMarquee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextMarquee.swift; sourceTree = "<group>"; };
 		51EF633B2D99715C00967EC8 /* View+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+.swift"; sourceTree = "<group>"; };
@@ -239,6 +250,17 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		512CED472DF08C1E001A800B /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				512CED4B2DF08EAF001A800B /* AudioPlayable.swift */,
+				512CED4D2DF08EC6001A800B /* MarkerManageable.swift */,
+				512CED4F2DF08ED3001A800B /* WatchConnectivityManageable.swift */,
+				512CED512DF08EDF001A800B /* ControlCenterManageable.swift */,
+			);
+			path = Protocols;
+			sourceTree = "<group>";
+		};
 		513303FF2C4CD65400CC5F22 /* Resource */ = {
 			isa = PBXGroup;
 			children = (
@@ -298,12 +320,13 @@
 			path = Resource;
 			sourceTree = "<group>";
 		};
-		51CAA1042C392B2500406BB8 /* Model */ = {
+		51CAA1042C392B2500406BB8 /* Models */ = {
 			isa = PBXGroup;
 			children = (
 				5104B7F52C3D67F2008E10E8 /* Music.swift */,
+				512CED482DF08E59001A800B /* Errors.swift */,
 			);
-			path = Model;
+			path = Models;
 			sourceTree = "<group>";
 		};
 		901BF9742C29804A00C02FF9 = {
@@ -331,12 +354,13 @@
 		901BF97F2C29804A00C02FF9 /* DancingMarker */ = {
 			isa = PBXGroup;
 			children = (
+				512CED472DF08C1E001A800B /* Protocols */,
 				512224BE2D8C682E00AABC82 /* Extensions */,
 				90E28F552C2D092E009098BE /* NavigationManager.swift */,
 				518D7F022CA2E24100612544 /* Application */,
 				518D7F042CA2E27B00612544 /* View */,
 				518D7F032CA2E26100612544 /* ViewModel */,
-				51CAA1042C392B2500406BB8 /* Model */,
+				51CAA1042C392B2500406BB8 /* Models */,
 				51FD01772C3BC6B1003F99B5 /* Info.plist */,
 				513303FF2C4CD65400CC5F22 /* Resource */,
 				901BF9862C29804B00C02FF9 /* Preview Content */,
@@ -524,8 +548,10 @@
 			files = (
 				510D90312CA2F1C8002E82CC /* PlayingView.swift in Sources */,
 				516D95502D533F5D00AA8EAA /* TextMarquee.swift in Sources */,
+				512CED4C2DF08EAF001A800B /* AudioPlayable.swift in Sources */,
 				510D90352CA2F1C8002E82CC /* ContentView.swift in Sources */,
 				510D90322CA2F1C8002E82CC /* TipPopupView.swift in Sources */,
+				512CED4A2DF08E59001A800B /* Errors.swift in Sources */,
 				510D902B2CA2F1C8002E82CC /* MusicEditView.swift in Sources */,
 				510D902C2CA2F1C8002E82CC /* MusicListView.swift in Sources */,
 				510D902D2CA2F1C8002E82CC /* NowPlayingView.swift in Sources */,
@@ -534,7 +560,10 @@
 				902077082C464CB800988D2B /* PlayerModel.swift in Sources */,
 				512224C02D8C685E00AABC82 /* UIImage+.swift in Sources */,
 				90A4722F2C450867008577A2 /* WCManager.swift in Sources */,
+				512CED4E2DF08EC6001A800B /* MarkerManageable.swift in Sources */,
+				512CED522DF08EDF001A800B /* ControlCenterManageable.swift in Sources */,
 				5104B7F62C3D67F2008E10E8 /* Music.swift in Sources */,
+				512CED502DF08ED3001A800B /* WatchConnectivityManageable.swift in Sources */,
 				51EF633C2D99716400967EC8 /* View+.swift in Sources */,
 				90E28F562C2D092E009098BE /* NavigationManager.swift in Sources */,
 			);
@@ -548,6 +577,7 @@
 				902077062C458ABB00988D2B /* WatchViewModel.swift in Sources */,
 				1FA811892D534029004B4807 /* MarkerResetAlert.swift in Sources */,
 				510D90262CA2F1C0002E82CC /* WatchMusicListView.swift in Sources */,
+				512CED492DF08E59001A800B /* Errors.swift in Sources */,
 				510D901A2CA2F1C0002E82CC /* WatchMarkerDetailView.swift in Sources */,
 				510D901B2CA2F1C0002E82CC /* WatchMarkerEditView.swift in Sources */,
 				510D901C2CA2F1C0002E82CC /* WatchMarkerListView.swift in Sources */,
