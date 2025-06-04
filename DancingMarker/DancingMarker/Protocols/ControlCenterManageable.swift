@@ -11,7 +11,7 @@ import MediaPlayer
 
 /// Control Center 및 Lock Screen 재생 정보를 관리하는 프로토콜
 ///
-/// iOS의 Control Center, Lock Screen, 그리고 백그라운드 재생 시
+/// iOS의 Live Activity, Control Center, Lock Screen에
 /// 나타나는 재생 정보와 컨트롤을 관리합니다.
 ///
 /// ## 주요 기능

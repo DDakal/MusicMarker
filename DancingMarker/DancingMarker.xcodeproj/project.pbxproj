@@ -43,6 +43,7 @@
 		512CEE5D2DF092A8001A800B /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 512CEE5C2DF092A8001A800B /* AudioService.swift */; };
 		512CEE5F2DF093FC001A800B /* MarkerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 512CEE5E2DF093FC001A800B /* MarkerService.swift */; };
 		512CEE612DF0991C001A800B /* WatchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 512CEE602DF0991C001A800B /* WatchService.swift */; };
+		512CEE632DF09BF9001A800B /* LiveActivityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 512CEE622DF09BF9001A800B /* LiveActivityService.swift */; };
 		51675E282CA2F0E800D8D08F /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 51675E272CA2F0E800D8D08F /* Secrets.xcconfig */; };
 		51675E292CA2F0E800D8D08F /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 51675E272CA2F0E800D8D08F /* Secrets.xcconfig */; };
 		516D95502D533F5D00AA8EAA /* TextMarquee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516D954F2D533F5D00AA8EAA /* TextMarquee.swift */; };
@@ -120,6 +121,7 @@
 		512CEE5C2DF092A8001A800B /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
 		512CEE5E2DF093FC001A800B /* MarkerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkerService.swift; sourceTree = "<group>"; };
 		512CEE602DF0991C001A800B /* WatchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchService.swift; sourceTree = "<group>"; };
+		512CEE622DF09BF9001A800B /* LiveActivityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityService.swift; sourceTree = "<group>"; };
 		51675E272CA2F0E800D8D08F /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		516D954F2D533F5D00AA8EAA /* TextMarquee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextMarquee.swift; sourceTree = "<group>"; };
 		51EF633B2D99715C00967EC8 /* View+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+.swift"; sourceTree = "<group>"; };
@@ -273,6 +275,7 @@
 				512CEE5C2DF092A8001A800B /* AudioService.swift */,
 				512CEE5E2DF093FC001A800B /* MarkerService.swift */,
 				512CEE602DF0991C001A800B /* WatchService.swift */,
+				512CEE622DF09BF9001A800B /* LiveActivityService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -565,6 +568,7 @@
 			files = (
 				510D90312CA2F1C8002E82CC /* PlayingView.swift in Sources */,
 				516D95502D533F5D00AA8EAA /* TextMarquee.swift in Sources */,
+				512CEE632DF09BF9001A800B /* LiveActivityService.swift in Sources */,
 				512CED4C2DF08EAF001A800B /* AudioPlayable.swift in Sources */,
 				510D90352CA2F1C8002E82CC /* ContentView.swift in Sources */,
 				510D90322CA2F1C8002E82CC /* TipPopupView.swift in Sources */,
