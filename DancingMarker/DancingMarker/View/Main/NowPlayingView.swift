@@ -9,12 +9,12 @@ import SwiftUI
 
 struct NowPlayingView: View {
     @Environment(NavigationManager.self) var navigationManager
-    @EnvironmentObject var playerModel: PlayerModel
+    @EnvironmentObject var playerViewModel: PlayerViewModel
     
     var body: some View {
         VStack {
             HStack(spacing: 10) {
-                if let music = playerModel.music {
+                if let music = playerViewModel.currentMusic {
                     if let albumArtData = music.albumArt, let albumArt = UIImage(data: albumArtData) {
                         Image(uiImage: albumArt)
                             .resizable()
@@ -34,7 +34,12 @@ struct NowPlayingView: View {
                     }
                     
                     VStack(alignment: .leading, spacing: 12) {
-                        TextMarquee(title: music.title, artist: music.artist, titleFont: UIFont.boldSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .title3).pointSize), artistFont: UIFont.systemFont(ofSize: UIFont.preferredFont(forTextStyle: .body).pointSize))
+                        TextMarquee(
+                            title: music.title, 
+                            artist: music.artist, 
+                            titleFont: UIFont.boldSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .title3).pointSize), 
+                            artistFont: UIFont.systemFont(ofSize: UIFont.preferredFont(forTextStyle: .body).pointSize)
+                        )
                     }
                     .overlay(
                         overlayForMarquee(title: music.title, artist: music.artist)
@@ -58,7 +63,7 @@ struct NowPlayingView: View {
             }
             .contentShape(Rectangle())
             .onTapGesture {
-                guard playerModel.music != nil else {
+                guard playerViewModel.currentMusic != nil else {
                     return
                 }
                 navigationManager.push(to: .playing)
@@ -74,18 +79,20 @@ struct NowPlayingView: View {
                         
                         Rectangle()
                             .foregroundStyle(.white)
-                            .frame(width: geometry.size.width * CGFloat(playerModel.progress), height: geometry.size.height)
+                            .frame(width: geometry.size.width * CGFloat(playerViewModel.progress), height: geometry.size.height)
                     }
                     .cornerRadius(12)
                     .gesture(DragGesture(minimumDistance: 0)
                         .onChanged({ value in
-                            DispatchQueue.main.async {
-                                let newProgress = min(max(0, Double(value.location.x / geometry.size.width)), 1.0)
-                                playerModel.progress = newProgress
-                                let newTime = newProgress * playerModel.duration
-                                playerModel.currentTime = newTime
-                                playerModel.formattedProgress = playerModel.formattedTime(newTime)
-                                playerModel.updateAudioPlayer(with: newTime)
+                            let newProgress = min(max(0, Double(value.location.x / geometry.size.width)), 1.0)
+                            let newTime = newProgress * playerViewModel.duration
+                            
+                            Task {
+                                do {
+                                    try await playerViewModel.seek(to: newTime)
+                                } catch {
+                                    print("시간 이동 중 오류: \(error)")
+                                }
                             }
                         }))
                 }
@@ -93,9 +100,9 @@ struct NowPlayingView: View {
                 .padding(.bottom, 3)
                 
                 HStack {
-                    Text("\(playerModel.formattedProgress)")
+                    Text("\(playerViewModel.formattedProgress)")
                     Spacer()
-                    Text("\(playerModel.formattedDuration)")
+                    Text("\(playerViewModel.formattedDuration)")
                 }
                 .font(.caption)
             }
@@ -107,7 +114,13 @@ struct NowPlayingView: View {
                     .frame(width: 60)
                     .overlay(
                         Button(action: {
-                            playerModel.backward5Sec()
+                            Task {
+                                do {
+                                    try await playerViewModel.skipBackward()
+                                } catch {
+                                    print("5초 뒤로 이동 중 오류: \(error)")
+                                }
+                            }
                         }) {
                             Image(systemName: "gobackward.5")
                                 .resizable()
@@ -123,9 +136,11 @@ struct NowPlayingView: View {
                     .frame(width: 80)
                     .overlay(
                         Button(action: {
-                            playerModel.togglePlayback()
+                            Task {
+                                await handlePlayPauseToggle()
+                            }
                         }) {
-                            Image(systemName: playerModel.isPlaying ? "pause.fill" : "play.fill")
+                            Image(systemName: playerViewModel.isPlaying ? "pause.fill" : "play.fill")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 30)
@@ -138,7 +153,13 @@ struct NowPlayingView: View {
                     .frame(width: 60)
                     .overlay(
                         Button(action: {
-                            playerModel.forward5Sec()
+                            Task {
+                                do {
+                                    try await playerViewModel.skipForward()
+                                } catch {
+                                    print("5초 앞으로 이동 중 오류: \(error)")
+                                }
+                            }
                         }) {
                             Image(systemName: "goforward.5")
                                 .resizable()
@@ -152,6 +173,23 @@ struct NowPlayingView: View {
             .padding(.bottom, 20)
         }
         .padding(.horizontal, 16)
+    }
+    
+    // MARK: - Private Methods
+    
+    /// 재생/일시정지 토글 처리
+    private func handlePlayPauseToggle() async {
+        do {
+            if playerViewModel.isPlaying {
+                playerViewModel.pauseMusic()
+            } else {
+                if playerViewModel.currentMusic != nil {
+                    try await playerViewModel.resumeMusic()
+                }
+            }
+        } catch {
+            print("재생/일시정지 토글 중 오류: \(error)")
+        }
     }
     
     // MARK: - Mask Logic

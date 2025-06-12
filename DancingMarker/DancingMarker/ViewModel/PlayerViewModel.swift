@@ -217,4 +217,7 @@ extension PlayerViewModel {
     internal func sendMusicListToWatch() async {
         print("TODO: sendMusicListToWatch 구현 필요")
     }
+    
+    // handlePlayToggle, handleForward5Seconds, handleBackward5Seconds 메서드들은
+    // PlayerViewModel+Audio.swift에서 구현됨
 }

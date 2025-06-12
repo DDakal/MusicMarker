@@ -53,6 +53,7 @@
 		51CD44D52DFB35A800BC8EDF /* PlayerViewModel+Audio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CD44D42DFB35A800BC8EDF /* PlayerViewModel+Audio.swift */; };
 		51CD44D72DFB3B6A00BC8EDF /* PlayerViewModel+Timer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CD44D62DFB3B6A00BC8EDF /* PlayerViewModel+Timer.swift */; };
 		51CD44D92DFB3FC600BC8EDF /* PlayerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CD44D82DFB3FC600BC8EDF /* PlayerModel.swift */; };
+		51CD44DC2DFB402500BC8EDF /* DependencyContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CD44DB2DFB402500BC8EDF /* DependencyContainer.swift */; };
 		51EF633C2D99716400967EC8 /* View+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51EF633B2D99715C00967EC8 /* View+.swift */; };
 		901BF9812C29804A00C02FF9 /* DancingMarkerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 901BF9802C29804A00C02FF9 /* DancingMarkerApp.swift */; };
 		901BF9852C29804B00C02FF9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 901BF9842C29804B00C02FF9 /* Assets.xcassets */; };
@@ -136,6 +137,7 @@
 		51CD44D42DFB35A800BC8EDF /* PlayerViewModel+Audio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayerViewModel+Audio.swift"; sourceTree = "<group>"; };
 		51CD44D62DFB3B6A00BC8EDF /* PlayerViewModel+Timer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayerViewModel+Timer.swift"; sourceTree = "<group>"; };
 		51CD44D82DFB3FC600BC8EDF /* PlayerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerModel.swift; sourceTree = "<group>"; };
+		51CD44DB2DFB402500BC8EDF /* DependencyContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DependencyContainer.swift; sourceTree = "<group>"; };
 		51EF633B2D99715C00967EC8 /* View+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+.swift"; sourceTree = "<group>"; };
 		51FD01772C3BC6B1003F99B5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		901BF97D2C29804A00C02FF9 /* DancingMarker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DancingMarker.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -381,6 +383,14 @@
 			path = "PlayerViewModel+";
 			sourceTree = "<group>";
 		};
+		51CD44DA2DFB400900BC8EDF /* DI */ = {
+			isa = PBXGroup;
+			children = (
+				51CD44DB2DFB402500BC8EDF /* DependencyContainer.swift */,
+			);
+			path = DI;
+			sourceTree = "<group>";
+		};
 		901BF9742C29804A00C02FF9 = {
 			isa = PBXGroup;
 			children = (
@@ -407,6 +417,7 @@
 			isa = PBXGroup;
 			children = (
 				518D7F022CA2E24100612544 /* Application */,
+				51CD44DA2DFB400900BC8EDF /* DI */,
 				512CED472DF08C1E001A800B /* Protocols */,
 				90E28F552C2D092E009098BE /* NavigationManager.swift */,
 				512CEE5B2DF0927A001A800B /* Services */,
@@ -597,6 +608,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				51CD44D92DFB3FC600BC8EDF /* PlayerModel.swift in Sources */,
+				51CD44DC2DFB402500BC8EDF /* DependencyContainer.swift in Sources */,
 				510D90312CA2F1C8002E82CC /* PlayingView.swift in Sources */,
 				516D95502D533F5D00AA8EAA /* TextMarquee.swift in Sources */,
 				512CEE632DF09BF9001A800B /* LiveActivityService.swift in Sources */,

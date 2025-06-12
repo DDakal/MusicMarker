@@ -10,26 +10,31 @@ import SwiftData
 
 @main
 struct DancingMarkerApp: App {
-    var modelContainer: ModelContainer = {
-            let schema = Schema([Music.self])
-            let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-            
-            do {
-                return try ModelContainer(for: schema, configurations: [modelConfiguration])
-            } catch {
-                fatalError("Could not create ModelContainer: \(error)")
-            }
-        }()
     
-    @StateObject var viewModel = PlayerModel(connectivityManager: WatchConnectivityManager())
+    // MARK: - Dependency Container
+    
+    @StateObject private var dependencyContainer = DependencyContainer.shared
+    
+    // MARK: - New Architecture
+    
+    @StateObject private var playerViewModel: PlayerViewModel
+    
+    // MARK: - Initialization
+    
+    init() {
+        let container = DependencyContainer.shared
+        self._playerViewModel = StateObject(wrappedValue: container.makePlayerViewModel())
+    }
 
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .modelContainer(modelContainer)
-                .environmentObject(viewModel)
-                .preferredColorScheme(/*@START_MENU_TOKEN@*/.dark/*@END_MENU_TOKEN@*/)
+                .modelContainer(dependencyContainer.modelContainer)
+                // New ViewModel (새로운 아키텍처)
+                .environmentObject(playerViewModel)
+                // Dependency Container
+                .environmentObject(dependencyContainer)
+                .preferredColorScheme(.dark)
         }
     }
 }
-
