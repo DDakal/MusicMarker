@@ -88,8 +88,11 @@ final class PlayerViewModel: ObservableObject {
     }
     
     deinit {
-        // nonisolated 메서드들로 정리 작업
-        stopTimerSync()
+        // Timer 정리 - nonisolated context에서 안전하게 처리
+        timer?.invalidate()
+        timer = nil
+        
+        // NotificationCenter 정리
         NotificationCenter.default.removeObserver(self)
         cancellables.removeAll()
     }
@@ -194,30 +197,6 @@ extension PlayerViewModel {
     
     internal func formattedTime(_ time: TimeInterval) -> String {
         return formatter.string(from: time) ?? "0:00"
-    }
-}
-
-// MARK: - Timer Management
-
-extension PlayerViewModel {
-    
-    /// MainActor 컨텍스트에서 타이머를 중지합니다
-    internal func stopTimer() {
-        timer?.invalidate()
-        timer = nil
-    }
-    
-    /// deinit에서 사용할 수 있는 동기적 타이머 중지 메서드
-    nonisolated internal func stopTimerSync() {
-        // Timer는 thread-safe하므로 안전하게 정리 가능
-        timer?.invalidate()
-        timer = nil
-    }
-    
-    /// 타이머를 시작합니다 (타이머 관련 기능이 구현될 때까지 임시)
-    internal func startTimer() {
-        // TODO: PlayerViewModel+Timer.swift에서 구현
-        print("TODO: startTimer 구현 필요")
     }
 }
 
