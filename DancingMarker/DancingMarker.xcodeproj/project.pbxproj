@@ -52,6 +52,7 @@
 		51675E282CA2F0E800D8D08F /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 51675E272CA2F0E800D8D08F /* Secrets.xcconfig */; };
 		51675E292CA2F0E800D8D08F /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 51675E272CA2F0E800D8D08F /* Secrets.xcconfig */; };
 		516D95502D533F5D00AA8EAA /* TextMarquee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516D954F2D533F5D00AA8EAA /* TextMarquee.swift */; };
+		51CD43CA2DFB327900BC8EDF /* PlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CD43C92DFB327900BC8EDF /* PlayerViewModel.swift */; };
 		51EF633C2D99716400967EC8 /* View+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51EF633B2D99715C00967EC8 /* View+.swift */; };
 		901BF9812C29804A00C02FF9 /* DancingMarkerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 901BF9802C29804A00C02FF9 /* DancingMarkerApp.swift */; };
 		901BF9852C29804B00C02FF9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 901BF9842C29804B00C02FF9 /* Assets.xcassets */; };
@@ -61,7 +62,6 @@
 		901BF99F2C29809A00C02FF9 /* WatchDancingMarker Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 901BF9922C29809900C02FF9 /* WatchDancingMarker Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		901BF9B62C2A533200C02FF9 /* WatchNavigationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 901BF9B52C2A533200C02FF9 /* WatchNavigationManager.swift */; };
 		902077062C458ABB00988D2B /* WatchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 902077052C458ABB00988D2B /* WatchViewModel.swift */; };
-		902077082C464CB800988D2B /* PlayerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 902077072C464CB800988D2B /* PlayerModel.swift */; };
 		90A4722A2C45080D008577A2 /* WatchConnectivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 90A472292C45080D008577A2 /* WatchConnectivity.framework */; };
 		90A4722C2C450825008577A2 /* WatchConnectivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 90A4722B2C450825008577A2 /* WatchConnectivity.framework */; };
 		90A4722F2C450867008577A2 /* WCManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90A4722E2C450867008577A2 /* WCManager.swift */; };
@@ -132,6 +132,7 @@
 		512CEE6B2DF12F65001A800B /* MusicCoreData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = MusicCoreData.xcdatamodel; sourceTree = "<group>"; };
 		51675E272CA2F0E800D8D08F /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		516D954F2D533F5D00AA8EAA /* TextMarquee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextMarquee.swift; sourceTree = "<group>"; };
+		51CD43C92DFB327900BC8EDF /* PlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewModel.swift; sourceTree = "<group>"; };
 		51EF633B2D99715C00967EC8 /* View+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+.swift"; sourceTree = "<group>"; };
 		51FD01772C3BC6B1003F99B5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		901BF97D2C29804A00C02FF9 /* DancingMarker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DancingMarker.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -143,7 +144,6 @@
 		901BF99B2C29809A00C02FF9 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		901BF9B52C2A533200C02FF9 /* WatchNavigationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchNavigationManager.swift; sourceTree = "<group>"; };
 		902077052C458ABB00988D2B /* WatchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchViewModel.swift; sourceTree = "<group>"; };
-		902077072C464CB800988D2B /* PlayerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerModel.swift; sourceTree = "<group>"; };
 		90A472292C45080D008577A2 /* WatchConnectivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WatchConnectivity.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS10.5.sdk/System/Library/Frameworks/WatchConnectivity.framework; sourceTree = DEVELOPER_DIR; };
 		90A4722B2C450825008577A2 /* WatchConnectivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WatchConnectivity.framework; path = System/Library/Frameworks/WatchConnectivity.framework; sourceTree = SDKROOT; };
 		90A4722E2C450867008577A2 /* WCManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WCManager.swift; sourceTree = "<group>"; };
@@ -332,7 +332,7 @@
 		518D7F032CA2E26100612544 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				902077072C464CB800988D2B /* PlayerModel.swift */,
+				51CD43C92DFB327900BC8EDF /* PlayerViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -594,13 +594,13 @@
 				512CEE652DF12BF0001A800B /* DataRepository.swift in Sources */,
 				512CEE692DF12E06001A800B /* MusicData.swift in Sources */,
 				512CEE5D2DF092A8001A800B /* AudioService.swift in Sources */,
+				51CD43CA2DFB327900BC8EDF /* PlayerViewModel.swift in Sources */,
 				512CED4A2DF08E59001A800B /* Errors.swift in Sources */,
 				510D902B2CA2F1C8002E82CC /* MusicEditView.swift in Sources */,
 				510D902C2CA2F1C8002E82CC /* MusicListView.swift in Sources */,
 				510D902D2CA2F1C8002E82CC /* NowPlayingView.swift in Sources */,
 				512224C22D8C68D100AABC82 /* SelectGalleryView.swift in Sources */,
 				901BF9812C29804A00C02FF9 /* DancingMarkerApp.swift in Sources */,
-				902077082C464CB800988D2B /* PlayerModel.swift in Sources */,
 				512224C02D8C685E00AABC82 /* UIImage+.swift in Sources */,
 				90A4722F2C450867008577A2 /* WCManager.swift in Sources */,
 				512CED4E2DF08EC6001A800B /* MarkerManageable.swift in Sources */,
