@@ -47,18 +47,19 @@ final class AudioService: AudioPlayable {
     
     // MARK: - AudioPlayable Protocol Implementation
     
-    func play(_ music: Music) async throws {
+    /// 음악을 재생합니다 (새로운 URL 기반 메서드)
+    func playMusic(from fileURL: URL) async throws {
         // 기존 재생 중단
         stop()
         
         // 파일 존재 여부 확인
-        guard FileManager.default.fileExists(atPath: music.fileURL.path) else {
+        guard FileManager.default.fileExists(atPath: fileURL.path) else {
             throw DancingMarkerError.audioFileNotFound
         }
         
         do {
             // AVAudioPlayer 초기화
-            self.audioPlayer = try AVAudioPlayer(contentsOf: music.fileURL)
+            self.audioPlayer = try AVAudioPlayer(contentsOf: fileURL)
             guard let player = audioPlayer else {
                 throw DancingMarkerError.audioInitializationFailed
             }
@@ -84,12 +85,28 @@ final class AudioService: AudioPlayable {
         }
     }
     
+    /// 재생을 일시정지합니다
     func pause() {
         audioPlayer?.pause()
         isPlaying = false
         stopTimer()
     }
     
+    /// 재생을 재개합니다 (새로 추가된 메서드)
+    func resume() async throws {
+        guard let player = audioPlayer else {
+            throw DancingMarkerError.audioInitializationFailed
+        }
+        
+        player.play()
+        
+        await MainActor.run {
+            self.isPlaying = true
+            self.startTimer()
+        }
+    }
+    
+    /// 재생을 완전히 중지합니다
     func stop() {
         audioPlayer?.stop()
         audioPlayer = nil
@@ -98,6 +115,7 @@ final class AudioService: AudioPlayable {
         stopTimer()
     }
     
+    /// 재생 위치를 변경합니다
     func seek(to time: TimeInterval) async throws {
         guard let player = audioPlayer else {
             throw DancingMarkerError.audioSeekFailed
@@ -111,6 +129,7 @@ final class AudioService: AudioPlayable {
         }
     }
     
+    /// 5초 뒤로 이동합니다
     func skipBackward() async throws {
         guard let player = audioPlayer else {
             throw DancingMarkerError.audioSeekFailed
@@ -120,6 +139,7 @@ final class AudioService: AudioPlayable {
         try await seek(to: newTime)
     }
     
+    /// 5초 앞으로 이동합니다
     func skipForward() async throws {
         guard let player = audioPlayer else {
             throw DancingMarkerError.audioSeekFailed
@@ -129,6 +149,7 @@ final class AudioService: AudioPlayable {
         try await seek(to: newTime)
     }
     
+    /// 재생 속도를 변경합니다
     func setPlaybackRate(_ rate: Float) async throws {
         guard rate >= 0.5 && rate <= 1.5 else {
             throw DancingMarkerError.audioInvalidPlaybackRate
@@ -139,6 +160,25 @@ final class AudioService: AudioPlayable {
         await MainActor.run {
             self.playbackRate = rate
         }
+    }
+    
+    /// 볼륨을 설정합니다 (새로 추가된 메서드)
+    func setVolume(_ volume: Float) async throws {
+        guard let player = audioPlayer else {
+            throw DancingMarkerError.audioInitializationFailed
+        }
+        
+        let clampedVolume = max(0.0, min(1.0, volume))
+        player.volume = clampedVolume
+    }
+    
+    /// 현재 재생 시간을 가져옵니다 (새로 추가된 메서드)
+    func getCurrentTime() async throws -> TimeInterval {
+        guard let player = audioPlayer else {
+            throw DancingMarkerError.audioInitializationFailed
+        }
+        
+        return player.currentTime
     }
     
     // MARK: - Private Methods

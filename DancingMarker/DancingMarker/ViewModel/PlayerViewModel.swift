@@ -213,30 +213,29 @@ extension PlayerViewModel {
         timer?.invalidate()
         timer = nil
     }
+    
+    /// 타이머를 시작합니다 (타이머 관련 기능이 구현될 때까지 임시)
+    internal func startTimer() {
+        // TODO: PlayerViewModel+Timer.swift에서 구현
+        print("TODO: startTimer 구현 필요")
+    }
 }
 
 // MARK: - Placeholder Methods for Extensions
 
 extension PlayerViewModel {
     
-    // TODO: PlayerViewModel+Audio.swift에서 구현
-    internal func handlePlayToggle() async {
-        print("TODO: handlePlayToggle 구현 필요")
-    }
-    
-    internal func handleForward5Seconds() async {
-        print("TODO: handleForward5Seconds 구현 필요")
-    }
-    
-    internal func handleBackward5Seconds() async {
-        print("TODO: handleBackward5Seconds 구현 필요")
-    }
-    
+    // TODO: PlayerViewModel+Marker.swift에서 구현
     internal func handleMarkerPlay(at index: Int) async {
         print("TODO: handleMarkerPlay 구현 필요")
     }
     
     internal func handleMarkerSave(at index: Int) async {
         print("TODO: handleMarkerSave 구현 필요")
+    }
+    
+    // TODO: PlayerViewModel+Watch.swift에서 구현
+    internal func sendMusicListToWatch() async {
+        print("TODO: sendMusicListToWatch 구현 필요")
     }
 }
