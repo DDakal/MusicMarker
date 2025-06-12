@@ -34,28 +34,3 @@ protocol DataRepository {
     /// - Returns: 음악 데이터 또는 nil
     func findMusic(id: UUID) async throws -> MusicData?
 }
-
-/// 버전 독립적인 음악 데이터 모델
-struct MusicData: Identifiable, Equatable {
-    let id: UUID
-    var title: String
-    var artist: String
-    var fileName: String
-    var markers: [TimeInterval]
-    var albumArt: Data?
-    
-    init(id: UUID = UUID(), title: String, artist: String, fileName: String, markers: [TimeInterval], albumArt: Data? = nil) {
-        self.id = id
-        self.title = title
-        self.artist = artist
-        self.fileName = fileName
-        self.markers = markers
-        self.albumArt = albumArt
-    }
-    
-    /// 파일 URL을 반환합니다
-    var fileURL: URL {
-        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        return documentsDirectory.appendingPathComponent(fileName)
-    }
-}

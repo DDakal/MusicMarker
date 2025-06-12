@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788" systemVersion="24F74" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+    <entity name="MusicEntity" representedClassName="MusicEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="albumArt" optional="YES" attributeType="Binary"/>
+        <attribute name="artist" attributeType="String"/>
+        <attribute name="fileName" attributeType="String"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="markers" attributeType="Transformable"/>
+        <attribute name="title" attributeType="String"/>
+    </entity>
+</model>
