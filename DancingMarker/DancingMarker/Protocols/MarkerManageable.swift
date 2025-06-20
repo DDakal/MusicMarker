@@ -53,4 +53,19 @@ protocol MarkerManageable: ObservableObject {
     /// 모든 마커를 초기화합니다.
     /// - Throws: 초기화 실패 시 `DancingMarkerError` 예외를 던짐
     func clearAllMarkers() async throws
+    
+    // MARK: - ✅ 누락된 메서드들 추가
+    
+    /// 편집 중인 마커의 변경사항을 저장합니다.
+    /// - Throws: 저장 실패 시 `DancingMarkerError` 예외를 던짐  
+    func saveEditingMarker() async throws
+    
+    /// 마커 배열을 직접 설정합니다.
+    /// - Parameter newMarkers: 새로운 마커 배열
+    func setMarkers(_ newMarkers: [TimeInterval])
+    
+    /// 특정 인덱스의 마커가 유효한지 확인합니다.
+    /// - Parameter index: 확인할 마커 인덱스
+    /// - Returns: 마커가 유효하면 true, 그렇지 않으면 false
+    func isValidMarker(at index: Int) -> Bool
 }

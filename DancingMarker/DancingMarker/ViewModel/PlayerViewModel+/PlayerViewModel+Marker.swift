@@ -27,7 +27,7 @@ extension PlayerViewModel {
             // 현재 음악의 마커 업데이트
             updateCurrentMusicMarkers()
             
-            // 워치에 마커 정보 전송 (Watch extension에서 처리)
+            // 워치에 마커 정보 전송 (PlayerViewModel+Watch.swift의 메서드 사용)
             await sendMarkersToWatch()
             
             print("마커 \(index + 1) 추가됨: \(formattedTime(currentTime))")
@@ -41,8 +41,8 @@ extension PlayerViewModel {
     /// - Parameter index: 마커 인덱스
     func moveToMarker(at index: Int) async {
         do {
-            // 마커 유효성 확인
-            guard markerService.canMoveToMarker(at: index) else {
+            // ✅ MarkerService의 실제 메서드 사용
+            guard markerService.isValidMarker(at: index) else {
                 print("유효하지 않은 마커: \(index)")
                 return
             }
@@ -161,6 +161,7 @@ extension PlayerViewModel {
     /// 편집 중인 마커를 저장합니다
     func saveEditingMarker() async {
         do {
+            // ✅ MarkerService의 실제 메서드 사용
             try await markerService.saveEditingMarker()
             
             // 편집 모드 종료
@@ -249,16 +250,6 @@ private extension PlayerViewModel {
         self.currentMusic = currentMusic
     }
     
-    /// 워치에 마커 정보를 전송합니다
-    func sendMarkersToWatch() async {
-        do {
-            try await watchService.sendMarkers(markers)
-            print("워치에 마커 정보 전송 완료")
-        } catch {
-            print("워치 마커 정보 전송 실패: \(error)")
-        }
-    }
-    
     /// 외부 서비스들에게 현재 상태를 전송합니다 (마커 관련)
     func sendCurrentStateToExternalServices() async {
         // 워치에 재생 상태 전송
@@ -300,7 +291,7 @@ extension PlayerViewModel {
     /// 새로운 음악의 마커들을 로드합니다
     /// - Parameter musicData: 음악 데이터
     func loadMarkers(from musicData: MusicData) {
-        // MarkerService에 마커 정보 설정
+        // ✅ 이제 MarkerManageable 프로토콜에 setMarkers가 있음
         markerService.setMarkers(musicData.markers)
         
         // PlayerViewModel의 마커 배열 동기화

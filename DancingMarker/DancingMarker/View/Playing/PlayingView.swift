@@ -309,54 +309,128 @@ struct PlayingView: View {
         }
     }
     
-    /// 마커 버튼 생성
+    /// 마커 버튼 생성 (기존 디자인 복원)
     @ViewBuilder
     private func markerButton(for time: TimeInterval, index: Int) -> some View {
-        RoundedRectangle(cornerRadius: 12)
-            .frame(width: 360, height: 50)
-            .foregroundStyle(.buttonDarkGray)
-            .overlay(
-                HStack {
-                    Button(action: {
-                        Task {
-                            await playerViewModel.moveToMarker(at: index)
-                        }
-                    }) {
-                        HStack {
-                            Text("마커 \(index + 1)")
-                                .foregroundStyle(.white)
-                            Spacer()
-                            Text(playerViewModel.formattedTime(time))
-                                .foregroundStyle(.white)
-                        }
-                    }
-                    .padding(.horizontal)
+        if playerViewModel.isEditingMarker && playerViewModel.editingMarkerIndex == index {
+            editMarkerButton(for: time, index: index)
+        } else {
+            Button(action: {
+                Task {
+                    await playerViewModel.moveToMarker(at: index)
                 }
-            )
-    }
-    
-    /// 마커 추가 버튼 생성
-    @ViewBuilder
-    private func addMarkerButton(index: Int) -> some View {
-        RoundedRectangle(cornerRadius: 12)
-            .frame(width: 360, height: 50)
-            .foregroundStyle(.buttonDarkGray)
-            .overlay(
+            }) {
+                HStack(spacing: 8) {
+                    Image("addedMarker")
+                    Text(playerViewModel.formattedTime(time))
+                        .font(.title3)
+                        .italic()
+                        .foregroundColor(.black)
+                }
+                .frame(width: 360, height: 60)
+                .background(.accent)
+                .cornerRadius(12)
+            }
+            .contextMenu {
                 Button(action: {
+                    playerViewModel.startMarkerEditing(at: index)
+                }) {
+                    Text("Local_MarkerEdit")
+                    Image(systemName: "pencil")
+                }
+                Button(role: .destructive, action: {
                     Task {
-                        await addMarkerAtCurrentTime(index: index)
+                        await playerViewModel.deleteMarker(at: index)
                     }
                 }) {
-                    HStack {
-                        Text("마커 \(index + 1)")
-                            .foregroundStyle(.white)
-                        Spacer()
-                        Text("99:59")
-                            .foregroundStyle(.inactiveGray)
-                    }
-                    .padding(.horizontal)
+                    Text("Local_MarkerReset")
+                    Image(systemName: "eraser")
                 }
-            )
+            }
+        }
+    }
+    
+    /// 마커 추가 버튼 생성 (기존 디자인 복원)
+    @ViewBuilder
+    private func addMarkerButton(index: Int) -> some View {
+        Button(action: {
+            Task {
+                await playerViewModel.addMarkerAtCurrentTime(at: index)
+            }
+        }) {
+            HStack(spacing: 8) {
+                Image("emptyMarker")
+                Text("Local_MarkerAdd")
+                    .font(.title3)
+                    .foregroundColor(.white)
+            }
+            .frame(width: 360, height: 60)
+            .background(Color.buttonDarkGray)
+            .cornerRadius(12)
+        }
+    }
+    
+    /// 마커 편집 버튼 생성 (기존 디자인 복원)
+    @ViewBuilder
+    private func editMarkerButton(for marker: TimeInterval, index: Int) -> some View {
+        HStack(spacing: 6) {
+            Circle()
+                .fill(.inactiveGray)
+                .frame(width: 40, height: 40)
+                .overlay {
+                    Image("backward1SecIcon")
+                }
+                .onTapGesture {
+                    // 마커 시간 1초 감소
+                    let currentEditingTime = playerViewModel.markers[index]
+                    if currentEditingTime > 1 {
+                        Task {
+                            await playerViewModel.editMarker(at: index, to: currentEditingTime - 1)
+                        }
+                    }
+                }
+            
+            HStack(spacing: 8) {
+                Text(playerViewModel.formattedTime(playerViewModel.markers[index]))
+                    .font(.title3)
+                    .italic()
+                    .foregroundColor(.black)
+            }
+            .frame(width: 200, height: 60)
+            .background(.accent)
+            .cornerRadius(12)
+            .padding(.horizontal, 6)
+            
+            Circle()
+                .fill(.inactiveGray)
+                .frame(width: 40, height: 40)
+                .overlay {
+                    Image("forward1SecIcon")
+                }
+                .onTapGesture {
+                    // 마커 시간 1초 증가
+                    let currentEditingTime = playerViewModel.markers[index]
+                    if currentEditingTime < playerViewModel.duration - 1 {
+                        Task {
+                            await playerViewModel.editMarker(at: index, to: currentEditingTime + 1)
+                        }
+                    }
+                }
+            
+            Circle()
+                .fill(.buttonDarkGray)
+                .frame(width: 40, height: 40)
+                .overlay {
+                    Image(systemName: "checkmark")
+                        .foregroundColor(Color.green)
+                }
+                .padding(.leading, 10)
+                .onTapGesture {
+                    Task {
+                        await playerViewModel.saveEditingMarker()
+                    }
+                }
+        }
     }
     
     /// 현재 시간에 마커 추가
