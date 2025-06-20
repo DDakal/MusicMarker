@@ -319,11 +319,7 @@ struct PlayingView: View {
                 HStack {
                     Button(action: {
                         Task {
-                            do {
-                                try await playerViewModel.seek(to: time)
-                            } catch {
-                                print("마커로 이동 중 오류: \(error)")
-                            }
+                            await playerViewModel.moveToMarker(at: index)
                         }
                     }) {
                         HStack {

@@ -83,7 +83,6 @@ final class PlayerViewModel: ObservableObject {
         
         // 초기화 작업
         setupServiceObservation()
-        setupRemoteControlHandlers()
     }
     
     deinit {
@@ -108,11 +107,6 @@ extension PlayerViewModel {
         // 임시로 기본 설정
         formattedProgress = "0:00"
         formattedDuration = "0:00"
-    }
-    
-    internal func setupRemoteControlHandlers() {
-        // Control Center 리모트 컨트롤 설정
-        // TODO: PlayerViewModel+LiveActivity.swift에서 구체적으로 구현
     }
 }
 

@@ -43,12 +43,13 @@ extension PlayerViewModel {
         do {
             // MusicData를 Music으로 변환하여 전송
             let musicList = self.musicList.compactMap { musicData in
-                // MusicData에서 Music 객체 생성 (임시 구현)
-                // TODO: 실제로는 SwiftData에서 Music 객체들을 가져와야 함
+                // MusicData에서 Music 객체 생성 (완전한 파라미터)
                 Music(
                     title: musicData.title,
                     artist: musicData.artist,
-                    fileName: musicData.fileName
+                    fileName: musicData.fileName,
+                    markers: musicData.markers,
+                    albumArt: musicData.albumArt
                 )
             }
             
@@ -123,22 +124,27 @@ extension PlayerViewModel {
             
             // Control Center 업데이트
             group.addTask {
-                do {
-                    let nowPlayingInfo = NowPlayingInfo(
-                        title: music.title,
-                        artist: music.artist,
-                        currentTime: self.currentTime,
-                        duration: self.duration,
-                        isPlaying: self.isPlaying,
-                        playbackRate: self.playbackRate,
-                        albumArtData: music.albumArt
-                    )
-                    
-                    try await self.liveActivityService.updateNowPlayingInfo(nowPlayingInfo)
-                } catch {
-                    print("Control Center 업데이트 실패: \(error.localizedDescription)")
-                }
+                await self.updateControlCenterForWatch(music: music)
             }
+        }
+    }
+    
+    /// Control Center 정보 업데이트 (워치용 - 내부 에러 처리)
+    private func updateControlCenterForWatch(music: MusicData) async {
+        do {
+            let nowPlayingInfo = NowPlayingInfo(
+                title: music.title,
+                artist: music.artist,
+                currentTime: self.currentTime,
+                duration: self.duration,
+                isPlaying: self.isPlaying,
+                playbackRate: self.playbackRate,
+                albumArtData: music.albumArt
+            )
+            
+            try await self.liveActivityService.updateNowPlayingInfo(nowPlayingInfo)
+        } catch {
+            print("Control Center 업데이트 실패: \(error.localizedDescription)")
         }
     }
 }
@@ -372,12 +378,8 @@ extension PlayerViewModel {
             return
         }
         
-        do {
-            await playMusic(musicData)
-            print("워치에서 음악 선택 명령 수신: \(musicData.title)")
-        } catch {
-            print("워치 음악 선택 처리 중 오류: \(error)")
-        }
+        await playMusic(musicData)
+        print("워치에서 음악 선택 명령 수신: \(musicData.title)")
     }
     
     /// 볼륨 변경 처리 (워치에서 호출)

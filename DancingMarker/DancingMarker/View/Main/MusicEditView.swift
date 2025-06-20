@@ -12,7 +12,7 @@ import AVFoundation
 struct MusicEditView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject var playerModel: PlayerModel
+    @EnvironmentObject var playerViewModel: PlayerViewModel
     
     @Query var musicList: [Music] = []
     
@@ -215,10 +215,8 @@ struct MusicEditView: View {
         }
         
         do {
-            // AVAsset에서 메타데이터를 가져오되, 사용자 입력을 우선적으로 사용할 예정
             let (metadataTitle, metadataArtist, metadataAlbumArt) = try await fetchMusicMetadata(from: url)
             
-            // 사용자가 입력한 값이 있다면 그것을, 아니면 메타데이터를 사용하도록 결정
             let finalTitle = title.isEmpty ? metadataTitle : title
             let finalArtist = artist.isEmpty ? metadataArtist : artist
             let finalAlbumArt: Data?
@@ -244,7 +242,8 @@ struct MusicEditView: View {
             modelContext.insert(newMusic)
             try modelContext.save()
             
-            playerModel.sendMusicListToWatch(with: musicList)
+            await sendMusicListToWatch()
+            
         } catch {
             print("Failed to add music: \(error.localizedDescription)")
         }
@@ -271,5 +270,9 @@ struct MusicEditView: View {
         }
         
         return (title, artist, albumArt)
+    }
+    
+    private func sendMusicListToWatch() async {
+        await playerViewModel.sendMusicListToWatch()
     }
 }
