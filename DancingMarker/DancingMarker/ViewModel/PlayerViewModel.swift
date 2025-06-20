@@ -141,13 +141,9 @@ extension PlayerViewModel {
 
 extension PlayerViewModel {
     
-    // TODO: PlayerViewModel+LiveActivity.swift에서 구현
-    internal func setupRemoteControlHandlers() {
-        print("TODO: setupRemoteControlHandlers 구현 필요")
-    }
-    
     // 모든 handler 메서드들은 각각의 extension에서 구현됨:
     // - PlayerViewModel+Audio.swift: handlePlayToggle, handleForward5Seconds, handleBackward5Seconds
     // - PlayerViewModel+Marker.swift: handleMarkerPlay, handleMarkerSave, handleMarkerDelete
     // - PlayerViewModel+Watch.swift: 기타 워치 관련 handler들
+    // - PlayerViewModel+LiveActivity.swift: setupRemoteControlHandlers, RemoteControlHandler
 }

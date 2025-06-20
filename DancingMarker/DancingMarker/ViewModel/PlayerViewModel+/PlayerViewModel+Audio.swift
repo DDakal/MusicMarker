@@ -29,6 +29,9 @@ extension PlayerViewModel {
             // 타이머 시작
             startTimer()
             
+            // Control Center 설정
+            await setupControlCenterForNewMusic(musicData)
+            
             // 워치에 새 음악 정보 전송
             await notifyWatchOfNewMusic(musicData)
             
@@ -45,9 +48,9 @@ extension PlayerViewModel {
     func pauseMusic() {
         audioService.pause()
         
-        // 워치 및 Control Center 업데이트
+        // Control Center 및 워치 업데이트
         Task {
-            await sendCurrentStateToExternalServices()
+            await notifyAllExternalServicesOfStateChange()
         }
     }
     
@@ -55,8 +58,8 @@ extension PlayerViewModel {
     func resumeMusic() async throws {
         try await audioService.resume()
         
-        // 워치 및 Control Center 업데이트
-        await sendCurrentStateToExternalServices()
+        // Control Center 및 워치 업데이트
+        await notifyAllExternalServicesOfStateChange()
         
         print("음악 재생 재개됨")
     }
@@ -76,25 +79,13 @@ extension PlayerViewModel {
         progress = 0
         formattedProgress = "0:00"
         
-        do {
-            // Control Center 정리
-            try await liveActivityService.clearNowPlayingInfo()
-            
-            // 워치에 중지 상태 전송
-            try await watchService.sendPlayingState(
-                isPlaying: false,
-                currentTime: 0,
-                duration: 0
-            )
-            
-            // 워치에 중지 상태 알림
-            await notifyWatchOfMusicStop()
-            
-            print("음악 재생 완전히 중지됨")
-            
-        } catch {
-            print("외부 서비스 정리 중 오류: \(error)")
-        }
+        // Control Center 정리
+        await cleanupControlCenterOnStop()
+        
+        // 워치에 중지 상태 알림
+        await notifyWatchOfMusicStop()
+        
+        print("음악 재생 완전히 중지됨")
     }
     
     /// 5초 뒤로 이동합니다

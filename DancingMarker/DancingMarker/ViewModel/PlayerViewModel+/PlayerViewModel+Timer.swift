@@ -69,9 +69,14 @@ extension PlayerViewModel {
                 formattedDuration = formattedTime(duration)
             }
             
-            // 재생 상태가 변경된 경우 워치와 Control Center 업데이트
+            // 재생 상태가 변경된 경우 외부 서비스들 업데이트
             if wasPlaying != isPlaying {
-                await updateWatchAndControlCenter()
+                await notifyAllExternalServicesOfStateChange()
+            }
+            
+            // 주기적으로 Control Center 시간 정보 업데이트 (10초마다)
+            if Int(currentTime) % 10 == 0 {
+                await updateControlCenterPlaybackTime()
             }
             
             // 주기적으로 워치 업데이트 (5초마다)

@@ -60,6 +60,9 @@ extension PlayerViewModel {
             // 외부 서비스들에 상태 업데이트
             await sendCurrentStateToExternalServices()
             
+            // Control Center에 위치 변경 알림
+            await notifyControlCenterOfMarkerJump()
+            
             print("마커 \(index + 1)로 이동: \(formattedTime(markerTime))")
             
         } catch {
