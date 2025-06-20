@@ -84,7 +84,7 @@ struct NowPlayingView: View {
                     .cornerRadius(12)
                     .gesture(DragGesture(minimumDistance: 0)
                         .onChanged({ value in
-                            let newProgress = min(max(0, Double(value.location.x / geometry.size.width)), 1.0)
+                                let newProgress = min(max(0, Double(value.location.x / geometry.size.width)), 1.0)
                             let newTime = newProgress * playerViewModel.duration
                             
                             Task {

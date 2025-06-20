@@ -20,6 +20,9 @@ extension PlayerViewModel {
             // 현재 음악 설정
             currentMusic = musicData
             
+            // 마커 정보 로드
+            loadMarkers(from: musicData)
+            
             // AudioService로 음악 재생
             try await audioService.playMusic(from: musicData.fileURL)
             

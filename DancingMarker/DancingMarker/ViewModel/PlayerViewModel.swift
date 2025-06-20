@@ -204,15 +204,6 @@ extension PlayerViewModel {
 
 extension PlayerViewModel {
     
-    // TODO: PlayerViewModel+Marker.swift에서 구현
-    internal func handleMarkerPlay(at index: Int) async {
-        print("TODO: handleMarkerPlay 구현 필요")
-    }
-    
-    internal func handleMarkerSave(at index: Int) async {
-        print("TODO: handleMarkerSave 구현 필요")
-    }
-    
     // TODO: PlayerViewModel+Watch.swift에서 구현
     internal func sendMusicListToWatch() async {
         print("TODO: sendMusicListToWatch 구현 필요")
@@ -220,4 +211,7 @@ extension PlayerViewModel {
     
     // handlePlayToggle, handleForward5Seconds, handleBackward5Seconds 메서드들은
     // PlayerViewModel+Audio.swift에서 구현됨
+    
+    // handleMarkerPlay, handleMarkerSave 메서드들은
+    // PlayerViewModel+Marker.swift에서 구현됨
 }

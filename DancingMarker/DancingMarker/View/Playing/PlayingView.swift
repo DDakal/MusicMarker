@@ -365,14 +365,7 @@ struct PlayingView: View {
     
     /// 현재 시간에 마커 추가
     private func addMarkerAtCurrentTime(index: Int) async {
-        // TODO: PlayerViewModel+Marker.swift에서 구현될 메서드 호출
-        print("TODO: 마커 \(index + 1) 추가 - 현재 시간: \(playerViewModel.currentTime)")
-        
-        // 임시로 현재 시간을 마커로 설정
-        if var currentMusic = playerViewModel.currentMusic {
-            currentMusic.markers[index] = playerViewModel.currentTime
-            // TODO: MarkerService를 통해 실제 저장
-        }
+        await playerViewModel.addMarkerAtCurrentTime(at: index)
     }
     
     @ViewBuilder
