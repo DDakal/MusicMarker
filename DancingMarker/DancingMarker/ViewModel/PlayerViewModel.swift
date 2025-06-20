@@ -83,7 +83,6 @@ final class PlayerViewModel: ObservableObject {
         
         // 초기화 작업
         setupServiceObservation()
-        setupWatchNotifications()
         setupRemoteControlHandlers()
     }
     
@@ -111,71 +110,9 @@ extension PlayerViewModel {
         formattedDuration = "0:00"
     }
     
-    internal func setupWatchNotifications() {
-        // 워치 관련 NotificationCenter 설정
-        // 기존 PlayerModel의 notification 로직을 async/await 방식으로 변경
-        // Notification.Name들은 Manager/WCManager.swift에서 이미 정의됨
-        
-        NotificationCenter.default.addObserver(
-            forName: .plusCount,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            Task { @MainActor in
-                await self?.handlePlayToggle()
-            }
-        }
-        
-        NotificationCenter.default.addObserver(
-            forName: .forward,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            Task { @MainActor in
-                await self?.handleForward5Seconds()
-            }
-        }
-        
-        NotificationCenter.default.addObserver(
-            forName: .backward,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            Task { @MainActor in
-                await self?.handleBackward5Seconds()
-            }
-        }
-        
-        NotificationCenter.default.addObserver(
-            forName: .markerPlay,
-            object: nil,
-            queue: .main
-        ) { [weak self] notification in
-            if let index = notification.object as? Int {
-                Task { @MainActor in
-                    await self?.handleMarkerPlay(at: index)
-                }
-            }
-        }
-        
-        NotificationCenter.default.addObserver(
-            forName: .markerSave,
-            object: nil,
-            queue: .main
-        ) { [weak self] notification in
-            if let index = notification.object as? Int {
-                Task { @MainActor in
-                    await self?.handleMarkerSave(at: index)
-                }
-            }
-        }
-        
-        // 추가 알림들 TODO: 다른 extension에서 구현
-    }
-    
     internal func setupRemoteControlHandlers() {
         // Control Center 리모트 컨트롤 설정
-        // TODO: PlayerViewModel+RemoteControl.swift에서 구체적으로 구현
+        // TODO: PlayerViewModel+LiveActivity.swift에서 구체적으로 구현
     }
 }
 
@@ -204,14 +141,13 @@ extension PlayerViewModel {
 
 extension PlayerViewModel {
     
-    // TODO: PlayerViewModel+Watch.swift에서 구현
-    internal func sendMusicListToWatch() async {
-        print("TODO: sendMusicListToWatch 구현 필요")
+    // TODO: PlayerViewModel+LiveActivity.swift에서 구현
+    internal func setupRemoteControlHandlers() {
+        print("TODO: setupRemoteControlHandlers 구현 필요")
     }
     
-    // handlePlayToggle, handleForward5Seconds, handleBackward5Seconds 메서드들은
-    // PlayerViewModel+Audio.swift에서 구현됨
-    
-    // handleMarkerPlay, handleMarkerSave 메서드들은
-    // PlayerViewModel+Marker.swift에서 구현됨
+    // 모든 handler 메서드들은 각각의 extension에서 구현됨:
+    // - PlayerViewModel+Audio.swift: handlePlayToggle, handleForward5Seconds, handleBackward5Seconds
+    // - PlayerViewModel+Marker.swift: handleMarkerPlay, handleMarkerSave, handleMarkerDelete
+    // - PlayerViewModel+Watch.swift: 기타 워치 관련 handler들
 }

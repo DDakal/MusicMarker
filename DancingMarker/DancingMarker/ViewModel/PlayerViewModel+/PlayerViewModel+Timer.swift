@@ -71,14 +71,11 @@ extension PlayerViewModel {
             
             // 재생 상태가 변경된 경우 워치와 Control Center 업데이트
             if wasPlaying != isPlaying {
-                await sendPlayingStateToWatch()
-                await updateNowPlayingInfo()
+                await updateWatchAndControlCenter()
             }
             
-            // 주기적으로 워치에 시간 정보 전송 (5초마다)
-            if Int(currentTime) % 5 == 0 {
-                await sendPlayingStateToWatch()
-            }
+            // 주기적으로 워치 업데이트 (5초마다)
+            await sendRealTimeUpdateToWatch()
             
         } catch {
             print("재생 진행 상황 업데이트 실패: \(error.localizedDescription)")
@@ -118,45 +115,6 @@ extension PlayerViewModel {
     /// 타이머 상태를 확인합니다
     var isTimerRunning: Bool {
         return timer != nil
-    }
-}
-
-// MARK: - Watch Communication (Timer Related)
-
-extension PlayerViewModel {
-    
-    /// 워치에 재생 상태를 전송합니다 (타이머에서 호출)
-    private func sendPlayingStateToWatch() async {
-        do {
-            try await watchService.sendPlayingState(
-                isPlaying: isPlaying,
-                currentTime: currentTime,
-                duration: duration
-            )
-        } catch {
-            print("워치 재생 상태 전송 실패: \(error.localizedDescription)")
-        }
-    }
-    
-    /// Control Center 정보를 업데이트합니다 (타이머에서 호출)
-    private func updateNowPlayingInfo() async {
-        guard let music = currentMusic else { return }
-        
-        do {
-            let nowPlayingInfo = NowPlayingInfo(
-                title: music.title,
-                artist: music.artist,
-                currentTime: currentTime,
-                duration: duration,
-                isPlaying: isPlaying,
-                playbackRate: playbackRate,
-                albumArtData: music.albumArt
-            )
-            
-            try await liveActivityService.updateNowPlayingInfo(nowPlayingInfo)
-        } catch {
-            print("Now Playing 정보 업데이트 실패: \(error.localizedDescription)")
-        }
     }
 }
 

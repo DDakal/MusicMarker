@@ -29,8 +29,8 @@ extension PlayerViewModel {
             // 타이머 시작
             startTimer()
             
-            // 워치 및 Control Center 업데이트
-            try await updateWatchAndControlCenter(musicData: musicData)
+            // 워치에 새 음악 정보 전송
+            await notifyWatchOfNewMusic(musicData)
             
             print("음악 재생 시작: \(musicData.title)")
             
@@ -86,6 +86,9 @@ extension PlayerViewModel {
                 currentTime: 0,
                 duration: 0
             )
+            
+            // 워치에 중지 상태 알림
+            await notifyWatchOfMusicStop()
             
             print("음악 재생 완전히 중지됨")
             
@@ -178,35 +181,6 @@ extension PlayerViewModel {
 // MARK: - Private Helper Methods
 
 private extension PlayerViewModel {
-    
-    /// 워치와 Control Center를 업데이트합니다
-    func updateWatchAndControlCenter(musicData: MusicData) async throws {
-        // 워치에 음악 제목 전송
-        try await watchService.sendMusicTitle(musicData.title)
-        
-        // 워치에 재생 상태 전송
-        try await watchService.sendPlayingState(
-            isPlaying: true,
-            currentTime: 0,
-            duration: audioService.duration
-        )
-        
-        // 워치에 마커 정보 전송
-        try await watchService.sendMarkers(musicData.markers)
-        
-        // Control Center Now Playing 정보 업데이트
-        let nowPlayingInfo = NowPlayingInfo(
-            title: musicData.title,
-            artist: musicData.artist,
-            currentTime: 0,
-            duration: audioService.duration,
-            isPlaying: true,
-            playbackRate: audioService.playbackRate,
-            albumArtData: musicData.albumArt
-        )
-        
-        try await liveActivityService.updateNowPlayingInfo(nowPlayingInfo)
-    }
     
     /// 현재 상태를 외부 서비스들에 전송합니다
     func sendCurrentStateToExternalServices() async {

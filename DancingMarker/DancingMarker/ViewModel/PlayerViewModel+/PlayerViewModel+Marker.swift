@@ -27,7 +27,7 @@ extension PlayerViewModel {
             // 현재 음악의 마커 업데이트
             updateCurrentMusicMarkers()
             
-            // 워치에 마커 정보 전송
+            // 워치에 마커 정보 전송 (Watch extension에서 처리)
             await sendMarkersToWatch()
             
             print("마커 \(index + 1) 추가됨: \(formattedTime(currentTime))")
