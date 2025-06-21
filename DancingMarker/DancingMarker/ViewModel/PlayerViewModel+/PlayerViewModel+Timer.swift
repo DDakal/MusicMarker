@@ -40,7 +40,7 @@ extension PlayerViewModel {
     ///
     /// AudioService로부터 현재 재생 상태를 가져와서
     /// PlayerViewModel의 Published 프로퍼티들을 업데이트합니다.
-    private func updatePlaybackProgress() async {
+    internal func updatePlaybackProgress() async {
         // 드래그 중일 때는 업데이트하지 않음 (사용자 입력 우선)
         guard !isDragging else { return }
         
@@ -94,7 +94,7 @@ extension PlayerViewModel {
     
     /// 사용자가 슬라이더를 드래그할 때 호출됩니다
     /// - Parameter isDragging: 드래그 상태
-    func setDragging(_ isDragging: Bool) {
+    public func setDragging(_ isDragging: Bool) {
         self.isDragging = isDragging
         
         if isDragging {
@@ -107,7 +107,7 @@ extension PlayerViewModel {
     }
     
     /// 드래그 중 고주파 업데이트를 위한 타이머
-    private func startHighFrequencyTimer() {
+    internal func startHighFrequencyTimer() {
         stopTimer()
         
         timer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
@@ -141,7 +141,7 @@ extension PlayerViewModel {
     }
     
     /// 타이머를 강제로 한 번 업데이트합니다 (디버깅용)
-    func forceTimerUpdate() async {
+    public func forceTimerUpdate() async {
         await updatePlaybackProgress()
     }
 }

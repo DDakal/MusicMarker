@@ -84,14 +84,31 @@ struct NowPlayingView: View {
                     .cornerRadius(12)
                     .gesture(DragGesture(minimumDistance: 0)
                         .onChanged({ value in
-                                let newProgress = min(max(0, Double(value.location.x / geometry.size.width)), 1.0)
+                            // ✅ 드래그 시작 시 타이머 업데이트 중단
+                            if !playerViewModel.isDragging {
+                                playerViewModel.setDragging(true)
+                            }
+                            
+                            let newProgress = min(max(0, Double(value.location.x / geometry.size.width)), 1.0)
+                            let newTime = newProgress * playerViewModel.duration
+                            
+                            // ✅ UI만 즉시 업데이트
+                            playerViewModel.currentTime = newTime
+                            playerViewModel.updateProgress()
+                            playerViewModel.updateFormattedTime()
+                        })
+                        .onEnded({ value in
+                            // ✅ 드래그 종료 시 실제 seek 수행
+                            let newProgress = min(max(0, Double(value.location.x / geometry.size.width)), 1.0)
                             let newTime = newProgress * playerViewModel.duration
                             
                             Task {
                                 do {
                                     try await playerViewModel.seek(to: newTime)
+                                    playerViewModel.setDragging(false)
                                 } catch {
                                     print("시간 이동 중 오류: \(error)")
+                                    playerViewModel.setDragging(false)
                                 }
                             }
                         }))

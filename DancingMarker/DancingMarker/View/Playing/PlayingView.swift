@@ -122,14 +122,26 @@ struct PlayingView: View {
                     .highPriorityGesture(
                         DragGesture(minimumDistance: 0)
                             .onChanged({ value in
+                                if !playerViewModel.isDragging {
+                                    playerViewModel.setDragging(true)
+                                }
+                                
+                                let newProgress = min(max(0, Double(value.location.x / geometry.size.width)), 1.0)
+                                let newTime = newProgress * playerViewModel.duration
+                                
+                                playerViewModel.updateSliderUI(newTime: newTime)
+                            })
+                            .onEnded({ value in
                                 let newProgress = min(max(0, Double(value.location.x / geometry.size.width)), 1.0)
                                 let newTime = newProgress * playerViewModel.duration
                                 
                                 Task {
                                     do {
                                         try await playerViewModel.seek(to: newTime)
+                                        playerViewModel.setDragging(false)
                                     } catch {
                                         print("시간 이동 중 오류: \(error)")
+                                        playerViewModel.setDragging(false)
                                     }
                                 }
                             })

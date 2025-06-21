@@ -152,7 +152,7 @@ extension PlayerViewModel {
         }
     }
     
-    internal func updateProgress() {
+    public func updateProgress() {
         guard duration > 0 else {
             progress = 0
             return
@@ -160,11 +160,11 @@ extension PlayerViewModel {
         progress = currentTime / duration
     }
     
-    internal func updateFormattedTime() {
+    public func updateFormattedTime() {
         formattedProgress = formattedTime(currentTime)
     }
     
-    internal func formattedTime(_ time: TimeInterval) -> String {
+    public func formattedTime(_ time: TimeInterval) -> String {
         return formatter.string(from: time) ?? "0:00"
     }
 }
@@ -289,5 +289,25 @@ nonisolated func handlePreviousTrackCommand() {
     
     Task { @MainActor in
         print("Control Center에서 이전 트랙 명령 수신 (단일 곡 재생 앱으로 지원하지 않음)")
+    }
+}
+
+// MARK: - UI Slider Support Methods
+
+extension PlayerViewModel {
+    
+    /// 슬라이더에서 드래그 중일 때 UI 업데이트를 위한 메서드
+    public func updateSliderUI(newTime: TimeInterval) {
+        currentTime = newTime
+        
+        // 진행률 업데이트
+        guard duration > 0 else {
+            progress = 0
+            return
+        }
+        progress = currentTime / duration
+        
+        // 포맷된 시간 업데이트
+        formattedProgress = formattedTime(currentTime)
     }
 }
