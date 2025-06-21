@@ -153,3 +153,13 @@ extension PlayerViewModel {
     // - PlayerViewModel+Watch.swift: 기타 워치 관련 handler들
     // - PlayerViewModel+LiveActivity.swift: setupRemoteControlHandlers, RemoteControlHandler
 }
+
+// MARK: - Service Access (디버깅 및 특별한 경우를 위한 접근)
+
+extension PlayerViewModel {
+    
+    /// MarkerService에 직접 접근이 필요한 경우를 위한 computed property
+    var markerServiceInstance: MarkerService? {
+        return markerService as? MarkerService
+    }
+}
