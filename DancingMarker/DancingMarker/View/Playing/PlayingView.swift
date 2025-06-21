@@ -381,8 +381,8 @@ struct PlayingView: View {
                     Image("backward1SecIcon")
                 }
                 .onTapGesture {
-                    // ✅ MarkerService의 편집 시간을 1초 감소
-                    playerViewModel.markerServiceInstance?.decreaseEditingTime()
+                    // ✅ PlayerViewModel의 래퍼 메서드 사용
+                    playerViewModel.decreaseEditingMarkerTime()
                     print("마커 편집 시간 1초 감소")
                 }
             
@@ -405,8 +405,8 @@ struct PlayingView: View {
                     Image("forward1SecIcon")
                 }
                 .onTapGesture {
-                    // ✅ MarkerService의 편집 시간을 1초 증가
-                    playerViewModel.markerServiceInstance?.increaseEditingTime(maxDuration: playerViewModel.duration)
+                    // ✅ PlayerViewModel의 래퍼 메서드 사용  
+                    playerViewModel.increaseEditingMarkerTime()
                     print("마커 편집 시간 1초 증가")
                 }
             
@@ -429,7 +429,7 @@ struct PlayingView: View {
     
     /// 편집 중인 마커의 포맷된 시간을 반환합니다
     private func formattedEditingTime(index: Int) -> String {
-        if let currentEditingTime = playerViewModel.markerServiceInstance?.currentEditingTime,
+        if let currentEditingTime = playerViewModel.currentEditingTime,
            playerViewModel.isEditingMarker && playerViewModel.editingMarkerIndex == index {
             return playerViewModel.formattedTime(currentEditingTime)
         }

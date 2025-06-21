@@ -183,6 +183,23 @@ extension PlayerViewModel {
         }
     }
     
+    // MARK: - UI Helper Methods (PlayingView에서 사용)
+    
+    /// 편집 중인 마커의 시간을 1초 감소시킵니다
+    func decreaseEditingMarkerTime() {
+        markerService.decreaseEditingTime()
+    }
+    
+    /// 편집 중인 마커의 시간을 1초 증가시킵니다
+    func increaseEditingMarkerTime() {
+        markerService.increaseEditingTime(maxDuration: duration)
+    }
+    
+    /// 편집 중인 마커의 현재 시간을 반환합니다
+    var currentEditingTime: TimeInterval? {
+        return markerService.currentEditingTime
+    }
+    
     // MARK: - Notification Handlers (워치에서 호출)
     
     /// 워치에서 마커 재생 요청 처리
