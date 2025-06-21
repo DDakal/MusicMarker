@@ -161,7 +161,8 @@ final class MarkerService: MarkerManageable {
     // MARK: - Editing Support Methods
     
     /// 현재 편집 중인 마커의 시간을 반환합니다.
-    var currentEditingTime: TimeInterval {
+    var currentEditingTime: TimeInterval? {
+        guard isEditing else { return nil }
         return editingMarker
     }
     

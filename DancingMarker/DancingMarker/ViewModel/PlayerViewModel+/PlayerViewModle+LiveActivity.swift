@@ -119,7 +119,7 @@ extension PlayerViewModel: RemoteControlHandler {
 extension PlayerViewModel {
     
     /// Control Center에서 재생/일시정지 버튼을 눌렀을 때
-    func handlePlayPauseCommand() {
+    nonisolated func handlePlayPauseCommand() {
         print("🎵 handlePlayPauseCommand 호출됨!")
         
         Task { @MainActor in
@@ -140,7 +140,7 @@ extension PlayerViewModel {
     }
     
     /// Control Center에서 5초 뒤로 이동 명령
-    func handleSkipBackwardCommand() {
+    nonisolated func handleSkipBackwardCommand() {
         print("⏪ handleSkipBackwardCommand 호출됨!")
         
         Task { @MainActor in
@@ -155,7 +155,7 @@ extension PlayerViewModel {
     }
     
     /// Control Center에서 5초 앞으로 이동 명령
-    func handleSkipForwardCommand() {
+    nonisolated func handleSkipForwardCommand() {
         print("⏩ handleSkipForwardCommand 호출됨!")
         
         Task { @MainActor in
@@ -170,7 +170,7 @@ extension PlayerViewModel {
     }
     
     /// Control Center에서 재생 위치 변경 명령
-    func handleChangePlaybackPositionCommand(to position: TimeInterval) {
+    nonisolated func handleChangePlaybackPositionCommand(to position: TimeInterval) {
         print("🎚️ handleChangePlaybackPositionCommand 호출됨! position: \(position)")
         
         Task { @MainActor in
@@ -185,7 +185,7 @@ extension PlayerViewModel {
     }
     
     /// Control Center에서 다음 트랙 명령 (추후 구현)
-    func handleNextTrackCommand() {
+    nonisolated func handleNextTrackCommand() {
         print("⏭️ handleNextTrackCommand 호출됨!")
         
         Task { @MainActor in
@@ -195,7 +195,7 @@ extension PlayerViewModel {
     }
     
     /// Control Center에서 이전 트랙 명령 (추후 구현)
-    func handlePreviousTrackCommand() {
+    nonisolated func handlePreviousTrackCommand() {
         print("⏮️ handlePreviousTrackCommand 호출됨!")
         
         Task { @MainActor in

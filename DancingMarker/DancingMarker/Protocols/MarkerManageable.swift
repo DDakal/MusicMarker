@@ -57,7 +57,7 @@ protocol MarkerManageable: ObservableObject {
     // MARK: - ✅ 누락된 메서드들 추가
     
     /// 편집 중인 마커의 변경사항을 저장합니다.
-    /// - Throws: 저장 실패 시 `DancingMarkerError` 예외를 던짐  
+    /// - Throws: 저장 실패 시 `DancingMarkerError` 예외를 던짐
     func saveEditingMarker() async throws
     
     /// 마커 배열을 직접 설정합니다.
@@ -68,4 +68,16 @@ protocol MarkerManageable: ObservableObject {
     /// - Parameter index: 확인할 마커 인덱스
     /// - Returns: 마커가 유효하면 true, 그렇지 않으면 false
     func isValidMarker(at index: Int) -> Bool
+    
+    // MARK: - 마커 편집 시간 조정 메서드
+    
+    /// 편집 중인 마커의 시간을 1초 감소시킵니다.
+    func decreaseEditingTime()
+    
+    /// 편집 중인 마커의 시간을 1초 증가시킵니다.
+    /// - Parameter maxDuration: 최대 허용 시간 (음악 길이)
+    func increaseEditingTime(maxDuration: TimeInterval)
+    
+    /// 현재 편집 중인 마커의 시간을 반환합니다.
+    var currentEditingTime: TimeInterval? { get }
 }

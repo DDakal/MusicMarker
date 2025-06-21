@@ -29,8 +29,9 @@ extension PlayerViewModel {
             // 타이머 시작
             startTimer()
             
-            // Control Center 설정 (PlayerViewModle+LiveActivity.swift에서 구현)
-            await setupControlCenterForNewMusic(musicData)
+            // Control Center 설정 및 정보 업데이트
+            setupControlCenter()
+            //updateControlCenterInfo()
             
             // 워치에 새 음악 정보 전송 (PlayerViewModel+Watch.swift에서 구현)
             await sendMusicListToWatch()
@@ -51,8 +52,9 @@ extension PlayerViewModel {
         audioService.pause()
         
         // Control Center 및 워치 업데이트
+        //updateControlCenterInfo()
         Task {
-            await notifyAllExternalServicesOfStateChange()
+            await sendPlayingStateToWatch()
         }
     }
     
@@ -61,7 +63,8 @@ extension PlayerViewModel {
         try await audioService.resume()
         
         // Control Center 및 워치 업데이트
-        await notifyAllExternalServicesOfStateChange()
+        //updateControlCenterInfo()
+        await sendPlayingStateToWatch()
         
         print("음악 재생 재개됨")
     }
@@ -93,19 +96,22 @@ extension PlayerViewModel {
     /// 5초 뒤로 이동합니다
     func skipBackward() async throws {
         try await audioService.skipBackward()
-        await sendCurrentStateToExternalServices()
+        //updateControlCenterInfo()
+        await sendPlayingStateToWatch()
     }
     
     /// 5초 앞으로 이동합니다
     func skipForward() async throws {
         try await audioService.skipForward()
-        await sendCurrentStateToExternalServices()
+        //updateControlCenterInfo()
+        await sendPlayingStateToWatch()
     }
     
     /// 특정 시간으로 이동합니다
     func seek(to time: TimeInterval) async throws {
         try await audioService.seek(to: time)
-        await sendCurrentStateToExternalServices()
+        //updateControlCenterInfo()
+        await sendPlayingStateToWatch()
     }
     
     /// 재생 속도를 변경합니다
@@ -116,7 +122,7 @@ extension PlayerViewModel {
         try await watchService.sendPlaybackRate(rate)
         
         // Control Center 업데이트
-        await sendCurrentStateToExternalServices()
+        //updateControlCenterInfo()
     }
     
     /// 워치로 음악 리스트를 전송합니다
@@ -171,37 +177,3 @@ extension PlayerViewModel {
     }
 }
 
-// MARK: - Private Helper Methods
-
-private extension PlayerViewModel {
-    
-    /// 현재 상태를 외부 서비스들에 전송합니다
-    func sendCurrentStateToExternalServices() async {
-        guard let musicData = currentMusic else { return }
-        
-        do {
-            // 워치 상태 업데이트
-            try await watchService.sendPlayingState(
-                isPlaying: isPlaying,
-                currentTime: currentTime,
-                duration: duration
-            )
-            
-            // Control Center Now Playing 정보 업데이트  
-            let nowPlayingInfo = NowPlayingInfo(
-                title: musicData.title,
-                artist: musicData.artist,
-                currentTime: currentTime,
-                duration: duration,
-                isPlaying: isPlaying,
-                playbackRate: playbackRate,
-                albumArtData: musicData.albumArt
-            )
-            
-            try await liveActivityService.updateNowPlayingInfo(nowPlayingInfo)
-            
-        } catch {
-            print("외부 서비스 상태 업데이트 실패: \(error)")
-        }
-    }
-}

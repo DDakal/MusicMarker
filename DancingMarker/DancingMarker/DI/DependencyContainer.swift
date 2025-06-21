@@ -37,12 +37,6 @@ final class DependencyContainer: ObservableObject {
         LiveActivityService()
     }()
     
-    // MARK: - Legacy Dependencies (기존 코드와 호환성)
-    
-    private lazy var watchConnectivityManager: WatchConnectivityManager = {
-        WatchConnectivityManager()
-    }()
-    
     // MARK: - Model Container
     
     let modelContainer: ModelContainer = {
@@ -95,14 +89,6 @@ final class DependencyContainer: ObservableObject {
             watchService: watchService,
             liveActivityService: liveActivityService
         )
-    }
-    
-    // MARK: - Legacy Support (기존 코드 호환성)
-    
-    /// 기존 PlayerModel을 위한 WatchConnectivityManager 반환
-    /// 점진적 전환을 위해 임시로 제공
-    var legacyWatchConnectivityManager: WatchConnectivityManager {
-        return watchConnectivityManager
     }
 }
 

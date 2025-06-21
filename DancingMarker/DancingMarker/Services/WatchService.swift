@@ -33,16 +33,33 @@ final class WatchService: NSObject, WatchConnectivityManageable {
     
     private func setupWatchConnectivity() {
         if WCSession.isSupported() {
+            print("🎯 WatchService: WCSession 지원됨, 델리게이트 설정 중...")
             session.delegate = self
             session.activate()
+            print("🎯 WatchService: WCSession 활성화 요청 완료")
+        } else {
+            print("🚨 WatchService: WCSession이 지원되지 않는 기기")
         }
     }
     
     // MARK: - WatchConnectivityManageable Implementation
     
     func sendPlayingState(isPlaying: Bool, currentTime: TimeInterval, duration: TimeInterval) async throws {
+        print("🎯 WatchService: 재생 상태 전송 시도")
+        print("   - isConnected: \(isConnected)")
+        print("   - isReachable: \(isReachable)")
+        print("   - session.activationState: \(session.activationState.rawValue)")
+        print("   - session.isPaired: \(session.isPaired)")
+        print("   - session.isWatchAppInstalled: \(session.isWatchAppInstalled)")
+        
+        guard session.isReachable else {
+            print("🚨 WatchService: 워치에 연결할 수 없음 (isReachable: false)")
+            throw DancingMarkerError.watchNotConnected
+        }
+        
         try await sendIsPlaying(isPlaying)
         try await sendPlayingTimes([currentTime, duration])
+        print("✅ WatchService: 재생 상태 전송 성공")
     }
     
     func sendMarkers(_ markers: [TimeInterval]) async throws {
@@ -133,10 +150,27 @@ final class WatchService: NSObject, WatchConnectivityManageable {
     // MARK: - Private Helper Methods
     
     private func sendMessage(_ message: [String: Any]) async throws {
+        print("🎯 WatchService: 메시지 전송 시도")
+        print("   - 메시지 액션: \(message["action"] ?? "Unknown")")
+        print("   - isReachable: \(session.isReachable)")
+        
         return try await withCheckedThrowingContinuation { continuation in
             session.sendMessage(message) { replyHandler in
+                print("✅ WatchService: 메시지 전송 성공, 응답: \(replyHandler)")
                 continuation.resume()
             } errorHandler: { error in
+                print("🚨 WatchService: 메시지 전송 실패")
+                print("   - 원본 에러: \(error.localizedDescription)")
+                print("   - 에러 코드: \(error._code)")
+                print("   - 에러 도메인: \(error._domain)")
+                
+                // 더 구체적인 에러 정보 제공
+                if error._code == 7012 {
+                    print("   - 워치 앱이 실행되지 않았거나 백그라운드 상태")
+                } else if error._code == 7013 {
+                    print("   - 워치가 연결되지 않음")
+                }
+                
                 continuation.resume(throwing: DancingMarkerError.watchSendFailed)
             }
         }
@@ -225,25 +259,51 @@ extension WatchService: WCSessionDelegate {
         error: Error?
     ) {
         #if os(iOS)
-        print("ACTIVATED ON iOS")
+        print("🎯 WatchService: iOS에서 세션 활성화 완료")
         #elseif os(watchOS)
-        print("ACTIVATED ON watchOS")
+        print("🎯 WatchService: watchOS에서 세션 활성화 완료")
         #endif
+        
+        print("   - activationState: \(activationState.rawValue)")
+        print("   - isPaired: \(session.isPaired)")
+        print("   - isWatchAppInstalled: \(session.isWatchAppInstalled)")
+        print("   - isReachable: \(session.isReachable)")
+        
+        if let error = error {
+            print("🚨 WatchService: 세션 활성화 중 오류 발생: \(error.localizedDescription)")
+        }
         
         DispatchQueue.main.async {
             self.isReachable = session.isReachable
             self.isConnected = activationState == .activated
+            
+            if self.isConnected && self.isReachable {
+                print("✅ WatchService: 워치 연결 및 통신 준비 완료")
+            } else if self.isConnected && !self.isReachable {
+                print("⚠️ WatchService: 워치가 연결되었지만 통신할 수 없음 (워치가 꺼져있거나 범위 밖)")
+            } else {
+                print("🚨 WatchService: 워치 연결 실패")
+            }
         }
     }
     
     func sessionReachabilityDidChange(_ session: WCSession) {
         DispatchQueue.main.async {
+            let wasReachable = self.isReachable
             self.isReachable = session.isReachable
-            print("Reachability changed: \(self.isReachable)")
+            
+            print("🎯 WatchService: Reachability 변경됨")
+            print("   - 이전 상태: \(wasReachable)")
+            print("   - 현재 상태: \(self.isReachable)")
+            print("   - isPaired: \(session.isPaired)")
+            print("   - isWatchAppInstalled: \(session.isWatchAppInstalled)")
+            print("   - activationState: \(session.activationState.rawValue)")
             
             if !self.isReachable {
-                print("Session is not reachable, attempting to reactivate...")
+                print("🚨 WatchService: 세션이 연결되지 않음, 재활성화 시도...")
                 self.session.activate()
+            } else {
+                print("✅ WatchService: 워치 연결 복원됨")
             }
         }
     }

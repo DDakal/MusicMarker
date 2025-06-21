@@ -90,49 +90,49 @@ protocol WatchConnectivityManageable: ObservableObject {
 protocol WatchMessageDelegate: AnyObject {
     
     /// 재생/일시정지 토글 명령을 받았을 때 호출됩니다.
-    func didReceivePlayToggleCommand()
+    nonisolated func didReceivePlayToggleCommand()
     
     /// 5초 앞으로 이동 명령을 받았을 때 호출됩니다.
-    func didReceiveForwardCommand()
+    nonisolated func didReceiveForwardCommand()
     
     /// 5초 뒤로 이동 명령을 받았을 때 호출됩니다.
-    func didReceiveBackwardCommand()
+    nonisolated func didReceiveBackwardCommand()
     
     /// 재생 속도 증가 명령을 받았을 때 호출됩니다.
-    func didReceiveIncreaseSpeedCommand()
+    nonisolated func didReceiveIncreaseSpeedCommand()
     
     /// 재생 속도 감소 명령을 받았을 때 호출됩니다.
-    func didReceiveDecreaseSpeedCommand()
+    nonisolated func didReceiveDecreaseSpeedCommand()
     
     /// 원래 재생 속도로 복원 명령을 받았을 때 호출됩니다.
-    func didReceiveOriginalSpeedCommand()
+    nonisolated func didReceiveOriginalSpeedCommand()
     
     /// 마커 재생 명령을 받았을 때 호출됩니다.
     /// - Parameter index: 재생할 마커의 인덱스 (0, 1, 2)
-    func didReceiveMarkerPlayCommand(index: Int)
+    nonisolated func didReceiveMarkerPlayCommand(index: Int)
     
     /// 마커 저장 명령을 받았을 때 호출됩니다.
     /// - Parameter index: 저장할 마커의 인덱스 (0, 1, 2)
-    func didReceiveMarkerSaveCommand(index: Int)
+    nonisolated func didReceiveMarkerSaveCommand(index: Int)
     
     /// 마커 삭제 명령을 받았을 때 호출됩니다.
     /// - Parameter index: 삭제할 마커의 인덱스 (0, 1, 2)
-    func didReceiveMarkerDeleteCommand(index: Int)
+    nonisolated func didReceiveMarkerDeleteCommand(index: Int)
     
     /// 마커 편집 명령을 받았을 때 호출됩니다.
     /// - Parameters:
     ///   - index: 편집할 마커의 인덱스
     ///   - adjustment: 시간 조정값 (초)
-    func didReceiveMarkerEditCommand(index: Int, adjustment: Double)
+    nonisolated func didReceiveMarkerEditCommand(index: Int, adjustment: Double)
     
     /// 음악 선택 명령을 받았을 때 호출됩니다.
     /// - Parameter musicID: 선택된 음악의 UUID
-    func didReceiveMusicSelectionCommand(musicID: UUID)
+    nonisolated func didReceiveMusicSelectionCommand(musicID: UUID)
     
     /// 볼륨 변경 명령을 받았을 때 호출됩니다.
     /// - Parameter volume: 설정할 볼륨 (0.0 ~ 1.0)
-    func didReceiveVolumeChangeCommand(volume: Float)
+    nonisolated func didReceiveVolumeChangeCommand(volume: Float)
     
     /// 음악 목록 요청 명령을 받았을 때 호출됩니다.
-    func didReceiveMusicListRequestCommand()
+    nonisolated func didReceiveMusicListRequestCommand()
 }
