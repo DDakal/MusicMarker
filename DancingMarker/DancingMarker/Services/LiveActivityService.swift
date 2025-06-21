@@ -318,41 +318,6 @@ final class LiveActivityService: ControlCenterManageable {
     
     // ✅ setupAudioSession 메서드 제거 (중복 호출 방지)
     
-    // MARK: - Legacy Support Methods (기존 PlayerModel과의 호환성)
-    
-    /// 기존 PlayerModel의 remoteControlCenterInfo 메서드와 호환
-    func updateRemoteControlCenterInfo(music: Music, currentTime: TimeInterval, duration: TimeInterval, isPlaying: Bool, playbackRate: Float) {
-        let info = NowPlayingInfo(
-            title: music.title,
-            artist: music.artist,
-            currentTime: currentTime,
-            duration: duration,
-            isPlaying: isPlaying,
-            playbackRate: playbackRate,
-            albumArtData: music.albumArt
-        )
-        
-        Task {
-            try? await updateNowPlayingInfo(info)
-        }
-    }
-    
-    /// 기존 PlayerModel의 setupControlCenterControls 메서드와 호환
-    func setupControlCenterControls(handler: RemoteControlHandler) {
-        Task {
-            try? await setupRemoteControlHandlers(handler)
-        }
-    }
-    
-    /// 기존 PlayerModel의 updateNowPlayingControlCenter 메서드와 호환
-    func updateNowPlayingControlCenter(currentTime: TimeInterval, playbackRate: Float, isPlaying: Bool) {
-        Task { @MainActor in
-            var nowPlayingInfo = nowPlayingInfoCenter.nowPlayingInfo ?? [String: Any]()
-            nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentTime
-            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = isPlaying ? playbackRate : 0.0
-            nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
-        }
-    }
 }
 
 // MARK: - Extensions
