@@ -50,7 +50,7 @@
 		512CEE6D2DF12F65001A800B /* MusicCoreData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 512CEE6A2DF12F65001A800B /* MusicCoreData.xcdatamodeld */; };
 		5131FFEF2E0618210049E281 /* PlayerViewModel+Marker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5131FFEE2E0618210049E281 /* PlayerViewModel+Marker.swift */; };
 		5131FFF12E061A670049E281 /* PlayerViewModel+Watch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5131FFF02E061A670049E281 /* PlayerViewModel+Watch.swift */; };
-		5131FFF32E061EED0049E281 /* PlayerViewModle+LiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5131FFF22E061EED0049E281 /* PlayerViewModle+LiveActivity.swift */; };
+		5131FFF52E0640540049E281 /* PlayerViewModel+LiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5131FFF42E0640540049E281 /* PlayerViewModel+LiveActivity.swift */; };
 		516D95502D533F5D00AA8EAA /* TextMarquee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516D954F2D533F5D00AA8EAA /* TextMarquee.swift */; };
 		51CD43CA2DFB327900BC8EDF /* PlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CD43C92DFB327900BC8EDF /* PlayerViewModel.swift */; };
 		51CD44D52DFB35A800BC8EDF /* PlayerViewModel+Audio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CD44D42DFB35A800BC8EDF /* PlayerViewModel+Audio.swift */; };
@@ -135,7 +135,7 @@
 		512CEE6B2DF12F65001A800B /* MusicCoreData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = MusicCoreData.xcdatamodel; sourceTree = "<group>"; };
 		5131FFEE2E0618210049E281 /* PlayerViewModel+Marker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayerViewModel+Marker.swift"; sourceTree = "<group>"; };
 		5131FFF02E061A670049E281 /* PlayerViewModel+Watch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayerViewModel+Watch.swift"; sourceTree = "<group>"; };
-		5131FFF22E061EED0049E281 /* PlayerViewModle+LiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayerViewModle+LiveActivity.swift"; sourceTree = "<group>"; };
+		5131FFF42E0640540049E281 /* PlayerViewModel+LiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayerViewModel+LiveActivity.swift"; sourceTree = "<group>"; };
 		51675E272CA2F0E800D8D08F /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		516D954F2D533F5D00AA8EAA /* TextMarquee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextMarquee.swift; sourceTree = "<group>"; };
 		51CD43C92DFB327900BC8EDF /* PlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewModel.swift; sourceTree = "<group>"; };
@@ -384,7 +384,7 @@
 				51CD44D62DFB3B6A00BC8EDF /* PlayerViewModel+Timer.swift */,
 				5131FFEE2E0618210049E281 /* PlayerViewModel+Marker.swift */,
 				5131FFF02E061A670049E281 /* PlayerViewModel+Watch.swift */,
-				5131FFF22E061EED0049E281 /* PlayerViewModle+LiveActivity.swift */,
+				5131FFF42E0640540049E281 /* PlayerViewModel+LiveActivity.swift */,
 			);
 			path = "PlayerViewModel+";
 			sourceTree = "<group>";
@@ -623,6 +623,7 @@
 				512CEE652DF12BF0001A800B /* DataRepository.swift in Sources */,
 				512CEE692DF12E06001A800B /* MusicData.swift in Sources */,
 				512CEE5D2DF092A8001A800B /* AudioService.swift in Sources */,
+				5131FFF52E0640540049E281 /* PlayerViewModel+LiveActivity.swift in Sources */,
 				51CD43CA2DFB327900BC8EDF /* PlayerViewModel.swift in Sources */,
 				51CD44D72DFB3B6A00BC8EDF /* PlayerViewModel+Timer.swift in Sources */,
 				512CED4A2DF08E59001A800B /* Errors.swift in Sources */,
@@ -642,7 +643,6 @@
 				512CEE5F2DF093FC001A800B /* MarkerService.swift in Sources */,
 				512CEE612DF0991C001A800B /* WatchService.swift in Sources */,
 				51EF633C2D99716400967EC8 /* View+.swift in Sources */,
-				5131FFF32E061EED0049E281 /* PlayerViewModle+LiveActivity.swift in Sources */,
 				5131FFEF2E0618210049E281 /* PlayerViewModel+Marker.swift in Sources */,
 				512CEE6D2DF12F65001A800B /* MusicCoreData.xcdatamodeld in Sources */,
 				90E28F562C2D092E009098BE /* NavigationManager.swift in Sources */,

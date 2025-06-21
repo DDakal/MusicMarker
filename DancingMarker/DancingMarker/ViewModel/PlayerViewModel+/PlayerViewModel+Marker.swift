@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 
 // MARK: - Marker Management
 
@@ -25,7 +26,7 @@ extension PlayerViewModel {
             await updateMarkersFromService()
             
             // 현재 음악의 마커 업데이트
-            updateCurrentMusicMarkers()
+            try await updateCurrentMusicMarkers()
             
             // 워치에 마커 정보 전송 (PlayerViewModel+Watch.swift의 메서드 사용)
             await sendMarkersToWatch()
@@ -80,7 +81,7 @@ extension PlayerViewModel {
             await updateMarkersFromService()
             
             // 현재 음악의 마커 업데이트
-            updateCurrentMusicMarkers()
+            try await updateCurrentMusicMarkers()
             
             // 워치에 마커 정보 전송
             await sendMarkersToWatch()
@@ -104,7 +105,7 @@ extension PlayerViewModel {
             await updateMarkersFromService()
             
             // 현재 음악의 마커 업데이트
-            updateCurrentMusicMarkers()
+            try await updateCurrentMusicMarkers()
             
             // 워치에 마커 정보 전송
             await sendMarkersToWatch()
@@ -125,7 +126,7 @@ extension PlayerViewModel {
             await updateMarkersFromService()
             
             // 현재 음악의 마커 업데이트
-            updateCurrentMusicMarkers()
+            try await updateCurrentMusicMarkers()
             
             // 워치에 마커 정보 전송
             await sendMarkersToWatch()
@@ -171,7 +172,7 @@ extension PlayerViewModel {
             await updateMarkersFromService()
             
             // 현재 음악의 마커 업데이트
-            updateCurrentMusicMarkers()
+            try await updateCurrentMusicMarkers()
             
             // 워치에 마커 정보 전송
             await sendMarkersToWatch()
@@ -260,11 +261,33 @@ private extension PlayerViewModel {
         }
     }
     
-    /// 현재 음악의 마커 정보를 업데이트합니다
-    func updateCurrentMusicMarkers() {
+    /// 현재 음악의 마커 정보를 업데이트하고 데이터베이스에 저장합니다
+    func updateCurrentMusicMarkers() async throws {
         guard var currentMusic = self.currentMusic else { return }
+        
+        // 1. MusicData 업데이트
         currentMusic.markers = markers
         self.currentMusic = currentMusic
+        
+        // 2. 데이터베이스의 실제 Music 객체 찾기 및 업데이트
+        let musicId = currentMusic.id  // 값을 미리 추출
+        let predicate = #Predicate<Music> { music in
+            music.id == musicId  // 같은 타입끼리 비교
+        }
+        
+        let descriptor = FetchDescriptor<Music>(predicate: predicate)
+        
+        do {
+            let results = try modelContext.fetch(descriptor)
+            if let music = results.first {
+                music.markers = markers
+                try modelContext.save()
+                print("마커 데이터베이스 저장 완료: \(music.title)")
+            }
+        } catch {
+            print("마커 데이터베이스 저장 실패: \(error)")
+            throw error
+        }
     }
     
     /// 외부 서비스들에게 현재 상태를 전송합니다 (마커 관련)

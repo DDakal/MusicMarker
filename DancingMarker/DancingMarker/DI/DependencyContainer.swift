@@ -82,12 +82,13 @@ final class DependencyContainer: ObservableObject {
     // MARK: - PlayerViewModel Factory
     
     /// 의존성이 주입된 PlayerViewModel을 생성합니다
-    func makePlayerViewModel() -> PlayerViewModel {
+    func makePlayerViewModel(modelContext: ModelContext) -> PlayerViewModel {
         return PlayerViewModel(
             audioService: audioService,
             markerService: markerService,
             watchService: watchService,
-            liveActivityService: liveActivityService
+            liveActivityService: liveActivityService,
+            modelContext: modelContext
         )
     }
 }

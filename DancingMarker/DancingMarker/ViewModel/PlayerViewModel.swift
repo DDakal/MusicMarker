@@ -10,6 +10,7 @@ import Foundation
 import AVFoundation
 import MediaPlayer
 import Combine
+import SwiftData
 
 /// 새로운 아키텍처 기반 플레이어 뷰모델
 ///
@@ -27,6 +28,7 @@ final class PlayerViewModel: ObservableObject {
     internal let markerService: any MarkerManageable
     internal let watchService: any WatchConnectivityManageable
     internal let liveActivityService: any ControlCenterManageable
+    internal let modelContext: ModelContext
     
     // MARK: - Published Properties
     
@@ -68,12 +70,14 @@ final class PlayerViewModel: ObservableObject {
         audioService: any AudioPlayable,
         markerService: any MarkerManageable,
         watchService: any WatchConnectivityManageable,
-        liveActivityService: any ControlCenterManageable
+        liveActivityService: any ControlCenterManageable,
+        modelContext: ModelContext
     ) {
         self.audioService = audioService
         self.markerService = markerService
         self.watchService = watchService
         self.liveActivityService = liveActivityService
+        self.modelContext = modelContext
         
         // DateComponentsFormatter 설정
         self.formatter = DateComponentsFormatter()

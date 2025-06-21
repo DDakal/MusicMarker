@@ -23,7 +23,9 @@ struct DancingMarkerApp: App {
     
     init() {
         let container = DependencyContainer.shared
-        self._playerViewModel = StateObject(wrappedValue: container.makePlayerViewModel())
+        // ModelContext를 컨테이너에서 가져와서 전달
+        let modelContext = container.modelContainer.mainContext
+        self._playerViewModel = StateObject(wrappedValue: container.makePlayerViewModel(modelContext: modelContext))
     }
 
     var body: some Scene {
