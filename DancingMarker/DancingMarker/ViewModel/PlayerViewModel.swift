@@ -107,6 +107,18 @@ extension PlayerViewModel {
         // 임시로 기본 설정
         formattedProgress = "0:00"
         formattedDuration = "0:00"
+        
+        // ✅ Remote Control 핸들러 설정을 더 강력하게 처리
+        print("🎯 PlayerViewModel.setupServiceObservation에서 Remote Control 설정 시작")
+        
+        Task { @MainActor in
+            // 잠시 대기 후 설정 (앱이 완전히 로드된 후)
+            try? await Task.sleep(nanoseconds: 500_000_000) // 0.5초 대기
+            
+            print("🎯 Task에서 setupRemoteControlHandlers 호출 시작")
+            setupRemoteControlHandlers()
+            print("🎯 Task에서 setupRemoteControlHandlers 호출 완료")
+        }
     }
 }
 

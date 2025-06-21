@@ -63,12 +63,24 @@ extension PlayerViewModel: RemoteControlHandler {
     
     /// Remote Control 명령 핸들러를 설정합니다
     internal func setupRemoteControlHandlers() {
+        print("🎯 setupRemoteControlHandlers 호출됨")
+        print("🎯 현재 스레드: \(Thread.isMainThread ? "Main" : "Background")")
+        print("🎯 PlayerViewModel 인스턴스: \(self)")
+        
         Task {
             do {
+                print("🎯 LiveActivityService.setupRemoteControlHandlers 호출 시작")
+                print("🎯 liveActivityService: \(liveActivityService)")
+                
                 try await liveActivityService.setupRemoteControlHandlers(self)
-                print("Remote Control 핸들러 설정 완료")
+                
+                print("✅ Remote Control 핸들러 설정 완료")
+                
+                // ✅ 설정 후 바로 테스트로 Now Playing Info 업데이트
+                await updateControlCenterNowPlaying()
+                
             } catch {
-                print("Remote Control 핸들러 설정 실패: \(error)")
+                print("❌ Remote Control 핸들러 설정 실패: \(error)")
             }
         }
     }
@@ -108,6 +120,8 @@ extension PlayerViewModel {
     
     /// Control Center에서 재생/일시정지 버튼을 눌렀을 때
     func handlePlayPauseCommand() {
+        print("🎵 handlePlayPauseCommand 호출됨!")
+        
         Task { @MainActor in
             if isPlaying {
                 pauseMusic()
@@ -127,6 +141,8 @@ extension PlayerViewModel {
     
     /// Control Center에서 5초 뒤로 이동 명령
     func handleSkipBackwardCommand() {
+        print("⏪ handleSkipBackwardCommand 호출됨!")
+        
         Task { @MainActor in
             do {
                 try await skipBackward()
@@ -140,6 +156,8 @@ extension PlayerViewModel {
     
     /// Control Center에서 5초 앞으로 이동 명령
     func handleSkipForwardCommand() {
+        print("⏩ handleSkipForwardCommand 호출됨!")
+        
         Task { @MainActor in
             do {
                 try await skipForward()
@@ -153,6 +171,8 @@ extension PlayerViewModel {
     
     /// Control Center에서 재생 위치 변경 명령
     func handleChangePlaybackPositionCommand(to position: TimeInterval) {
+        print("🎚️ handleChangePlaybackPositionCommand 호출됨! position: \(position)")
+        
         Task { @MainActor in
             do {
                 try await seek(to: position)
@@ -166,6 +186,8 @@ extension PlayerViewModel {
     
     /// Control Center에서 다음 트랙 명령 (추후 구현)
     func handleNextTrackCommand() {
+        print("⏭️ handleNextTrackCommand 호출됨!")
+        
         Task { @MainActor in
             // TODO: 다음 곡 기능 구현
             print("Control Center에서 다음 트랙 명령 수신 (미구현)")
@@ -174,6 +196,8 @@ extension PlayerViewModel {
     
     /// Control Center에서 이전 트랙 명령 (추후 구현)
     func handlePreviousTrackCommand() {
+        print("⏮️ handlePreviousTrackCommand 호출됨!")
+        
         Task { @MainActor in
             // TODO: 이전 곡 기능 구현
             print("Control Center에서 이전 트랙 명령 수신 (미구현)")
@@ -187,35 +211,14 @@ extension PlayerViewModel {
     
     /// 새 음악 재생 시 Control Center 설정
     func setupControlCenterForNewMusic(_ musicData: MusicData) async {
-        await withTaskGroup(of: Void.self) { group in
-            // 백그라운드 오디오 세션 구성
-            group.addTask {
-                await self.configureBackgroundAudioSession()
-            }
-            
-            // Control Center 정보 업데이트
-            group.addTask {
-                await self.updateControlCenterNowPlaying()
-            }
-        }
-        
+        // ✅ Audio Session 설정을 여기서 하지 않음 (setupRemoteControlHandlers에서 처리)
+        await updateControlCenterNowPlaying()
         print("새 음악에 대한 Control Center 설정 완료: \(musicData.title)")
     }
     
     /// 음악 중지 시 Control Center 정리
     func cleanupControlCenterOnStop() async {
-        await withTaskGroup(of: Void.self) { group in
-            // Control Center 정보 초기화
-            group.addTask {
-                await self.clearControlCenterInfo()
-            }
-            
-            // 오디오 세션 비활성화
-            group.addTask {
-                await self.deactivateAudioSession()
-            }
-        }
-        
+        await clearControlCenterInfo()
         print("음악 중지에 따른 Control Center 정리 완료")
     }
     

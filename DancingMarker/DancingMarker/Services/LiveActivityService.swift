@@ -21,11 +21,13 @@ final class LiveActivityService: ControlCenterManageable {
     private let nowPlayingInfoCenter = MPNowPlayingInfoCenter.default()
     private let remoteCommandCenter = MPRemoteCommandCenter.shared()
     private weak var remoteControlHandler: RemoteControlHandler?
+    private var isAudioSessionConfigured = false  // ✅ 중복 설정 방지 플래그
     
     // MARK: - Initialization
     
     init() {
-        setupAudioSession()
+        // ✅ init에서 Audio Session 설정 제거
+        print("🎧 LiveActivityService 초기화됨")
     }
     
     deinit {
@@ -70,61 +72,117 @@ final class LiveActivityService: ControlCenterManageable {
     }
     
     func setupRemoteControlHandlers(_ handler: RemoteControlHandler) async throws {
+        print("🎯 LiveActivityService.setupRemoteControlHandlers 시작")
+        print("🎯 handler 타입: \(type(of: handler))")
+        
+        // ✅ Audio Session이 아직 설정되지 않았을 때만 설정
+        if !isAudioSessionConfigured {
+            try await configureAudioSession()
+        }
+        
         remoteControlHandler = handler
+        print("🎯 remoteControlHandler 설정 완료!")
         
         await MainActor.run {
-            // 기존 핸들러 제거
-            disableRemoteControlHandlers()
+            print("🎯 MainActor에서 Remote Command 설정 시작")
+            
+            // 기존 핸들러 제거 (하지만 handler는 유지)
+            print("🧹 기존 Remote Command 비활성화...")
+            remoteCommandCenter.togglePlayPauseCommand.isEnabled = false
+            remoteCommandCenter.skipBackwardCommand.isEnabled = false
+            remoteCommandCenter.skipForwardCommand.isEnabled = false
+            remoteCommandCenter.changePlaybackPositionCommand.isEnabled = false
+            
+            // 타겟 제거
+            remoteCommandCenter.togglePlayPauseCommand.removeTarget(nil)
+            remoteCommandCenter.skipBackwardCommand.removeTarget(nil)
+            remoteCommandCenter.skipForwardCommand.removeTarget(nil)
+            remoteCommandCenter.changePlaybackPositionCommand.removeTarget(nil)
+            
+            print("🧹 기존 핸들러 제거 완료")
             
             // Play/Pause 명령 설정
             remoteCommandCenter.togglePlayPauseCommand.isEnabled = true
-            remoteCommandCenter.togglePlayPauseCommand.addTarget { [weak self] _ in
-                self?.remoteControlHandler?.handlePlayPauseCommand()
+            remoteCommandCenter.togglePlayPauseCommand.addTarget { [weak self] event in
+                print("🎵 togglePlayPauseCommand 타겟 호출됨!")
+                
+                if let strongSelf = self, let handler = strongSelf.remoteControlHandler {
+                    print("✅ handler 존재함! handlePlayPauseCommand 호출")
+                    handler.handlePlayPauseCommand()
+                    print("✅ handlePlayPauseCommand 호출 완료")
+                } else {
+                    print("❌ self 또는 remoteControlHandler가 nil")
+                    print("   - self: \(self != nil ? "존재" : "nil")")
+                    print("   - handler: \(self?.remoteControlHandler != nil ? "존재" : "nil")")
+                }
+                
                 return .success
             }
+            print("🎯 togglePlayPauseCommand 설정 완료")
             
             // Skip Backward 명령 설정 (5초)
             remoteCommandCenter.skipBackwardCommand.isEnabled = true
-            remoteCommandCenter.skipBackwardCommand.preferredIntervals = [5]
-            remoteCommandCenter.skipBackwardCommand.addTarget { [weak self] _ in
-                self?.remoteControlHandler?.handleSkipBackwardCommand()
+            remoteCommandCenter.skipBackwardCommand.preferredIntervals = [NSNumber(value: 5)]
+            remoteCommandCenter.skipBackwardCommand.addTarget { [weak self] event in
+                print("⏪ skipBackwardCommand 타겟 호출됨!")
+                
+                if let strongSelf = self, let handler = strongSelf.remoteControlHandler {
+                    print("✅ handler 존재함! handleSkipBackwardCommand 호출")
+                    handler.handleSkipBackwardCommand()
+                    print("✅ handleSkipBackwardCommand 호출 완료")
+                } else {
+                    print("❌ self 또는 remoteControlHandler가 nil")
+                }
+                
                 return .success
             }
+            print("🎯 skipBackwardCommand 설정 완료")
             
             // Skip Forward 명령 설정 (5초)
             remoteCommandCenter.skipForwardCommand.isEnabled = true
-            remoteCommandCenter.skipForwardCommand.preferredIntervals = [5]
-            remoteCommandCenter.skipForwardCommand.addTarget { [weak self] _ in
-                self?.remoteControlHandler?.handleSkipForwardCommand()
+            remoteCommandCenter.skipForwardCommand.preferredIntervals = [NSNumber(value: 5)]
+            remoteCommandCenter.skipForwardCommand.addTarget { [weak self] event in
+                print("⏩ skipForwardCommand 타겟 호출됨!")
+                
+                if let strongSelf = self, let handler = strongSelf.remoteControlHandler {
+                    print("✅ handler 존재함! handleSkipForwardCommand 호출")
+                    handler.handleSkipForwardCommand()
+                    print("✅ handleSkipForwardCommand 호출 완료")
+                } else {
+                    print("❌ self 또는 remoteControlHandler가 nil")
+                }
+                
                 return .success
             }
+            print("🎯 skipForwardCommand 설정 완료")
             
             // 재생 위치 변경 명령 설정
             remoteCommandCenter.changePlaybackPositionCommand.isEnabled = true
             remoteCommandCenter.changePlaybackPositionCommand.addTarget { [weak self] event in
-                if let positionEvent = event as? MPChangePlaybackPositionCommandEvent {
-                    self?.remoteControlHandler?.handleChangePlaybackPositionCommand(to: positionEvent.positionTime)
+                print("🎚️ changePlaybackPositionCommand 타겟 호출됨!")
+                
+                if let positionEvent = event as? MPChangePlaybackPositionCommandEvent,
+                   let strongSelf = self, let handler = strongSelf.remoteControlHandler {
+                    print("✅ handler 존재함! handleChangePlaybackPositionCommand 호출")
+                    handler.handleChangePlaybackPositionCommand(to: positionEvent.positionTime)
+                    print("✅ handleChangePlaybackPositionCommand 호출 완료")
                     return .success
+                } else {
+                    print("❌ 이벤트 캐스팅 실패 또는 handler가 nil")
+                    return .commandFailed
                 }
-                return .commandFailed
             }
+            print("🎯 changePlaybackPositionCommand 설정 완료")
             
-            // 다음/이전 트랙 명령 (선택적)
-            remoteCommandCenter.nextTrackCommand.isEnabled = true
-            remoteCommandCenter.nextTrackCommand.addTarget { [weak self] _ in
-                self?.remoteControlHandler?.handleNextTrackCommand()
-                return .success
-            }
-            
-            remoteCommandCenter.previousTrackCommand.isEnabled = true
-            remoteCommandCenter.previousTrackCommand.addTarget { [weak self] _ in
-                self?.remoteControlHandler?.handlePreviousTrackCommand()
-                return .success
-            }
+            print("🎯 모든 Remote Command 설정 완료")
         }
+        
+        print("✅ LiveActivityService.setupRemoteControlHandlers 완료")
     }
     
     func disableRemoteControlHandlers() {
+        print("🧹 Remote Command 비활성화 시작")
+        
         // 모든 remote command 비활성화
         remoteCommandCenter.togglePlayPauseCommand.isEnabled = false
         remoteCommandCenter.skipBackwardCommand.isEnabled = false
@@ -141,24 +199,63 @@ final class LiveActivityService: ControlCenterManageable {
         remoteCommandCenter.nextTrackCommand.removeTarget(nil)
         remoteCommandCenter.previousTrackCommand.removeTarget(nil)
         
-        remoteControlHandler = nil
+        // ✅ handler는 nil로 만들지 않음 (계속 유지)
+        // remoteControlHandler = nil
+        
+        print("🧹 Remote Command 비활성화 완료 (handler는 유지)")
     }
     
     func configureAudioSession() async throws {
+        // ✅ 이미 설정되었으면 중복 설정하지 않음
+        guard !isAudioSessionConfigured else {
+            print("🎧 Audio Session 이미 구성됨, 스킵")
+            return
+        }
+        
+        print("🎧 Audio Session 구성 시작")
+        
         do {
             let audioSession = AVAudioSession.sharedInstance()
-            try audioSession.setCategory(.playback, mode: .default, options: [])
+            
+            // 현재 상태 확인
+            print("🎧 현재 Audio Session 상태: category=\(audioSession.category), active=\(audioSession.isOtherAudioPlaying)")
+            
+            // ✅ 가장 단순한 설정으로 시작
+            try audioSession.setCategory(.playback)
+            print("🎧 Audio Session 카테고리 설정 완료")
+            
             try audioSession.setActive(true)
+            print("🎧 Audio Session 활성화 완료")
+            
+            isAudioSessionConfigured = true  // ✅ 설정 완료 플래그
+            
         } catch {
+            print("❌ Audio Session 구성 실패: \(error)")
+            
+            // 더 자세한 에러 정보 출력
+            if let nsError = error as NSError? {
+                print("   - Domain: \(nsError.domain)")
+                print("   - Code: \(nsError.code)")
+                print("   - LocalizedDescription: \(nsError.localizedDescription)")
+            }
+            
             throw DancingMarkerError.audioSessionSetupFailed
         }
     }
     
     func deactivateAudioSession() async throws {
+        guard isAudioSessionConfigured else {
+            print("🎧 Audio Session이 구성되지 않음, 비활성화 스킵")
+            return
+        }
+        
         do {
             let audioSession = AVAudioSession.sharedInstance()
             try audioSession.setActive(false)
+            isAudioSessionConfigured = false  // ✅ 플래그 초기화
+            print("🎧 Audio Session 비활성화 완료")
         } catch {
+            print("❌ Audio Session 비활성화 실패: \(error)")
             throw DancingMarkerError.audioSessionSetupFailed
         }
     }
@@ -219,11 +316,7 @@ final class LiveActivityService: ControlCenterManageable {
     
     // MARK: - Private Methods
     
-    private func setupAudioSession() {
-        Task {
-            try? await configureAudioSession()
-        }
-    }
+    // ✅ setupAudioSession 메서드 제거 (중복 호출 방지)
     
     // MARK: - Legacy Support Methods (기존 PlayerModel과의 호환성)
     

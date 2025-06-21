@@ -370,7 +370,7 @@ struct PlayingView: View {
         }
     }
     
-    /// 마커 편집 버튼 생성 (기존 디자인 복원)
+    /// 마커 편집 버튼 생성 (수정된 버전)
     @ViewBuilder
     private func editMarkerButton(for marker: TimeInterval, index: Int) -> some View {
         HStack(spacing: 6) {
@@ -381,17 +381,14 @@ struct PlayingView: View {
                     Image("backward1SecIcon")
                 }
                 .onTapGesture {
-                    // 마커 시간 1초 감소
-                    let currentEditingTime = playerViewModel.markers[index]
-                    if currentEditingTime > 1 {
-                        Task {
-                            await playerViewModel.editMarker(at: index, to: currentEditingTime - 1)
-                        }
-                    }
+                    // ✅ MarkerService의 편집 시간을 1초 감소
+                    playerViewModel.markerServiceInstance?.decreaseEditingTime()
+                    print("마커 편집 시간 1초 감소")
                 }
             
             HStack(spacing: 8) {
-                Text(playerViewModel.formattedTime(playerViewModel.markers[index]))
+                // ✅ MarkerService의 현재 편집 시간을 표시
+                Text(formattedEditingTime(index: index))
                     .font(.title3)
                     .italic()
                     .foregroundColor(.black)
@@ -408,13 +405,9 @@ struct PlayingView: View {
                     Image("forward1SecIcon")
                 }
                 .onTapGesture {
-                    // 마커 시간 1초 증가
-                    let currentEditingTime = playerViewModel.markers[index]
-                    if currentEditingTime < playerViewModel.duration - 1 {
-                        Task {
-                            await playerViewModel.editMarker(at: index, to: currentEditingTime + 1)
-                        }
-                    }
+                    // ✅ MarkerService의 편집 시간을 1초 증가
+                    playerViewModel.markerServiceInstance?.increaseEditingTime(maxDuration: playerViewModel.duration)
+                    print("마커 편집 시간 1초 증가")
                 }
             
             Circle()
@@ -427,10 +420,20 @@ struct PlayingView: View {
                 .padding(.leading, 10)
                 .onTapGesture {
                     Task {
+                        print("마커 편집 저장 버튼 클릭")
                         await playerViewModel.saveEditingMarker()
                     }
                 }
         }
+    }
+    
+    /// 편집 중인 마커의 포맷된 시간을 반환합니다
+    private func formattedEditingTime(index: Int) -> String {
+        if let currentEditingTime = playerViewModel.markerServiceInstance?.currentEditingTime,
+           playerViewModel.isEditingMarker && playerViewModel.editingMarkerIndex == index {
+            return playerViewModel.formattedTime(currentEditingTime)
+        }
+        return playerViewModel.formattedTime(playerViewModel.markers[index])
     }
     
     /// 현재 시간에 마커 추가

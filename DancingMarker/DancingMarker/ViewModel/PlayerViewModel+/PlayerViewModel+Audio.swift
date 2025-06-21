@@ -29,11 +29,13 @@ extension PlayerViewModel {
             // 타이머 시작
             startTimer()
             
-            // Control Center 설정
+            // Control Center 설정 (PlayerViewModle+LiveActivity.swift에서 구현)
             await setupControlCenterForNewMusic(musicData)
             
-            // 워치에 새 음악 정보 전송
-            await notifyWatchOfNewMusic(musicData)
+            // 워치에 새 음악 정보 전송 (PlayerViewModel+Watch.swift에서 구현)
+            await sendMusicListToWatch()
+            await sendMarkersToWatch()
+            await sendPlayingStateToWatch()
             
             print("음악 재생 시작: \(musicData.title)")
             
@@ -79,11 +81,11 @@ extension PlayerViewModel {
         progress = 0
         formattedProgress = "0:00"
         
-        // Control Center 정리
+        // Control Center 정리 (PlayerViewModle+LiveActivity.swift에서 구현)
         await cleanupControlCenterOnStop()
         
-        // 워치에 중지 상태 알림
-        await notifyWatchOfMusicStop()
+        // 워치에 중지 상태 알림 (PlayerViewModel+Watch.swift에서 구현)
+        await sendPlayingStateToWatch()
         
         print("음악 재생 완전히 중지됨")
     }
@@ -185,7 +187,7 @@ private extension PlayerViewModel {
                 duration: duration
             )
             
-            // Control Center Now Playing 정보 업데이트
+            // Control Center Now Playing 정보 업데이트  
             let nowPlayingInfo = NowPlayingInfo(
                 title: musicData.title,
                 artist: musicData.artist,
