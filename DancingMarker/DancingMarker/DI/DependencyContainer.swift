@@ -120,8 +120,8 @@ extension DependencyContainer {
     ) -> DependencyContainer {
         let container = DependencyContainer()
         
-        // Mock 서비스들로 교체 (향후 테스트 시 사용)
-        // TODO: Mock 서비스들이 구현되면 여기서 교체
+        // 향후 Mock 구현 시 여기서 실제 서비스 대신 Mock 주입 가능
+        // 현재는 실제 서비스들을 그대로 사용
         
         return container
     }

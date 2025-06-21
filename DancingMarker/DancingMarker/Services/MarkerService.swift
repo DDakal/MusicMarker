@@ -52,8 +52,6 @@ final class MarkerService: MarkerManageable {
             self.markers[index] = time
         }
         
-        // SwiftData 저장 로직은 나중에 추가
-        // TODO: modelContext.save()
     }
     
     func deleteMarker(at index: Int) async throws {
@@ -71,8 +69,6 @@ final class MarkerService: MarkerManageable {
             self.markers[index] = -1
         }
         
-        // SwiftData 저장 로직은 나중에 추가
-        // TODO: modelContext.save()
     }
     
     func editMarker(at index: Int, to newTime: TimeInterval) async throws {
@@ -94,9 +90,6 @@ final class MarkerService: MarkerManageable {
         await MainActor.run {
             self.markers[index] = newTime
         }
-        
-        // SwiftData 저장 로직은 나중에 추가
-        // TODO: modelContext.save()
     }
     
     func startEditing(at index: Int) {
@@ -119,8 +112,6 @@ final class MarkerService: MarkerManageable {
             self.markers = [-1, -1, -1]
         }
         
-        // SwiftData 저장 로직은 나중에 추가
-        // TODO: modelContext.save()
     }
     
     // MARK: - Additional Helper Methods

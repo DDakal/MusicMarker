@@ -105,10 +105,7 @@ final class PlayerViewModel: ObservableObject {
 extension PlayerViewModel {
     
     internal func setupServiceObservation() {
-        // AudioService 상태 관찰 설정
-        // TODO: 각 서비스의 Publisher들이 구현되면 연결
-        
-        // 임시로 기본 설정
+        // 기본 설정
         formattedProgress = "0:00"
         formattedDuration = "0:00"
         
@@ -126,7 +123,7 @@ extension PlayerViewModel {
             }
         }
         
-        // ✅ Remote Control 핸들러 설정을 더 강력하게 처리
+        // ✅ Remote Control 핸들러 설정
         print("🎯 PlayerViewModel.setupServiceObservation에서 Remote Control 설정 시작")
         
         Task { @MainActor in
@@ -274,5 +271,23 @@ extension PlayerViewModel: WatchMessageDelegate {
         Task { @MainActor in
             await handleMusicListRequest()
         }
+    }
+}
+
+/// Control Center에서 다음 트랙 명령 (이 앱에서는 지원하지 않음)
+nonisolated func handleNextTrackCommand() {
+    print("⏭️ handleNextTrackCommand 호출됨!")
+    
+    Task { @MainActor in
+        print("Control Center에서 다음 트랙 명령 수신 (단일 곡 재생 앱으로 지원하지 않음)")
+    }
+}
+
+/// Control Center에서 이전 트랙 명령 (이 앱에서는 지원하지 않음)  
+nonisolated func handlePreviousTrackCommand() {
+    print("⏮️ handlePreviousTrackCommand 호출됨!")
+    
+    Task { @MainActor in
+        print("Control Center에서 이전 트랙 명령 수신 (단일 곡 재생 앱으로 지원하지 않음)")
     }
 }
