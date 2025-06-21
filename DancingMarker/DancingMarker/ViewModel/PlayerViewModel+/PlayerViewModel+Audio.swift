@@ -31,7 +31,7 @@ extension PlayerViewModel {
             
             // Control Center 설정 및 정보 업데이트
             setupControlCenter()
-            //updateControlCenterInfo()
+            Task { await updateControlCenterNowPlaying() }
             
             // 워치에 새 음악 정보 전송 (PlayerViewModel+Watch.swift에서 구현)
             await sendMusicListToWatch()
@@ -52,7 +52,7 @@ extension PlayerViewModel {
         audioService.pause()
         
         // Control Center 및 워치 업데이트
-        //updateControlCenterInfo()
+        Task { await updateControlCenterNowPlaying() }
         Task {
             await sendPlayingStateToWatch()
         }
@@ -63,7 +63,7 @@ extension PlayerViewModel {
         try await audioService.resume()
         
         // Control Center 및 워치 업데이트
-        //updateControlCenterInfo()
+        Task { await updateControlCenterNowPlaying() }
         await sendPlayingStateToWatch()
         
         print("음악 재생 재개됨")
@@ -96,21 +96,21 @@ extension PlayerViewModel {
     /// 5초 뒤로 이동합니다
     func skipBackward() async throws {
         try await audioService.skipBackward()
-        //updateControlCenterInfo()
+        Task { await updateControlCenterNowPlaying() }
         await sendPlayingStateToWatch()
     }
     
     /// 5초 앞으로 이동합니다
     func skipForward() async throws {
         try await audioService.skipForward()
-        //updateControlCenterInfo()
+        Task { await updateControlCenterNowPlaying() }
         await sendPlayingStateToWatch()
     }
     
     /// 특정 시간으로 이동합니다
     func seek(to time: TimeInterval) async throws {
         try await audioService.seek(to: time)
-        //updateControlCenterInfo()
+        Task { await updateControlCenterNowPlaying() }
         await sendPlayingStateToWatch()
     }
     
@@ -122,7 +122,7 @@ extension PlayerViewModel {
         try await watchService.sendPlaybackRate(rate)
         
         // Control Center 업데이트
-        //updateControlCenterInfo()
+        Task { await updateControlCenterNowPlaying() }
     }
     
     /// 워치로 음악 리스트를 전송합니다
