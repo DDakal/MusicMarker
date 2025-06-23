@@ -174,13 +174,25 @@ extension PlayerViewModel {
         print("🎚️ handleChangePlaybackPositionCommand 호출됨! position: \(position)")
         
         Task { @MainActor in
+            // Control Center에서 seek 중임을 표시
+            isControlCenterSeeking = true
+            
             do {
                 try await seek(to: position)
+                
+                // 전용 동기화 메서드로 완전한 상태 동기화
+                await forceSyncAfterSeek()
+                
+                // 동기화된 정보로 Control Center 즉시 업데이트
                 await updateControlCenterNowPlaying()
-                print("Control Center에서 재생 위치 변경 명령 수신: \(formattedTime(position))")
+                
+                print("Control Center seek 완료: \(formattedTime(currentTime))")
+                
             } catch {
                 print("Control Center 재생 위치 변경 처리 중 오류: \(error)")
             }
+            
+            isControlCenterSeeking = false
         }
     }
     

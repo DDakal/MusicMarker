@@ -42,6 +42,7 @@ final class PlayerViewModel: ObservableObject {
     @Published var playbackRate: Float = 1.0
     @Published var volume: Float = 1.0
     @Published var isDragging: Bool = false
+    @Published var isControlCenterSeeking: Bool = false
     
     // UI 관련
     @Published var progress: Double = 0.0
@@ -60,6 +61,7 @@ final class PlayerViewModel: ObservableObject {
     
     internal let formatter: DateComponentsFormatter
     internal var cancellables = Set<AnyCancellable>()
+    internal var lastSeekTask: Task<Void, Never>?
     
     /// Timer는 thread-safe하므로 nonisolated context에서도 안전하게 접근 가능
     nonisolated(unsafe) internal var timer: Timer?
@@ -109,11 +111,11 @@ extension PlayerViewModel {
         formattedProgress = "0:00"
         formattedDuration = "0:00"
         
-        // ✅ WatchService 델리게이트 설정
+        // WatchService 델리게이트 설정
         watchService.setMessageDelegate(self)
         print("🎯 WatchService 델리게이트 설정 완료")
         
-        // ✅ WatchService 세션 활성화
+        // WatchService 세션 활성화
         Task { @MainActor in
             do {
                 try await watchService.activateSession()
@@ -123,7 +125,7 @@ extension PlayerViewModel {
             }
         }
         
-        // ✅ Remote Control 핸들러 설정
+        // Remote Control 핸들러 설정
         print("🎯 PlayerViewModel.setupServiceObservation에서 Remote Control 설정 시작")
         
         Task { @MainActor in

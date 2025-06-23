@@ -73,8 +73,8 @@ extension PlayerViewModel {
                 await notifyAllExternalServicesOfStateChange()
             }
             
-            // 주기적으로 Control Center 시간 정보 업데이트 (10초마다)
-            if Int(currentTime) % 10 == 0 {
+            // ✅ Control Center seek 중이 아닐 때만 주기적 업데이트
+            if Int(currentTime) % 10 == 0 && !isControlCenterSeeking {
                 await updateControlCenterPlaybackTime()
             }
             
@@ -142,5 +142,35 @@ extension PlayerViewModel {
     /// 타이머를 강제로 한 번 업데이트합니다 (디버깅용)
     public func forceTimerUpdate() async {
         await updatePlaybackProgress()
+    }
+    
+    /// Control Center seek 후 즉시 동기화를 위한 전용 메서드
+    public func forceSyncAfterSeek() async {
+        do {
+            // AudioService에서 최신 상태 가져오기
+            let audioCurrentTime = try await audioService.getCurrentTime()
+            let audioIsPlaying = audioService.isPlaying
+            let audioDuration = audioService.duration
+            let audioPlaybackRate = audioService.playbackRate
+            
+            // 모든 상태 즉시 동기화
+            currentTime = audioCurrentTime
+            isPlaying = audioIsPlaying
+            duration = audioDuration
+            playbackRate = audioPlaybackRate
+            
+            // UI 관련 계산값 즉시 업데이트
+            updateProgress()
+            updateFormattedTime()
+            
+            if formattedDuration != formattedTime(duration) {
+                formattedDuration = formattedTime(duration)
+            }
+            
+            print("Control Center seek 후 완전 동기화 완료: \(formattedTime(currentTime))")
+            
+        } catch {
+            print("Control Center seek 후 동기화 실패: \(error)")
+        }
     }
 }
