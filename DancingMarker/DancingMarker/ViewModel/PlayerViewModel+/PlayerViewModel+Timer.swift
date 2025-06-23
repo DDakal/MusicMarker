@@ -41,9 +41,6 @@ extension PlayerViewModel {
     /// AudioService로부터 현재 재생 상태를 가져와서
     /// PlayerViewModel의 Published 프로퍼티들을 업데이트합니다.
     internal func updatePlaybackProgress() async {
-        // 드래그 중일 때는 업데이트하지 않음 (사용자 입력 우선)
-        guard !isDragging else { return }
-        
         do {
             // AudioService에서 현재 상태 가져오기
             let audioCurrentTime = try await audioService.getCurrentTime()
@@ -54,19 +51,21 @@ extension PlayerViewModel {
             // 재생 상태가 변경되었는지 확인
             let wasPlaying = isPlaying
             
-            // 상태 업데이트
-            currentTime = audioCurrentTime
+            // 항상 재생 상태는 동기화
             isPlaying = audioIsPlaying
             duration = audioDuration
             playbackRate = audioPlaybackRate
             
-            // UI 관련 계산값 업데이트
-            updateProgress()
-            updateFormattedTime()
-            
-            // duration이 변경되면 formatted duration도 업데이트
-            if formattedDuration != formattedTime(duration) {
-                formattedDuration = formattedTime(duration)
+            // 드래그 중일 때는 시간 관련 업데이트만 건너뛰기
+            if !isDragging {
+                currentTime = audioCurrentTime
+                updateProgress()
+                updateFormattedTime()
+                
+                // duration이 변경되면 formatted duration도 업데이트
+                if formattedDuration != formattedTime(duration) {
+                    formattedDuration = formattedTime(duration)
+                }
             }
             
             // 재생 상태가 변경된 경우 외부 서비스들 업데이트
