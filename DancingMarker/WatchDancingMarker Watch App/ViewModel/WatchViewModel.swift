@@ -102,7 +102,7 @@ class WatchViewModel: ObservableObject {
             self.isPlaying = isPlaying
             if isPlaying {
                 startTimer()
-            } else{
+            } else {
                 stopTimer()
             }
         }
@@ -133,6 +133,7 @@ class WatchViewModel: ObservableObject {
             self.musicTitle = musicTitle
         }
     }
+    
     @objc func setVolumeBySystem(_ notification: Notification) {
         if let systemVolume = notification.object as? Float {
             self.crownVolume = systemVolume * 60
@@ -146,27 +147,35 @@ class WatchViewModel: ObservableObject {
     func playForward() {
         connectivityManager.sendForwardToIOS()
     }
+    
     func playBackward() {
         connectivityManager.sendBackwardToIOS()
     }
+    
     func decreasePlaybackRate() {
         connectivityManager.sendDecreasePlaybackToIOS()
     }
+    
     func increasePlaybackRate() {
         connectivityManager.sendIncreasePlaybackToIOS()
     }
+    
     func originalPlaybckRate() {
         connectivityManager.sendOriginalPlaybackToIOS()
     }
+    
     func requireMusicList() {
         //        connectivityManager.
     }
+    
     func sendUUID(id: String) {
         connectivityManager.sendUUIDPlayToIOS(id)
     }
+    
     func deletemarker(index: Int){
         connectivityManager.sendMarkerDeleteToIOS(index)
     }
+    
     func changeVolume(){
         let volumeToSend = self.crownVolume / 60
         connectivityManager.sendVolumeChangeToIOS(volumeToSend)
