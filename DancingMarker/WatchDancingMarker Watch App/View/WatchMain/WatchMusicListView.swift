@@ -26,7 +26,7 @@ struct WatchMusicListView: View {
 //                }
 //                .padding(.top, 0)
                 
-                if viewModel.musicList.filter{ $0 != ["",""] }.count == 0 {
+                if viewModel.musicList.filter({ $0 != ["",""] }).count == 0 {
                     VStack {
                         Spacer()
                         Text("Local_Watch_FirstAtMobileMessage")
@@ -40,12 +40,12 @@ struct WatchMusicListView: View {
                         LazyVGrid(columns: columns) {
                             ForEach(viewModel.musicList.indices, id:\.self) { index in
                                 if  viewModel.musicList[index][0] != ""{
-                                    Button {
+                                    Button(action: {
                                         DispatchQueue.main.async{
                                             viewModel.sendUUID(id: viewModel.musicList[index][1])
                                             navigationManager.push(to: .playing)
                                         }
-                                    } label: {
+                                    }) {
                                         Text(viewModel.musicList[index][0])
                                             .font(.system(size: 17, weight: .regular))
                                             .lineLimit(1)

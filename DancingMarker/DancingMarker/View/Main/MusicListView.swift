@@ -12,26 +12,16 @@ import MediaPlayer
 
 class SheetState: ObservableObject {
     @Published var musicToEdit: Music? = nil
-    @Published var urlToAdd: URL? = nil
     @Published var isPresented: Bool = false
     
     func editMusic(_ music: Music) {
-        urlToAdd = nil
         musicToEdit = music
         isPresented = true
         print("🔍 SheetState - editMusic 설정: \(music.title)")
     }
     
-    func addMusic(_ url: URL) {
-        musicToEdit = nil
-        urlToAdd = url
-        isPresented = true
-        print("🔍 SheetState - addMusic 설정: \(url.lastPathComponent)")
-    }
-    
     func dismiss() {
         musicToEdit = nil
-        urlToAdd = nil
         isPresented = false
         print("🔍 SheetState - dismiss")
     }
@@ -109,7 +99,7 @@ struct MusicListView: View {
                 }
                 .listStyle(.inset)
                 
-                // 현재 음악이 있을 때 NowPlayingView 표시
+                // 현재 음원이 있을 때 NowPlayingView 표시
                 if playerViewModel.currentMusic != nil {
                     NowPlayingView()
                         .frame(height: 240)
@@ -144,7 +134,10 @@ struct MusicListView: View {
             switch result {
             case .success(let urls):
                 if let url = urls.first {
-                    sheetState.addMusic(url)  
+                    // 파일 선택 후 바로 새 음원을 추가하는 메서드 호출
+                    Task {
+                        await addMusic(from: url)
+                    }
                 }
             case .failure(let error):
                 print("Failed to import file: \(error.localizedDescription)")
@@ -158,12 +151,7 @@ struct MusicListView: View {
                 if let music = sheetState.musicToEdit {
                     MusicEditView(music: music, didSaveMusic: $didSaveMusic)
                         .onAppear {
-                            print("✅ 음악 편집 뷰 표시: \(music.title)")
-                        }
-                } else if let url = sheetState.urlToAdd {
-                    MusicEditView(fileURL: url, didSaveMusic: $didSaveMusic)
-                        .onAppear {
-                            print("✅ 음악 추가 뷰 표시: \(url.lastPathComponent)")
+                            print("✅ 음원 편집 뷰 표시: \(music.title)")
                         }
                 } else {
                     VStack(spacing: 20) {
@@ -196,7 +184,7 @@ struct MusicListView: View {
     
     // MARK: - Private Methods
     
-    /// 음악 선택 처리 (새로운 아키텍처)
+    /// 음원 선택 처리 (새로운 아키텍처)
     private func handleMusicSelection(_ music: Music) async {
         do {
             let musicData = MusicData(
@@ -221,7 +209,7 @@ struct MusicListView: View {
             navigationManager.push(to: .playing)
             
         } catch {
-            print("음악 재생 중 오류 발생: \(error)")
+            print("음원 재생 중 오류 발생: \(error)")
         }
     }
     
@@ -246,11 +234,11 @@ struct MusicListView: View {
         }
     }
     
-    /// 음악 삭제 처리
+    /// 음원 삭제 처리
     private func deleteMusic(_ music: Music) async {
         if playerViewModel.currentMusic?.id == music.id {
             await playerViewModel.stopMusic()
-            print("재생 중인 음악이 삭제되어 재생을 중지했습니다.")
+            print("재생 중인 음원이 삭제되어 재생을 중지했습니다.")
         }
         
         if let index = musicList.firstIndex(of: music) {
@@ -259,18 +247,93 @@ struct MusicListView: View {
                 try modelContext.save()
                 await sendMusicListToWatch()
             } catch {
-                print("음악 삭제 중 오류 발생: \(error)")
+                print("음원 삭제 중 오류 발생: \(error)")
             }
         }
     }
     
-    /// 워치로 음악 리스트 전송
+    /// 워치로 음원 리스트 전송
     private func sendMusicListToWatch() async {
         do {
             try await playerViewModel.sendMusicListToWatch(musicList)
         } catch {
-            print("워치로 음악 리스트 전송 실패: \(error)")
+            print("워치로 음원 리스트 전송 실패: \(error)")
         }
+    }
+    
+    /// 새로운 음원 추가
+    private func addMusic(from url: URL) async {
+        // 보안 범위 설정 시작
+        guard url.startAccessingSecurityScopedResource() else {
+            print("Failed to start accessing security scoped resource at \(url)")
+            return
+        }
+        
+        defer {
+            // 보안 범위 접근 종료
+            url.stopAccessingSecurityScopedResource()
+        }
+        
+        do {
+            let (title, artist, albumArt) = try await fetchMusicMetadata(from: url)
+            let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            
+            let uniqueFileURL = documentsDirectory.appendingUniquePathComponent(url.lastPathComponent)
+            
+            try FileManager.default.copyItem(at: url, to: uniqueFileURL)
+            
+            let newMusic = Music(
+                title: title,
+                artist: artist,
+                fileName: uniqueFileURL.lastPathComponent,
+                markers: [-1, -1, -1],
+                albumArt: albumArt
+            )
+            
+            modelContext.insert(newMusic)
+            try modelContext.save()
+            
+            await sendMusicListToWatch()
+            print("✅ 새 음원 추가 완료: \(title)")
+        } catch {
+            print("Failed to add music: \(error.localizedDescription)")
+        }
+    }
+    
+    /// 음원 메타데이터 추출
+    private func fetchMusicMetadata(from url: URL) async throws -> (String, String, Data?) {
+        let asset = AVAsset(url: url)
+        let metadata = try await asset.load(.commonMetadata)
+        
+        var title: String? = nil
+        var artist: String? = nil
+        var albumArt: Data? = nil
+        
+        for item in metadata {
+            if item.commonKey == .commonKeyTitle,
+               let loadedTitle = try await item.load(.stringValue) {
+                title = loadedTitle
+            }
+            if item.commonKey == .commonKeyArtist,
+               let loadedArtist = try await item.load(.stringValue) {
+                artist = loadedArtist
+            }
+            if item.commonKey == .commonKeyArtwork {
+                albumArt = try await item.load(.dataValue)
+            }
+        }
+        
+        // title이 없거나 "Unknown Title"인 경우 파일 이름(확장자 제외)을 사용
+        if title == nil || title == "Unknown Title" {
+            title = url.deletingPathExtension().lastPathComponent
+        }
+        
+        // artist는 메타데이터가 없을 경우 기본값 설정
+        if artist == nil || artist == "Unknown Artist" {
+            artist = "Unknown Artist"
+        }
+        
+        return (title!, artist!, albumArt)
     }
 }
 
