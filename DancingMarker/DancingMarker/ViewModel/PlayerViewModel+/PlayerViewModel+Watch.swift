@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 
 // MARK: - Watch Communication
 
@@ -38,13 +39,53 @@ extension PlayerViewModel {
         }
     }
     
-    /// 워치에 음악 목록을 전송합니다
+    /// SwiftData에서 최신 음악 목록을 로드하여 musicList 동기화
+    func loadMusicListFromSwiftData() async {
+        do {
+            let descriptor = FetchDescriptor<Music>()
+            let swiftDataMusicList = try modelContext.fetch(descriptor)
+            
+            // SwiftData의 Music을 MusicData로 변환
+            let musicDataList = swiftDataMusicList.map { music in
+                MusicData(
+                    id: music.id,
+                    title: music.title,
+                    artist: music.artist,
+                    fileName: music.fileName,
+                    markers: music.markers,
+                    albumArt: music.albumArt
+                )
+            }
+            
+            // PlayerViewModel.musicList 업데이트
+            self.musicList = musicDataList
+            print("✅ PlayerViewModel.musicList 동기화 완료: \(musicDataList.count)개")
+            
+        } catch {
+            print("❌ SwiftData에서 음악 목록 로드 실패: \(error)")
+        }
+    }
+    
+    /// 워치에 음악 목록을 전송합니다 - 개선된 버전
     func sendMusicListToWatch() async {
+        print("🎯 sendMusicListToWatch 시작")
+        
+        // 먼저 SwiftData에서 최신 음악 목록 로드
+        await loadMusicListFromSwiftData()
+        
+        print("   - 전송할 음악 개수: \(musicList.count)")
+        
+        // 연결 상태 재확인
+        guard watchService.isConnected && watchService.isReachable else {
+            print("⚠️ 워치 연결 상태가 좋지 않아 음악 목록 전송을 건너뜁니다")
+            return
+        }
+        
         do {
             // MusicData를 Music으로 변환하여 전송
-            let musicList = self.musicList.compactMap { musicData in
-                // MusicData에서 Music 객체 생성 (완전한 파라미터)
-                Music(
+            let musicListForWatch = self.musicList.compactMap { musicData in
+                print("   - 음악: \(musicData.title) (ID: \(musicData.id))")
+                return Music(
                     title: musicData.title,
                     artist: musicData.artist,
                     fileName: musicData.fileName,
@@ -53,10 +94,10 @@ extension PlayerViewModel {
                 )
             }
             
-            try await watchService.sendMusicList(musicList)
-            print("워치에 음악 목록 전송 완료: \(musicList.count)개")
+            try await watchService.sendMusicList(musicListForWatch)
+            print("✅ 워치에 음악 목록 전송 완료: \(musicListForWatch.count)개")
         } catch {
-            print("워치 음악 목록 전송 실패: \(error.localizedDescription)")
+            print("❌ 워치 음악 목록 전송 실패: \(error.localizedDescription)")
         }
     }
     
@@ -370,16 +411,33 @@ extension PlayerViewModel {
         print("워치에서 마커 편집 성공 명령 수신: 마커 \(index + 1)")
     }
     
-    /// 음악 선택 처리 (워치에서 호출)
+    /// 음악 선택 처리 (워치에서 호출) - 개선된 버전
     internal func handleMusicSelection(musicID: UUID) async {
+        print("🎯 워치에서 음악 선택 명령 수신: \(musicID)")
+        
         // 현재 음악 목록에서 해당 ID의 음악 찾기
         guard let musicData = musicList.first(where: { $0.id == musicID }) else {
-            print("워치에서 요청한 음악을 찾을 수 없음: \(musicID)")
+            print("❌ 워치에서 요청한 음악을 찾을 수 없음: \(musicID)")
+            print("   - 현재 음악 목록: \(musicList.map { "\($0.title)(\($0.id))" })")
+            
+            // 음악을 찾을 수 없으면 최신 음악 목록을 다시 전송
+            await sendMusicListToWatch()
             return
         }
         
+        // 이미 같은 음악이 재생 중이면 재생/일시정지만 토글
+        if currentMusic?.id == musicID {
+            print("🎯 이미 선택된 음악입니다. 재생/일시정지 토글")
+            await handlePlayToggle()
+            return
+        }
+        
+        // 새로운 음악 재생
         await playMusic(musicData)
-        print("워치에서 음악 선택 명령 수신: \(musicData.title)")
+        print("✅ 워치에서 음악 선택 완료: \(musicData.title)")
+        
+        // 워치에 전체 상태 업데이트 전송
+        await sendCompleteStateToWatch()
     }
     
     /// 볼륨 변경 처리 (워치에서 호출)
@@ -388,10 +446,28 @@ extension PlayerViewModel {
         print("워치에서 볼륨 변경 명령 수신: \(volume)")
     }
     
-    /// 음악 목록 요청 처리 (워치에서 호출)
+    /// 음악 목록 요청 처리 (워치에서 호출) - 개선된 버전
     internal func handleMusicListRequest() async {
+        print("🎯 워치에서 음악 목록 요청 수신!")
+        print("   - 현재 음악 개수: \(musicList.count)")
+        print("   - 워치 연결 상태: connected=\(watchService.isConnected), reachable=\(watchService.isReachable)")
+        
+        // 연결 상태 확인
+        guard watchService.isConnected && watchService.isReachable else {
+            print("⚠️ 워치가 연결되지 않아 음악 목록 전송을 건너뜁니다")
+            return
+        }
+        
+        // 음악 목록 전송
         await sendMusicListToWatch()
-        print("워치에서 음악 목록 요청 수신")
+        
+        // 현재 재생 중인 음악이 있다면 전체 상태도 함께 전송
+        if let currentMusic = currentMusic {
+            print("🎯 현재 재생 중인 음악이 있어 전체 상태도 전송합니다: \(currentMusic.title)")
+            await sendCompleteStateToWatch()
+        }
+        
+        print("✅ 워치 음악 목록 요청 처리 완료")
     }
 }
 
@@ -453,5 +529,27 @@ extension PlayerViewModel {
         // watchService.setMessageDelegate(self)
         
         // TODO: WatchMessageDelegate 구현이 필요하면 추가
+    }
+}
+
+// MARK: - Watch Integration Support
+
+extension PlayerViewModel {
+    
+    /// 워치 연결 복원시 전체 상태 동기화
+    internal func syncCompleteStateToWatch() async {
+        print("🔄 워치와 전체 상태 동기화 시작")
+        
+        await withTaskGroup(of: Void.self) { group in
+            // 음악 목록 전송
+            group.addTask { await self.sendMusicListToWatch() }
+            
+            // 현재 재생 상태가 있으면 모든 정보 전송
+            if self.currentMusic != nil {
+                group.addTask { await self.sendCompleteStateToWatch() }
+            }
+        }
+        
+        print("✅ 워치 전체 상태 동기화 완료")
     }
 }
