@@ -26,9 +26,6 @@ extension PlayerViewModel {
             // AudioService로 음악 재생
             try await audioService.playMusic(from: musicData.fileURL)
             
-            // 타이머 시작
-            startTimer()
-            
             // Control Center 설정 및 정보 업데이트
             setupControlCenter()
             Task { await updateControlCenterNowPlaying() }
@@ -73,9 +70,6 @@ extension PlayerViewModel {
     func stopMusic() async {
         // AudioService 중지
         audioService.stop()
-        
-        // 타이머 중지
-        stopTimer()
         
         // 상태 초기화
         currentMusic = nil

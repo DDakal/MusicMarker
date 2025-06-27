@@ -381,6 +381,11 @@ extension WatchService: WCSessionDelegate {
                 messageDelegate?.didReceiveMarkerEditCommand(index: forEdit[0], adjustment: Double(forEdit[1]))
             }
             
+        case "MarkerEditSuccess":
+            if let forEdit = message["forEdit"] as? [Int], forEdit.count >= 2 {
+                messageDelegate?.didReceiveMarkerEditSuccessCommand(index: forEdit[0], newTime: Double(forEdit[1]))
+            }
+            
         case "UUIDPlay":
             if let uuidString = message["id"] as? String, let uuid = UUID(uuidString: uuidString) {
                 messageDelegate?.didReceiveMusicSelectionCommand(musicID: uuid)

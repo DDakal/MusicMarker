@@ -317,7 +317,7 @@ extension PlayerViewModel {
         ) { [weak self] notification in
             if let forEdit = notification.object as? [Int] {
                 Task { @MainActor in
-                    await self?.handleMarkerEditSuccess(at: forEdit[0], adjustment: Double(forEdit[1]))
+                    await self?.handleMarkerEditSuccess(at: forEdit[0], newTime: Double(forEdit[1]))
                 }
             }
         }
@@ -400,15 +400,15 @@ extension PlayerViewModel {
         }
     }
     
-    /// 마커 편집 성공 처리 (워치에서 호출)
-    internal func handleMarkerEditSuccess(at index: Int, adjustment: Double) async {
+    /// 마커 편집 성공 처리 (워치에서 호출) - 수정된 버전
+    internal func handleMarkerEditSuccess(at index: Int, newTime: Double) async {
         guard index >= 0 && index < 3 else { return }
         guard markers[index] != -1 else { return }
         
-        let newTime = markers[index] + adjustment
+        // ✅ 절대값으로 마커 시간 설정
         await editMarker(at: index, to: max(0, newTime))
         
-        print("워치에서 마커 편집 성공 명령 수신: 마커 \(index + 1)")
+        print("워치에서 마커 편집 성공 명령 수신: 마커 \(index + 1), 새로운 시간: \(formattedTime(newTime))")
     }
     
     /// 음악 선택 처리 (워치에서 호출) - 개선된 버전

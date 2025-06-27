@@ -41,8 +41,13 @@ extension PlayerViewModel {
     /// 특정 마커로 이동합니다
     /// - Parameter index: 마커 인덱스
     func moveToMarker(at index: Int) async {
+        // ✅ 이미 마커 이동 중이면 무시
+        guard !isMarkerSeeking else {
+            print("⚠️ 이미 마커 이동 중 - 요청 무시")
+            return
+        }
+        
         do {
-            // ✅ MarkerService의 실제 메서드 사용
             guard markerService.isValidMarker(at: index) else {
                 print("유효하지 않은 마커: \(index)")
                 return
@@ -50,19 +55,33 @@ extension PlayerViewModel {
             
             let markerTime = markers[index]
             
-            // AudioService를 통해 시간 이동 (5초 버튼과 동일한 방식)
+            // ✅ 마커 이동 시작 - AudioService 동기화 중단
+            setMarkerSeeking(true)
+            
+            // AudioService를 통해 시간 이동 (순수한 seek만)
             try await audioService.seek(to: markerTime)
             
-            // 외부 서비스들에 상태 업데이트
-            await sendCurrentStateToExternalServices()
+            // ✅ seek 후 즉시 강제 동기화
+            await forceSyncAfterSeek()
             
-            // Control Center에 위치 변경 알림
-            await notifyControlCenterOfMarkerJump()
+            // ✅ 0.5초 후 마커 이동 완료 (짧은 안정화 시간)
+            Task {
+                try? await Task.sleep(nanoseconds: 500_000_000) // 0.5초
+                await MainActor.run {
+                    self.setMarkerSeeking(false)
+                    
+                    // 마커 이동 완료 후 외부 서비스 상태 전송
+                    Task {
+                        await self.sendCompleteStateToExternalServices()
+                    }
+                }
+            }
             
             print("마커 \(index + 1)로 이동: \(formattedTime(markerTime))")
             
         } catch {
             print("마커 이동 실패: \(error)")
+            setMarkerSeeking(false)
         }
     }
     
@@ -316,6 +335,46 @@ private extension PlayerViewModel {
         } catch {
             print("Control Center 업데이트 실패: \(error)")
         }
+    }
+    
+    /// 마커 이동 후 완전 동기화 (새로 추가)
+    private func forceSyncAfterMarkerMove() async {
+        do {
+            // AudioService에서 최신 상태 강제 가져오기
+            let audioCurrentTime = try await audioService.getCurrentTime()
+            let audioIsPlaying = audioService.isPlaying
+            let audioDuration = audioService.duration
+            let audioPlaybackRate = audioService.playbackRate
+            
+            // 모든 상태 즉시 동기화
+            currentTime = audioCurrentTime
+            isPlaying = audioIsPlaying
+            duration = audioDuration
+            playbackRate = audioPlaybackRate
+            
+            // UI 관련 계산값 즉시 업데이트
+            updateProgress()
+            updateFormattedTime()
+            
+            if formattedDuration != formattedTime(duration) {
+                formattedDuration = formattedTime(duration)
+            }
+            
+            print("마커 이동 후 강제 동기화 완료: 재생상태=\(isPlaying), 시간=\(formattedTime(currentTime))")
+            
+        } catch {
+            print("마커 이동 후 동기화 실패: \(error)")
+        }
+    }
+    
+    /// 외부 서비스들에 완전한 상태를 전송합니다
+    private func sendCompleteStateToExternalServices() async {
+        await withTaskGroup(of: Void.self) { group in
+            group.addTask { await self.sendPlayingStateToWatch() }
+            group.addTask { await self.updateControlCenterNowPlaying() }
+            group.addTask { await self.notifyControlCenterOfMarkerJump() }
+        }
+        print("✅ 마커 이동 완료 후 모든 외부 서비스 상태 동기화 완료")
     }
 }
 

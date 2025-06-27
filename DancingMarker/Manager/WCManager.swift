@@ -71,191 +71,99 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
         replyHandler: @escaping ([String : Any]) -> Void
     ) {
         #if os(iOS)
-        if let action = message["action"] as? String,
-           action == "PlayToggle" {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .plusCount,
-                    object: nil
-                )
-                replyHandler(["success": true])
-                print("성공!")
+        guard let action = message["action"] as? String else {
+                replyHandler(["success": false])
+                return
             }
-        } else {
-            replyHandler(["success": false])
-        }
-        
-        if let action = message["action"] as? String,
-           action == "Forward" {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .forward,
-                    object: nil
-                )
-                replyHandler(["success": true])
+            
+            // 한 번만 응답
+            var wasHandled = false
+            
+            switch action {
+            case "PlayToggle":
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .plusCount, object: nil)
+                }
+                wasHandled = true
+                
+            case "Forward":
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .forward, object: nil)
+                }
+                wasHandled = true
+                
+            case "Backward":
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .backward, object: nil)
+                }
+                wasHandled = true
+                
+            case "SendIncreasePlayback":
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .increaseSpeed, object: nil)
+                }
+                wasHandled = true
+                
+            case "SendDecreasePlayback":
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .decreaseSpeed, object: nil)
+                }
+                wasHandled = true
+                
+            case "SendOriginalPlayback":
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .originalSpeed, object: nil)
+                }
+                wasHandled = true
+                
+            case "MarkerPlay":
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .markerPlay, object: message["index"])
+                }
+                wasHandled = true
+                
+            case "MarkerSave":
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .markerSave, object: message["index"])
+                }
+                wasHandled = true
+                
+            case "UUIDPlay":
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .UUIDPlay, object: message["id"])
+                }
+                wasHandled = true
+                
+            case "MarkerDelete":
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .markerDelete, object: message["index"])
+                }
+                wasHandled = true
+                
+            case "MarkerEditSuccess":
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .markerEditSuccess, object: message["forEdit"])
+                }
+                wasHandled = true
+                
+            case "SendRequireMusicList":
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .requireMusicList, object: nil)
+                }
+                wasHandled = true
+                
+            case "ChangeVolume":
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .changeVolume, object: message["volume"])
+                }
+                wasHandled = true
+                
+            default:
+                wasHandled = false
             }
-        } else {
-            replyHandler(["success": false])
-        }
-        
-        
-        if let action = message["action"] as? String,
-           action == "Backward" {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .backward,
-                    object: nil
-                )
-                replyHandler(["success": true])
-            }
-        } else {
-            replyHandler(["success": false])
-        }
-        
-        if let action = message["action"] as? String,
-           action == "SendIncreasePlayback" {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .increaseSpeed,
-                    object: nil
-                )
-                replyHandler(["success": true])
-            }
-        } else {
-            replyHandler(["success": false])
-        }
-        
-        if let action = message["action"] as? String,
-           action == "SendDecreasePlayback" {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .decreaseSpeed,
-                    object: nil
-                )
-                replyHandler(["success": true])
-            }
-        } else {
-            replyHandler(["success": false])
-        }
-        
-        if let action = message["action"] as? String,
-           action == "SendOriginalPlayback" {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .originalSpeed,
-                    object: nil
-                )
-                replyHandler(["success": true])
-            }
-        } else {
-            replyHandler(["success": false])
-        }
-        
-        if let action = message["action"] as? String,
-           action == "MarkerPlay" {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .markerPlay,
-                    object: message["index"]
-                )
-                replyHandler(["success": true])
-            }
-        } else {
-            replyHandler(["success": false])
-        }
-        
-        if let action = message["action"] as? String,
-           action == "MarkerSave" {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .markerSave,
-                    object: message["index"]
-                )
-                replyHandler(["success": true])
-            }
-        } else {
-            replyHandler(["success": false])
-        }
-        
-        if let action = message["action"] as? String,
-           action == "UUIDPlay" {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .UUIDPlay,
-                    object: message["id"]
-                )
-                replyHandler(["success": true])
-            }
-        } else {
-            replyHandler(["success": false])
-        }
-        
-        if let action = message["action"] as? String,
-           action == "MarkerDelete" {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .markerDelete,
-                    object: message["index"]
-                )
-                replyHandler(["success": true])
-            }
-        } else {
-            replyHandler(["success": false])
-        }
-        
-        if let action = message["action"] as? String,
-           action == "MarkerEdit" {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .markerEdit,
-                    object: message["forEdit"]
-                )
-                replyHandler(["success": true])
-            }
-        } else {
-            replyHandler(["success": false])
-        }
-        
-        if let action = message["action"] as? String,
-           action == "MarkerEditSuccess" {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .markerEditSuccess,
-                    object: message["forEdit"]
-                )
-                replyHandler(["success": true])
-            }
-        } else {
-            replyHandler(["success": false])
-        }
-        
-        if let action = message["action"] as? String,
-           action == "SendRequireMusicList" {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .requireMusicList,
-                    object: nil
-                )
-                replyHandler(["success": true])
-            }
-        } else {
-            replyHandler(["success": false])
-        }
-        
-        if let action = message["action"] as? String,
-           action == "ChangeVolume" {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .changeVolume,
-                    object: message["volume"]
-                )
-                replyHandler(["success": true])
-            }
-        } else {
-            replyHandler(["success": false])
-        }
-        
-        
+            
+            // ✅ 한 번만 응답
+            replyHandler(["success": wasHandled ? 1 : 0])
         
         
         #elseif os(watchOS)

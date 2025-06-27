@@ -26,6 +26,8 @@ class WatchViewModel: ObservableObject {
     @Published var crownVolume: Float = 0.5  // 초기 볼륨 값 (0.0 ~ 1.0)
     @Published var lastSentCrownValue: Float = 0.5  // 마지막으로 전송된 Crown 값
 
+    @Published private var isMarkerSeeking: Bool = false
+    
     private var timer: Timer?
     
     init(connectivityManager: WatchConnectivityManager) {
@@ -221,6 +223,24 @@ class WatchViewModel: ObservableObject {
         }
         progress = currentTime / duration
         formattedProgress = formattedTime(currentTime)
+    }
+    
+    func withMarkerSeekingProtection<T>(_ operation: () async throws -> T) async rethrows -> T? {
+        guard !isMarkerSeeking else {
+            print("⚠️ 마커 이동 중 - 추가 요청 무시")
+            return nil
+        }
+        
+        isMarkerSeeking = true
+        
+        // ✅ 0.8초 후 플래그 해제 (충분한 시간 확보)
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 800_000_000)
+            self.isMarkerSeeking = false
+            print("✅ 마커 연타 방지 플래그 해제")
+        }
+        
+        return try await operation()
     }
 }
 

@@ -66,6 +66,9 @@ final class PlayerViewModel: ObservableObject {
     /// Timer는 thread-safe하므로 nonisolated context에서도 안전하게 접근 가능
     nonisolated(unsafe) internal var timer: Timer?
     
+    // ✅ private을 internal로 변경
+    internal var isMarkerSeeking: Bool = false
+    
     // MARK: - Initialization
     
     init(
@@ -111,6 +114,9 @@ extension PlayerViewModel {
         formattedProgress = "0:00"
         formattedDuration = "0:00"
         
+        // ✅ AudioService 직접 구독 설정 (타이머 대체)
+        setupAudioServiceSubscription()
+        
         // WatchService 델리게이트 설정
         watchService.setMessageDelegate(self)
         print("🎯 WatchService 델리게이트 설정 완료")
@@ -120,21 +126,14 @@ extension PlayerViewModel {
             do {
                 try await watchService.activateSession()
                 print("🎯 WatchService 세션 활성화 완료")
+                
+                // 워치 알림 설정
+                setupWatchNotifications()
+                print("🎯 워치 알림 설정 완료")
+                
             } catch {
-                print("🚨 WatchService 세션 활성화 실패: \(error)")
+                print("❌ WatchService 세션 활성화 실패: \(error)")
             }
-        }
-        
-        // Remote Control 핸들러 설정
-        print("🎯 PlayerViewModel.setupServiceObservation에서 Remote Control 설정 시작")
-        
-        Task { @MainActor in
-            // 잠시 대기 후 설정 (앱이 완전히 로드된 후)
-            try? await Task.sleep(nanoseconds: 500_000_000) // 0.5초 대기
-            
-            print("🎯 Task에서 setupControlCenter 호출 시작")
-            setupControlCenter()
-            print("🎯 Task에서 setupControlCenter 호출 완료")
         }
     }
 }
@@ -254,6 +253,12 @@ extension PlayerViewModel: WatchMessageDelegate {
     func didReceiveMarkerEditCommand(index: Int, adjustment: Double) {
         Task { @MainActor in
             await handleMarkerEdit(at: index, adjustment: adjustment)
+        }
+    }
+    
+    func didReceiveMarkerEditSuccessCommand(index: Int, newTime: Double) {
+        Task { @MainActor in
+            await handleMarkerEditSuccess(at: index, newTime: newTime)
         }
     }
     

@@ -125,6 +125,12 @@ protocol WatchMessageDelegate: AnyObject {
     ///   - adjustment: 시간 조정값 (초)
     nonisolated func didReceiveMarkerEditCommand(index: Int, adjustment: Double)
     
+    /// ✅ 추가: 마커 편집 성공 명령을 받았을 때 호출됩니다.
+    /// - Parameters:
+    ///   - index: 편집된 마커의 인덱스
+    ///   - newTime: 새로운 마커 시간 (절대값)
+    nonisolated func didReceiveMarkerEditSuccessCommand(index: Int, newTime: Double)
+    
     /// 음악 선택 명령을 받았을 때 호출됩니다.
     /// - Parameter musicID: 선택된 음악의 UUID
     nonisolated func didReceiveMusicSelectionCommand(musicID: UUID)

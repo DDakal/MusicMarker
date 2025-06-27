@@ -38,5 +38,9 @@ struct DancingMarkerApp: App {
                 .environmentObject(dependencyContainer)
                 .preferredColorScheme(.dark)
         }
+        .backgroundTask(.appRefresh("com.dancingmarker.refresh")) {
+            // 백그라운드에서 워치 메시지 처리
+            print("백그라운드 앱 새로고침 수행됨")
+        }
     }
 }

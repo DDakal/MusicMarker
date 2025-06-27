@@ -321,13 +321,14 @@ struct PlayingView: View {
         }
     }
     
-    /// 마커 버튼 생성 (기존 디자인 복원)
+    /// 마커 버튼 생성 (연타 방지 추가)
     @ViewBuilder
     private func markerButton(for time: TimeInterval, index: Int) -> some View {
         if playerViewModel.isEditingMarker && playerViewModel.editingMarkerIndex == index {
             editMarkerButton(for: time, index: index)
         } else {
             Button(action: {
+                // ✅ moveToMarker 내부에서 연타 방지 처리
                 Task {
                     await playerViewModel.moveToMarker(at: index)
                 }
