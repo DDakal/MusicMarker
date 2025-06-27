@@ -50,13 +50,8 @@ extension PlayerViewModel {
             
             let markerTime = markers[index]
             
-            // AudioService를 통해 시간 이동
+            // AudioService를 통해 시간 이동 (5초 버튼과 동일한 방식)
             try await audioService.seek(to: markerTime)
-            
-            // 재생 상태를 재개 (기존 동작과 동일)
-            if !isPlaying {
-                try await audioService.resume()
-            }
             
             // 외부 서비스들에 상태 업데이트
             await sendCurrentStateToExternalServices()
