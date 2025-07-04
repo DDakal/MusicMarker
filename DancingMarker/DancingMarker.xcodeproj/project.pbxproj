@@ -402,8 +402,8 @@
 			children = (
 				1F9385762DE228D50093725C /* Localizable.strings */,
 				51675E272CA2F0E800D8D08F /* Secrets.xcconfig */,
-				90A4722D2C450837008577A2 /* Manager */,
 				901BF97F2C29804A00C02FF9 /* DancingMarker */,
+				90A4722D2C450837008577A2 /* Manager */,
 				901BF9932C29809900C02FF9 /* WatchDancingMarker Watch App */,
 				901BF97E2C29804A00C02FF9 /* Products */,
 				90A472282C45080D008577A2 /* Frameworks */,

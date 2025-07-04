@@ -66,7 +66,7 @@ final class PlayerViewModel: ObservableObject {
     /// Timer는 thread-safe하므로 nonisolated context에서도 안전하게 접근 가능
     nonisolated(unsafe) internal var timer: Timer?
     
-    // ✅ private을 internal로 변경
+    // private을 internal로 변경
     internal var isMarkerSeeking: Bool = false
     
     // MARK: - Initialization
@@ -92,6 +92,10 @@ final class PlayerViewModel: ObservableObject {
         
         // 초기화 작업
         setupServiceObservation()
+        
+        // WatchService 델리게이트 설정
+        self.watchService.setMessageDelegate(self)
+        print("WatchService 델리게이트 설정 완료")
     }
     
     deinit {
@@ -114,12 +118,12 @@ extension PlayerViewModel {
         formattedProgress = "0:00"
         formattedDuration = "0:00"
         
-        // ✅ AudioService 직접 구독 설정 (타이머 대체)
+        // AudioService 직접 구독 설정 (타이머 대체)
         setupAudioServiceSubscription()
         
         // WatchService 델리게이트 설정
         watchService.setMessageDelegate(self)
-        print("🎯 WatchService 델리게이트 설정 완료")
+        print("WatchService 델리게이트 설정 완료")
         
         // WatchService 세션 활성화
         Task { @MainActor in

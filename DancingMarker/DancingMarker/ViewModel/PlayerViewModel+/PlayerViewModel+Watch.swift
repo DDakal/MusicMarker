@@ -415,6 +415,9 @@ extension PlayerViewModel {
     internal func handleMusicSelection(musicID: UUID) async {
         print("🎯 워치에서 음악 선택 명령 수신: \(musicID)")
         
+        // SwiftData에서 최신 음악 목록 먼저 로드
+        await loadMusicListFromSwiftData()
+        
         // 현재 음악 목록에서 해당 ID의 음악 찾기
         guard let musicData = musicList.first(where: { $0.id == musicID }) else {
             print("❌ 워치에서 요청한 음악을 찾을 수 없음: \(musicID)")
@@ -425,10 +428,12 @@ extension PlayerViewModel {
             return
         }
         
-        // 이미 같은 음악이 재생 중이면 재생/일시정지만 토글
+        // ✅ 이미 같은 음악이 재생 중이면 아무것도 하지 않음 (토글하지 않음)
         if currentMusic?.id == musicID {
-            print("🎯 이미 선택된 음악입니다. 재생/일시정지 토글")
-            await handlePlayToggle()
+            print("🎯 이미 선택된 음악입니다. 상태 유지: \(musicData.title)")
+            
+            // 워치에 현재 상태만 다시 전송 (재생 상태 동기화)
+            await sendCompleteStateToWatch()
             return
         }
         

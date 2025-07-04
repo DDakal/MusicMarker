@@ -27,11 +27,6 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
         activationDidCompleteWith activationState: WCSessionActivationState,
         error: Error?
     ) {
-        #if os(iOS)
-        print("ACTIVATED ON IOS")
-        #elseif os(watchOS)
-        print("ACTIVATED ON WATCHOS")
-        #endif
         DispatchQueue.main.async {
             self.isReachable = session.isReachable
         }
@@ -39,13 +34,8 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
     
     func sessionReachabilityDidChange(_ session: WCSession) {
         DispatchQueue.main.async {
-                   self.isReachable = session.isReachable
-                   print("Reachability changed: \(self.isReachable)")
-                   if !self.isReachable {
-                       print("Session is not reachable, attempting to reactivate...")
-                       self.session.activate() // 재활성화 시도
-                   }
-               }
+            self.isReachable = session.isReachable
+        }
     }
     
     #if os(iOS)
@@ -54,13 +44,12 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
     }
 
     func sessionDidBecomeInactive(_ session: WCSession) {
-        print("Session did become inactive: \(session.activationState.rawValue)")
+        // 로그 제거
     }
 
     func sessionWatchStateDidChange(_ session: WCSession) {
-        print("Session watch state did change: \(session.activationState.rawValue)")
+        // 로그 제거
     }
-    
     #endif
     
     // MARK: MESSAGE RECEIVER
@@ -72,193 +61,47 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
     ) {
         #if os(iOS)
         guard let action = message["action"] as? String else {
-                replyHandler(["success": false])
-                return
-            }
-            
-            // 한 번만 응답
-            var wasHandled = false
-            
-            switch action {
-            case "PlayToggle":
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: .plusCount, object: nil)
-                }
-                wasHandled = true
-                
-            case "Forward":
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: .forward, object: nil)
-                }
-                wasHandled = true
-                
-            case "Backward":
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: .backward, object: nil)
-                }
-                wasHandled = true
-                
-            case "SendIncreasePlayback":
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: .increaseSpeed, object: nil)
-                }
-                wasHandled = true
-                
-            case "SendDecreasePlayback":
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: .decreaseSpeed, object: nil)
-                }
-                wasHandled = true
-                
-            case "SendOriginalPlayback":
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: .originalSpeed, object: nil)
-                }
-                wasHandled = true
-                
-            case "MarkerPlay":
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: .markerPlay, object: message["index"])
-                }
-                wasHandled = true
-                
-            case "MarkerSave":
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: .markerSave, object: message["index"])
-                }
-                wasHandled = true
-                
-            case "UUIDPlay":
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: .UUIDPlay, object: message["id"])
-                }
-                wasHandled = true
-                
-            case "MarkerDelete":
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: .markerDelete, object: message["index"])
-                }
-                wasHandled = true
-                
-            case "MarkerEditSuccess":
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: .markerEditSuccess, object: message["forEdit"])
-                }
-                wasHandled = true
-                
-            case "SendRequireMusicList":
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: .requireMusicList, object: nil)
-                }
-                wasHandled = true
-                
-            case "ChangeVolume":
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: .changeVolume, object: message["volume"])
-                }
-                wasHandled = true
-                
-            default:
-                wasHandled = false
-            }
-            
-            // ✅ 한 번만 응답
-            replyHandler(["success": wasHandled ? 1 : 0])
+            replyHandler(["success": false])
+            return
+        }
         
+        print("WCManager: 워치에서 메시지 수신: \(action)")
+        
+        // WatchService로 위임 (우선순위)
+        let wasHandled = WatchService.shared?.handleReceivedWatchMessage(action: action, message: message) ?? false
+        
+        if wasHandled {
+            print("WCManager: WatchService에서 처리됨")
+            replyHandler(["success": true])
+        } else {
+            print("WCManager: NotificationCenter로 폴백")
+            handleMessageWithNotificationCenter(action: action, message: message)
+            replyHandler(["success": true])
+        }
         
         #elseif os(watchOS)
-        
-        if let action = message["action"] as? String,
-           action == "SendMarkers" {
+        // 워치OS 메시지 수신 처리 (기존 로직 유지하되 로그 정리)
+        if let action = message["action"] as? String {
             DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .sendMarkers,
-                    object: message["markers"]
-                )
-                replyHandler(["success": true])
-                print("성공!")
-            }
-        } else {
-            replyHandler(["success": false])
-        }
-        
-        if let action = message["action"] as? String,
-           action == "SendSpeed" {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .sendSpeed,
-                    object: message["speed"]
-                )
-                replyHandler(["success": true])
-                print("성공!")
-            }
-        } else {
-            replyHandler(["success": false])
-        }
-        
-        if let action = message["action"] as? String,
-           action == "SendIsPlaying" {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .sendIsPlaying,
-                    object: message["isPlaying"]
-                )
-                replyHandler(["success": true])
-                print("성공!")
-            }
-        } else {
-            replyHandler(["success": false])
-        }
-        
-        if let action = message["action"] as? String,
-           action == "SendPlayingTimes" {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .sendPlayingTimes,
-                    object: message["playingTimes"]
-                )
-                replyHandler(["success": true])
-                print("성공!")
-            }
-        } else {
-            replyHandler(["success": false])
-        }
-        
-        if let action = message["action"] as? String,
-           action == "SendMusicList" {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .sendMusicList,
-                    object: message["musicList"]
-                )
-                replyHandler(["success": true])
-                print("성공!")
-            }
-        } else {
-            replyHandler(["success": false])
-        }
-        
-        if let action = message["action"] as? String,
-           action == "SendMusicTitle" {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .sendMusicTitle,
-                    object: message["musicTitle"]
-                )
-                replyHandler(["success": true])
-                print("성공!")
-            }
-        } else {
-            replyHandler(["success": false])
-        }
-        
-        if let action = message["action"] as? String,
-           action == "SendSystemVolume" {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: .sendSystemVolume,
-                    object: message["volume"]
-                )
+                switch action {
+                case "SendMarkers":
+                    NotificationCenter.default.post(name: .sendMarkers, object: message["markers"])
+                case "SendSpeed":
+                    NotificationCenter.default.post(name: .sendSpeed, object: message["speed"])
+                case "SendIsPlaying":
+                    NotificationCenter.default.post(name: .sendIsPlaying, object: message["isPlaying"])
+                case "SendPlayingTimes":
+                    NotificationCenter.default.post(name: .sendPlayingTimes, object: message["playingTimes"])
+                case "SendMusicList":
+                    NotificationCenter.default.post(name: .sendMusicList, object: message["musicList"])
+                    print("✅ 음악 목록 수신 완료")
+                case "SendMusicTitle":
+                    NotificationCenter.default.post(name: .sendMusicTitle, object: message["musicTitle"])
+                case "SendSystemVolume":
+                    NotificationCenter.default.post(name: .sendSystemVolume, object: message["volume"])
+                default:
+                    break
+                }
                 replyHandler(["success": true])
             }
         } else {
@@ -267,20 +110,71 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
         #endif
     }
     
+    // MARK: - Private Helper Methods
     
+    private func handleMessageWithNotificationCenter(action: String, message: [String: Any]) {
+        let notificationName: Notification.Name
+        var object: Any? = nil
+        
+        switch action {
+        case "SendRequireMusicList":
+            notificationName = .requireMusicList
+        case "newPlayerLinkChosen":
+            notificationName = .newLinkChosen
+            object = message["link"]
+        case "PlusCount":
+            notificationName = .plusCount
+        case "Forward":
+            notificationName = .forward
+        case "Backward":
+            notificationName = .backward
+        case "MarkerPlay":
+            notificationName = .markerPlay
+            object = message["index"]
+        case "MarkerSave":
+            notificationName = .markerSave
+            object = message["index"]
+        case "SendIncreasePlayback":
+            notificationName = .increaseSpeed
+        case "SendDecreasePlayback":
+            notificationName = .decreaseSpeed
+        case "SendOriginalPlayback":
+            notificationName = .originalSpeed
+        case "UUIDPlay":
+            notificationName = .UUIDPlay
+            object = message["id"]
+        case "MarkerDelete":
+            notificationName = .markerDelete
+            object = message["index"]
+        case "MarkerEdit":
+            notificationName = .markerEdit
+            object = message["forEdit"]
+        case "MarkerEditSuccess":
+            notificationName = .markerEditSuccess
+            object = message["forEdit"]
+        case "ChangeVolume":
+            notificationName = .changeVolume
+            object = message["volume"]
+        default:
+            return
+        }
+        
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: notificationName, object: object)
+        }
+    }
     
-    #if os (iOS)
-    // MARK: iOS MESSAGE SENDERS
+    // MARK: - iOS MESSAGE SENDERS (기존 메서드들 유지)
+    #if os(iOS)
     func sendMarkersToWatch(_ markers: [TimeInterval]) {
         let message = [
             "action": "SendMarkers",
             "markers": markers
         ] as [String : Any]
 
-        session.sendMessage(message) { replyHandler in
-            print(replyHandler)
+        session.sendMessage(message) { _ in
         } errorHandler: { error in
-            print(error.localizedDescription)
+            print("마커 전송 실패: \(error.localizedDescription)")
         }
     }
     
@@ -290,10 +184,9 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
             "speed": speed
         ] as [String : Any]
         
-        session.sendMessage(message) { replyHandler in
-            print(replyHandler)
+        session.sendMessage(message) { _ in
         } errorHandler: { error in
-            print(error.localizedDescription)
+            print("속도 전송 실패: \(error.localizedDescription)")
         }
     }
     
@@ -303,10 +196,9 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
             "isPlaying": isPlaying
         ] as [String : Any]
         
-        session.sendMessage(message) { replyHandler in
-            print(replyHandler)
+        session.sendMessage(message) { _ in
         } errorHandler: { error in
-            print(error.localizedDescription)
+            print("재생 상태 전송 실패: \(error.localizedDescription)")
         }
     }
     
@@ -316,10 +208,9 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
             "playingTimes": playingTimes
         ] as [String : Any]
 
-        session.sendMessage(message) { replyHandler in
-            print(replyHandler)
+        session.sendMessage(message) { _ in
         } errorHandler: { error in
-            print(error.localizedDescription)
+            print("재생 시간 전송 실패: \(error.localizedDescription)")
         }
     }
     
@@ -329,10 +220,11 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
             "musicList": musics
         ] as [String : Any]
 
-        session.sendMessage(message) { replyHandler in
-            print(replyHandler)
+        print("📤 WCManager: 음악 목록 전송 중... (\(musics.count)개)")
+        session.sendMessage(message) { _ in
+            print("✅ WCManager: 음악 목록 전송 성공")
         } errorHandler: { error in
-            print(error.localizedDescription)
+            print("❌ WCManager: 음악 목록 전송 실패: \(error.localizedDescription)")
         }
     }
     
@@ -342,10 +234,9 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
             "musicTitle": musictitle
         ] as [String : Any]
 
-        session.sendMessage(message) { replyHandler in
-            print(replyHandler)
+        session.sendMessage(message) { _ in
         } errorHandler: { error in
-            print(error.localizedDescription)
+            print("제목 전송 실패: \(error.localizedDescription)")
         }
     }
     
@@ -355,23 +246,15 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
             "volume": volume
         ] as [String : Any]
 
-        session.sendMessage(message) { replyHandler in
-            print(replyHandler)
+        session.sendMessage(message) { _ in
         } errorHandler: { error in
-            print(error.localizedDescription)
+            print("볼륨 전송 실패: \(error.localizedDescription)")
         }
     }
-
     #endif
     
-    
-    
-    
-    // MARK: WATCH MESSAGE RECIEVERS
-    
-    // MARK: WATCH MESSAGE SENDERS
+    // MARK: WATCH MESSAGE SENDERS (기존 메서드들 유지하되 로그 정리)
     #if os(watchOS)
-
     func sendPlayerLinkToIOS(_ link: String) {
         let message = [
             "action": "newPlayerLinkChosen",
@@ -458,16 +341,15 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
     }
     
     func sendRequireMusicListToIOS() {
-        let message = [
-            "action": "SendRequireMusicList"
-        ]
+        let message = ["action": "SendRequireMusicList"]
         
         session.sendMessage(message) { replyHandler in
-            print(replyHandler)
+            print("✅ 음악 목록 요청 성공")
         } errorHandler: { error in
-            print(error.localizedDescription)
+            print("❌ 음악 목록 요청 실패: \(error.localizedDescription)")
         }
     }
+    
     func sendUUIDPlayToIOS(_ id: String) {
         let message = [
             "action": "UUIDPlay",
@@ -480,9 +362,9 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
             print(error.localizedDescription)
         }
     }
-    
     #endif
     
+    // MARK: - Common Methods (Both iOS and watchOS)
     func sendMarkerPlayToIOS(_ index: Int) {
         let message = [
             "action": "MarkerPlay",
@@ -563,7 +445,6 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
 }
 
 extension Notification.Name {
-    
     static let newLinkChosen = Notification.Name("NewLinkChosen")
     static let plusCount = Notification.Name("PlusCount")
     static let forward = Notification.Name("Forward")

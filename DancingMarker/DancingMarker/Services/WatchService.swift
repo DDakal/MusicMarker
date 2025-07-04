@@ -24,19 +24,30 @@ final class WatchService: NSObject, WatchConnectivityManageable {
     private let session: WCSession = WCSession.default
     private weak var messageDelegate: WatchMessageDelegate?
     
+    // 전역 참조를 위한 static 프로퍼티 추가
+    static weak var shared: WatchService?
+    
     // MARK: - Initialization
     
     override init() {
         super.init()
+        Self.shared = self  // 전역 참조 설정
         setupWatchConnectivity()
     }
     
     private func setupWatchConnectivity() {
         if WCSession.isSupported() {
             print("🎯 WatchService: WCSession 지원됨, 델리게이트 설정 중...")
-            session.delegate = self
-            session.activate()
-            print("🎯 WatchService: WCSession 활성화 요청 완료")
+            
+            // WCManager와 공존하므로 델리게이트 설정하지 않음
+            // session.delegate = self  // 주석 처리
+            
+            // 대신 세션 상태만 모니터링
+            if session.activationState != .activated {
+                print("🎯 WatchService: 세션 활성화 대기 중...")
+            }
+            
+            print("🎯 WatchService: WCManager와 공존 모드로 설정됨")
         } else {
             print("🚨 WatchService: WCSession이 지원되지 않는 기기")
         }
@@ -152,10 +163,19 @@ final class WatchService: NSObject, WatchConnectivityManageable {
     private func sendMessage(_ message: [String: Any]) async throws {
         print("🎯 WatchService: 메시지 전송 시도")
         print("   - 메시지 액션: \(message["action"] ?? "Unknown")")
-        print("   - isReachable: \(session.isReachable)")
+        
+        // WCManager의 세션 상태 확인
+        let wcManagerSession = WCSession.default
+        print("   - WCSession.default.isReachable: \(wcManagerSession.isReachable)")
+        print("   - WCSession.default.activationState: \(wcManagerSession.activationState.rawValue)")
+        
+        guard wcManagerSession.isReachable else {
+            print("🚨 WatchService: 워치에 연결할 수 없음 (isReachable: false)")
+            throw DancingMarkerError.watchNotConnected
+        }
         
         return try await withCheckedThrowingContinuation { continuation in
-            session.sendMessage(message) { replyHandler in
+            wcManagerSession.sendMessage(message) { replyHandler in
                 print("✅ WatchService: 메시지 전송 성공, 응답: \(replyHandler)")
                 continuation.resume()
             } errorHandler: { error in
@@ -163,13 +183,6 @@ final class WatchService: NSObject, WatchConnectivityManageable {
                 print("   - 원본 에러: \(error.localizedDescription)")
                 print("   - 에러 코드: \(error._code)")
                 print("   - 에러 도메인: \(error._domain)")
-                
-                // 더 구체적인 에러 정보 제공
-                if error._code == 7012 {
-                    print("   - 워치 앱이 실행되지 않았거나 백그라운드 상태")
-                } else if error._code == 7013 {
-                    print("   - 워치가 연결되지 않음")
-                }
                 
                 continuation.resume(throwing: DancingMarkerError.watchSendFailed)
             }
@@ -246,6 +259,84 @@ final class WatchService: NSObject, WatchConnectivityManageable {
         ] as [String : Any]
         
         try await sendMessage(message)
+    }
+    
+    // 메시지 처리를 위한 공개 메서드 추가
+    func handleReceivedWatchMessage(action: String, message: [String: Any]) -> Bool {
+        switch action {
+        case "PlayToggle":
+            messageDelegate?.didReceivePlayToggleCommand()
+            return true
+            
+        case "Forward":
+            messageDelegate?.didReceiveForwardCommand()
+            return true
+            
+        case "Backward":
+            messageDelegate?.didReceiveBackwardCommand()
+            return true
+            
+        case "SendIncreasePlayback":
+            messageDelegate?.didReceiveIncreaseSpeedCommand()
+            return true
+            
+        case "SendDecreasePlayback":
+            messageDelegate?.didReceiveDecreaseSpeedCommand()
+            return true
+            
+        case "SendOriginalPlayback":
+            messageDelegate?.didReceiveOriginalSpeedCommand()
+            return true
+            
+        case "MarkerPlay":
+            if let index = message["index"] as? Int {
+                messageDelegate?.didReceiveMarkerPlayCommand(index: index)
+                return true
+            }
+            
+        case "MarkerSave":
+            if let index = message["index"] as? Int {
+                messageDelegate?.didReceiveMarkerSaveCommand(index: index)
+                return true
+            }
+            
+        case "UUIDPlay":
+            if let uuidString = message["id"] as? String, 
+               let uuid = UUID(uuidString: uuidString) {
+                messageDelegate?.didReceiveMusicSelectionCommand(musicID: uuid)
+                return true
+            }
+            
+        case "MarkerDelete":
+            if let index = message["index"] as? Int {
+                messageDelegate?.didReceiveMarkerDeleteCommand(index: index)
+                return true
+            }
+            
+        case "MarkerEditSuccess":
+            if let forEdit = message["forEdit"] as? [Int], forEdit.count >= 2 {
+                messageDelegate?.didReceiveMarkerEditSuccessCommand(
+                    index: forEdit[0], 
+                    newTime: Double(forEdit[1])
+                )
+                return true
+            }
+            
+        case "SendRequireMusicList":
+            messageDelegate?.didReceiveMusicListRequestCommand()
+            return true
+            
+        case "ChangeVolume":
+            if let volume = message["volume"] as? Float {
+                messageDelegate?.didReceiveVolumeChangeCommand(volume: volume)
+                return true
+            }
+            
+        default:
+            return false
+        }
+        
+        return false
     }
 }
 

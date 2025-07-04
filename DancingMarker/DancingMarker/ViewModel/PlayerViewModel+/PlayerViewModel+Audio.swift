@@ -48,20 +48,24 @@ extension PlayerViewModel {
     func pauseMusic() {
         audioService.pause()
         
-        // Control Center 및 워치 업데이트
-        Task { await updateControlCenterNowPlaying() }
-        Task {
+        // 워치에 상태 업데이트 전송
+        Task { 
+            await updateControlCenterNowPlaying()
             await sendPlayingStateToWatch()
         }
+        
+        print("음악 일시정지됨")
     }
     
     /// 음악 재생을 재개합니다
     func resumeMusic() async throws {
         try await audioService.resume()
         
-        // Control Center 및 워치 업데이트
-        Task { await updateControlCenterNowPlaying() }
-        await sendPlayingStateToWatch()
+        // 워치에 상태 업데이트 전송
+        Task { 
+            await updateControlCenterNowPlaying()
+            await sendPlayingStateToWatch()
+        }
         
         print("음악 재생 재개됨")
     }
@@ -145,6 +149,10 @@ extension PlayerViewModel {
                     print("재생할 음악이 없어 워치 재생 명령 무시")
                 }
             }
+            
+            // 상태 변경 후 즉시 워치에 업데이트 전송
+            await sendPlayingStateToWatch()
+            
         } catch {
             print("워치 재생 토글 처리 중 오류: \(error)")
         }

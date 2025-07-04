@@ -19,6 +19,9 @@ struct DancingMarkerApp: App {
     
     @StateObject private var playerViewModel: PlayerViewModel
     
+    // WCManager 강제 초기화
+    private let wcManager = WatchConnectivityManager.shared
+    
     // MARK: - Initialization
     
     init() {
@@ -26,6 +29,10 @@ struct DancingMarkerApp: App {
         // ModelContext를 컨테이너에서 가져와서 전달
         let modelContext = container.modelContainer.mainContext
         self._playerViewModel = StateObject(wrappedValue: container.makePlayerViewModel(modelContext: modelContext))
+        
+        // WCManager 초기화 확인
+        print("DancingMarkerApp: WCManager 초기화 확인")
+        print("   - WCManager.shared 존재: \(WatchConnectivityManager.shared)")
     }
 
     var body: some Scene {
@@ -37,6 +44,11 @@ struct DancingMarkerApp: App {
                 // Dependency Container
                 .environmentObject(dependencyContainer)
                 .preferredColorScheme(.dark)
+                .onAppear {
+                    // 앱 시작 시 WCManager 상태 확인
+                    print("ContentView 나타남, WCManager 상태 확인")
+                    print("   - isReachable: \(WatchConnectivityManager.shared.isReachable)")
+                }
         }
         .backgroundTask(.appRefresh("com.dancingmarker.refresh")) {
             // 백그라운드에서 워치 메시지 처리
