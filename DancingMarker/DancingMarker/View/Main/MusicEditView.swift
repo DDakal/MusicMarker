@@ -140,6 +140,24 @@ struct MusicEditView: View {
                             existingMusic.albumArt = albumArt?.pngData()
                             do {
                                 try modelContext.save()
+                                
+                                // PlayerViewModel의 currentMusic 업데이트
+                                if playerViewModel.currentMusic?.id == existingMusic.id {
+                                    let updatedMusicData = MusicData(
+                                        id: existingMusic.id,
+                                        title: existingMusic.title,
+                                        artist: existingMusic.artist,
+                                        fileName: existingMusic.fileName,
+                                        markers: existingMusic.markers,
+                                        albumArt: existingMusic.albumArt
+                                    )
+                                    playerViewModel.currentMusic = updatedMusicData
+                                    
+                                    // Control Center 업데이트
+                                    await playerViewModel.updateControlCenterNowPlaying()
+                                    
+                                    print("✅ 음원 수정 후 PlayerViewModel 업데이트 완료: \(updatedMusicData.title)")
+                                }
                             } catch {
                                 print("음원 수정 실패: \(error.localizedDescription)")
                             }
