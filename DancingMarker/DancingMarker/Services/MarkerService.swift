@@ -20,10 +20,10 @@ final class MarkerService: MarkerManageable {
     @Published private(set) var markers: [TimeInterval] = [-1, -1, -1]
     @Published private(set) var editingIndex: Int? = nil
     @Published private(set) var isEditing: Bool = false
+    @Published private(set) var editingMarker: TimeInterval = 0.0
     
     // MARK: - Private Properties
     
-    private var editingMarker: TimeInterval = 0.0
     private let formatter: DateComponentsFormatter
     
     // MARK: - Initialization
@@ -163,6 +163,7 @@ final class MarkerService: MarkerManageable {
         
         if editingMarker < maxDuration - 1 {
             editingMarker += 1
+            print("✅ 편집 중인 마커 시간 증가: \(editingMarker)")
         }
     }
     
@@ -172,6 +173,7 @@ final class MarkerService: MarkerManageable {
         
         if editingMarker > 1 {
             editingMarker -= 1
+            print("✅ 편집 중인 마커 시간 감소: \(editingMarker)")
         }
     }
     

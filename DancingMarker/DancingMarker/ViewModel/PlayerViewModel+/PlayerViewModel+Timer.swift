@@ -60,7 +60,15 @@ extension PlayerViewModel {
             }
             .store(in: &cancellables)
         
-        print("✅ AudioService 개별 프로퍼티 구독 설정 완료 - 타이머 불필요")
+        // MarkerService의 editingMarker 변경 구독
+        if let markerServiceObject = markerService as? MarkerService {
+            markerServiceObject.$editingMarker
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] _ in
+                    self?.objectWillChange.send()
+                }
+                .store(in: &cancellables)
+        }
     }
     
     /// AudioService의 재생 상태 변경 처리
