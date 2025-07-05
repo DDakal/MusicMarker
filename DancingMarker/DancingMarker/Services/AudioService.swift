@@ -28,6 +28,7 @@ final class AudioService: AudioPlayable {
     private var audioPlayer: AVAudioPlayer?
     private var timer: Timer?
     private let formatter: DateComponentsFormatter
+    private var isSeeking: Bool = false  // ✅ seek 작업 상태 추가
     
     // MARK: - Initialization
     
@@ -121,12 +122,19 @@ final class AudioService: AudioPlayable {
             throw DancingMarkerError.audioSeekFailed
         }
         
+        // ✅ seek 작업 시작
+        isSeeking = true
+        
         let seekTime = max(0, min(time, player.duration))
         player.currentTime = seekTime
         
         await MainActor.run {
             self.currentTime = seekTime
         }
+        
+        // ✅ seek 작업 완료 (약간의 지연 후)
+        try await Task.sleep(nanoseconds: 100_000_000) // 0.1초
+        isSeeking = false
     }
     
     /// 5초 뒤로 이동합니다
@@ -200,7 +208,8 @@ final class AudioService: AudioPlayable {
             guard let self = self, let player = self.audioPlayer else { return }
             
             Task { @MainActor in
-                if !player.isPlaying {
+                // ✅ seek 작업 중이 아닐 때만 재생 상태 체크
+                if !self.isSeeking && !player.isPlaying && self.isPlaying {
                     self.isPlaying = false
                 }
                 self.currentTime = player.currentTime
