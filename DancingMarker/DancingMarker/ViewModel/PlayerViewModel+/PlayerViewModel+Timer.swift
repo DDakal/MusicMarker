@@ -50,6 +50,15 @@ extension PlayerViewModel {
                 }
             }
             .store(in: &cancellables)
+
+        audioServiceObject.$playbackRate
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] newPlaybackRate in
+                Task { @MainActor in
+                    await self?.handleAudioServicePlaybackRateChange(newPlaybackRate)
+                }
+            }
+            .store(in: &cancellables)
         
         print("✅ AudioService 개별 프로퍼티 구독 설정 완료 - 타이머 불필요")
     }
@@ -105,6 +114,13 @@ extension PlayerViewModel {
         if formattedDuration != formattedTime(duration) {
             formattedDuration = formattedTime(duration)
         }
+    }
+
+    /// AudioService의 재생 속도 변경 처리 (새로 추가)
+    @MainActor
+    private func handleAudioServicePlaybackRateChange(_ newPlaybackRate: Float) async {
+        playbackRate = newPlaybackRate
+        print("✅ 재생 속도 동기화 완료: \(newPlaybackRate)x")
     }
     
     /// 마커 이동 상태를 설정합니다
