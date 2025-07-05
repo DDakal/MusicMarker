@@ -311,7 +311,6 @@ extension PlayerViewModel {
     public func updateSliderUI(newTime: TimeInterval) {
         currentTime = newTime
         
-        // 진행률 업데이트
         guard duration > 0 else {
             progress = 0
             return

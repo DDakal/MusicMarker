@@ -15,7 +15,7 @@ extension PlayerViewModel {
     
     /// AudioService의 @Published 프로퍼티를 직접 구독하여 상태 동기화
     internal func setupAudioServiceSubscription() {
-        // ✅ AudioService를 AnyObject로 캐스팅하여 구독
+        // AudioService를 AnyObject로 캐스팅하여 구독
         guard let audioServiceObject = audioService as? AudioService else {
             print("❌ AudioService를 구체 타입으로 캐스팅 실패")
             return
@@ -66,7 +66,7 @@ extension PlayerViewModel {
     /// AudioService의 재생 상태 변경 처리
     @MainActor
     private func handleAudioServicePlayingStateChange(_ newIsPlaying: Bool) async {
-        // ✅ 마커 이동 중이거나 드래그 중일 때는 상태 변경 제한
+        // 마커 이동 중이거나 드래그 중일 때는 상태 변경 제한
         guard !isMarkerSeeking && !isDragging else {
             print("🔄 재생 상태 변경 무시 (마커 이동 중: \(isMarkerSeeking), 드래그 중: \(isDragging))")
             return
