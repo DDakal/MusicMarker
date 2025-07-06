@@ -9,7 +9,7 @@ struct WatchMusicListView: View {
     
     @State private var drawingHeight = true
     @State private var hasInitialized = false
-    @State private var afterOnAppear = false  // 추가
+    @State private var afterOnAppear = true
     
     //    @Query var musicList: [watchMusic] = []
     let columns = [ GridItem(.flexible()) ]

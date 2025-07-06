@@ -61,12 +61,12 @@ extension PlayerViewModel {
             // AudioService를 통해 시간 이동 (순수한 seek만)
             try await audioService.seek(to: markerTime)
             
-            // ✅ seek 후 즉시 강제 동기화
+            // seek 후 즉시 강제 동기화
             await forceSyncAfterSeek()
             
-            // ✅ 0.5초 후 마커 이동 완료 (짧은 안정화 시간)
+            // 0.1초 후 마커 이동 완료 (짧은 안정화 시간)
             Task {
-                try? await Task.sleep(nanoseconds: 500_000_000) // 0.5초
+                try? await Task.sleep(nanoseconds: 100_000_000)
                 await MainActor.run {
                     self.setMarkerSeeking(false)
                     
