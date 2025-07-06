@@ -170,6 +170,20 @@ final class WatchService: NSObject, ObservableObject, WatchConnectivityManageabl
                 return true
             }
             
+        // ✅ 추가: MarkerEditSuccess 케이스
+        case "MarkerEditSuccess":
+            if let forEdit = message["forEdit"] as? [Int], forEdit.count >= 2 {
+                messageDelegate?.didReceiveMarkerEditSuccessCommand(
+                    index: forEdit[0], 
+                    newTime: Double(forEdit[1])
+                )
+                return true
+            }
+            
+        case "SendRequireMusicList":
+            messageDelegate?.didReceiveMusicListRequestCommand()
+            return true
+            
         case "UUIDPlay":
             if let uuidString = message["id"] as? String, 
                let uuid = UUID(uuidString: uuidString) {
@@ -182,11 +196,6 @@ final class WatchService: NSObject, ObservableObject, WatchConnectivityManageabl
                 messageDelegate?.didReceiveVolumeChangeCommand(volume: volume)
                 return true
             }
-            
-        case "SendRequireMusicList":
-            print("🎯 WatchService: 음악 목록 요청 수신")
-            messageDelegate?.didReceiveMusicListRequestCommand()
-            return true
             
         default:
             print("⚠️ WatchService: 알 수 없는 액션 - \(action)")

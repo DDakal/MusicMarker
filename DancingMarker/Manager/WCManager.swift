@@ -12,7 +12,6 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
     private let session: WCSession = WCSession.default
     @Published var isReachable = false
     
-    // ✅ shared 인스턴스 추가
     static let shared = WatchConnectivityManager()
 
     override init() {
@@ -166,6 +165,14 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
         case "ChangeVolume":
             if let volume = message["volume"] as? Float {
                 NotificationCenter.default.post(name: .changeVolume, object: volume)
+            }
+            replyHandler(["success": true])
+            
+        // 마커 수정 완료
+        case "MarkerEditSuccess":
+            if let forEdit = message["forEdit"] as? [Int], forEdit.count >= 2 {
+                print("📥 WCManager: MarkerEditSuccess 수신 - 인덱스: \(forEdit[0]), 시간: \(forEdit[1])")
+                NotificationCenter.default.post(name: .markerEditSuccess, object: forEdit)
             }
             replyHandler(["success": true])
             
