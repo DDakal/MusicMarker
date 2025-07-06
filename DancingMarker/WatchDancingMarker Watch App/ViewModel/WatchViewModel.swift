@@ -233,9 +233,9 @@ class WatchViewModel: ObservableObject {
         
         isMarkerSeeking = true
         
-        // ✅ 0.8초 후 플래그 해제 (충분한 시간 확보)
+        // 0.8초 후 플래그 해제 (충분한 시간 확보)
         Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 800_000_000)
+            try? await Task.sleep(for: .milliseconds(800))
             self.isMarkerSeeking = false
             print("✅ 마커 연타 방지 플래그 해제")
         }
@@ -259,5 +259,76 @@ extension UserDefaults {
     
     func clearMusicList() {
         removeObject(forKey: Keys.musicList)
+    }
+}
+
+// MARK: - ApplicationContext 처리 메서드들
+
+extension WatchViewModel {
+    
+    /// ApplicationContext에서 음악 목록을 로드합니다
+    func loadMusicListFromApplicationContext() {
+        if let musicList = connectivityManager.getMusicListFromApplicationContext() {
+            print("✅ WatchViewModel: ApplicationContext에서 음악 목록 로드: \(musicList.count)개")
+            
+            // UserDefaults에 저장
+            UserDefaults.standard.clearMusicList()
+            UserDefaults.standard.saveMusicList(musicList)
+            
+            // ViewModel 업데이트
+            DispatchQueue.main.async {
+                self.musicList = musicList
+            }
+            
+            return
+        }
+        
+        print("ℹ️ WatchViewModel: ApplicationContext에 음악 목록 없음")
+    }
+    
+    /// ApplicationContext가 유효한지 확인합니다
+    func isApplicationContextValid() -> Bool {
+        return connectivityManager.isApplicationContextValid()
+    }
+    
+    /// ApplicationContext에서 마지막 업데이트 시간을 가져옵니다
+    func getLastUpdateTimeFromApplicationContext() -> TimeInterval? {
+        return connectivityManager.getLastUpdateTimeFromApplicationContext()
+    }
+    
+    /// 통합 동기화 메서드 (ApplicationContext + 실시간 요청)
+    func syncMusicListOnAppear() async {
+        print(" WatchViewModel: 통합 동기화 시작")
+        
+        // 1단계: ApplicationContext 먼저 확인
+        loadMusicListFromApplicationContext()
+        
+        // 2단계: 연결 대기 후 실시간 요청
+        await waitForConnectionAndRequestSync()
+    }
+    
+    /// 연결 대기 후 실시간 동기화 요청
+    private func waitForConnectionAndRequestSync() async {
+        print("   - 연결 대기 시작...")
+        
+        // 연결 대기 (최대 3초)
+        for attempt in 1...30 {
+            if connectivityManager.isReachable {
+                print("✅ 워치 연결됨! (시도 \(attempt)번째)")
+                break
+            }
+            
+            if attempt == 30 {
+                print("⚠️ 워치 연결 시간 초과 - ApplicationContext 데이터 사용")
+                return
+            }
+            
+            // ✅ 0.1초 대기 (100ms)
+            try? await Task.sleep(for: .milliseconds(100))
+        }
+        
+        // 실시간 동기화 요청
+        print("   - iOS 앱에 실시간 동기화 요청")
+        connectivityManager.sendRequireMusicListToIOS()
     }
 }

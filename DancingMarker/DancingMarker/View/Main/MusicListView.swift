@@ -252,13 +252,10 @@ struct MusicListView: View {
         }
     }
     
-    /// 워치로 음원 리스트 전송
+    /// 워치로 음원 리스트 전송 (3단계 동기화)
     private func sendMusicListToWatch() async {
-        do {
-            try await playerViewModel.sendMusicListToWatch(musicList)
-        } catch {
-            print("워치로 음원 리스트 전송 실패: \(error)")
-        }
+        // ✅ 3단계 동기화 시스템 사용
+        await playerViewModel.sendMusicListToWatch()
     }
     
     /// 새로운 음원 추가

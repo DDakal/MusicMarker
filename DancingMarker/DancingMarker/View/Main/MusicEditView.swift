@@ -291,6 +291,7 @@ struct MusicEditView: View {
     }
     
     private func sendMusicListToWatch() async {
+        // ✅ 3단계 동기화 시스템 사용
         await playerViewModel.sendMusicListToWatch()
     }
 }

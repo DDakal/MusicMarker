@@ -3,12 +3,13 @@ import SwiftData
 
 struct WatchMusicListView: View {
     
-    @State private var navigationManager = WatchNavigationManager()
-    @Environment(\.scenePhase) var scenePhase
     @EnvironmentObject var viewModel: WatchViewModel
+    @State private var navigationManager = WatchNavigationManager()  // @State로 변경
+    @Environment(\.scenePhase) var scenePhase
     
     @State private var drawingHeight = true
-    @State private var afterOnAppear: Bool = true
+    @State private var hasInitialized = false
+    @State private var afterOnAppear = false  // 추가
     
     //    @Query var musicList: [watchMusic] = []
     let columns = [ GridItem(.flexible()) ]
@@ -105,38 +106,35 @@ struct WatchMusicListView: View {
             }
         }
         .environment(navigationManager)
-        .task {
-            if viewModel.connectivityManager.isReachable {
-                viewModel.connectivityManager.sendRequireMusicListToIOS()
-            } else {
-                viewModel.connectivityManager.sendRequireMusicListToIOS()
-                print("WatchConnectivity session is not reachable.")
-                
-            }
-            afterOnAppear = true
+        .onAppear {
+            afterOnAppear = true  // onAppear 감지용
         }
+        // 첫 번째 onChange - scenePhase 변경 감지
         .onChange(of: scenePhase) { oldPhase, newPhase in
             if newPhase == .active {
                 print("onActive")
                 DispatchQueue.main.async {
                     viewModel.connectivityManager.sendRequireMusicListToIOS()
-                    print("\(viewModel.musicList)")
+                    print("onActive - 음악 목록: \(viewModel.musicList)")
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     viewModel.connectivityManager.sendRequireMusicListToIOS()
-                    print("\(viewModel.musicList)")
+                    print("onActive (0.5초 후) - 음악 목록: \(viewModel.musicList)")
                 }
             }
         }
+        // 두 번째 onChange - afterOnAppear 변경 감지
         .onChange(of: afterOnAppear) { beforeAppear, afterAppear in
             if afterAppear == true {
                 print("onAppear")
                 DispatchQueue.main.async {
                     viewModel.connectivityManager.sendRequireMusicListToIOS()
+                    print("onAppear - 음악 목록: \(viewModel.musicList)")
                     afterOnAppear = false
                 }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5){
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     viewModel.connectivityManager.sendRequireMusicListToIOS()
+                    print("onAppear (0.5초 후) - 음악 목록: \(viewModel.musicList)")
                     afterOnAppear = false
                 }
             }
@@ -158,5 +156,38 @@ struct WatchMusicListView: View {
     
     var animation: Animation {
         return .linear(duration: 0.5).repeatForever()
+    }
+    
+    // MARK: - Private Methods
+    
+    private func performInitialSync() async {
+        print(" 앱 시작 - 초기 음악 목록 동기화")
+        await syncMusicList()
+        hasInitialized = true
+    }
+    
+    private func syncMusicList() async {
+        // 연결 상태 확인
+        guard viewModel.connectivityManager.isReachable else {
+            print("⚠️ 워치 연결 안됨 - 동기화 건너뜀")
+            return
+        }
+        
+        // 즉시 요청
+        viewModel.connectivityManager.sendRequireMusicListToIOS()
+        
+        // 0.5초 후 재요청 (연결 안정성 확보)
+        try? await Task.sleep(nanoseconds: 500_000_000)
+        viewModel.connectivityManager.sendRequireMusicListToIOS()
+        
+        print("✅ 음악 목록 동기화 요청 완료")
+    }
+
+    // 워치 앱 시작 시 통합 동기화 실행
+    private func syncMusicListOnAppear() async {
+        print("🎯 syncMusicListOnAppear 시작")
+        
+        // ✅ WatchViewModel을 통해 통합 동기화 실행
+        await viewModel.syncMusicListOnAppear()
     }
 }

@@ -66,7 +66,7 @@ extension PlayerViewModel {
         }
     }
     
-    /// 워치에 음악 목록을 전송합니다 - 개선된 버전
+    /// 워치에 음악 목록을 전송합니다 - 3단계 동기화 시스템 사용
     func sendMusicListToWatch() async {
         print("🎯 sendMusicListToWatch 시작")
         
@@ -75,30 +75,15 @@ extension PlayerViewModel {
         
         print("   - 전송할 음악 개수: \(musicList.count)")
         
-        // 연결 상태 재확인
-        guard watchService.isConnected && watchService.isReachable else {
-            print("⚠️ 워치 연결 상태가 좋지 않아 음악 목록 전송을 건너뜁니다")
-            return
+        // MusicData를 [[String]] 형태로 변환 (워치에서 기대하는 형태)
+        let musicListForWatch = self.musicList.map { musicData in
+            return [musicData.title, musicData.id.uuidString]
         }
         
-        do {
-            // MusicData를 Music으로 변환하여 전송
-            let musicListForWatch = self.musicList.compactMap { musicData in
-                print("   - 음악: \(musicData.title) (ID: \(musicData.id))")
-                return Music(
-                    title: musicData.title,
-                    artist: musicData.artist,
-                    fileName: musicData.fileName,
-                    markers: musicData.markers,
-                    albumArt: musicData.albumArt
-                )
-            }
-            
-            try await watchService.sendMusicList(musicListForWatch)
-            print("✅ 워치에 음악 목록 전송 완료: \(musicListForWatch.count)개")
-        } catch {
-            print("❌ 워치 음악 목록 전송 실패: \(error.localizedDescription)")
-        }
+        // ✅ 3단계 동기화 시스템 사용
+        WatchConnectivityManager.shared.syncMusicDataToWatch(musicListForWatch)
+        
+        print("✅ 3단계 동기화로 음악 목록 전송 완료")
     }
     
     /// 워치에 현재 음악 제목을 전송합니다
@@ -196,6 +181,8 @@ extension PlayerViewModel {
     
     /// 워치 알림 시스템을 설정합니다
     internal func setupWatchNotifications() {
+        print("🔍 setupWatchNotifications 시작")
+        
         // 기존 PlayerModel의 notification 로직을 async/await 방식으로 변경
         // Notification.Name들은 Manager/WCManager.swift에서 이미 정의됨
         
@@ -360,7 +347,19 @@ extension PlayerViewModel {
             }
         }
         
-        print("워치 알림 시스템 설정 완료")
+        // ✅ 자동 동기화 트리거 추가
+        NotificationCenter.default.addObserver(
+            forName: .triggerAutoSync,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            print("🎯 자동 동기화 트리거 수신")
+            Task { @MainActor in
+                await self?.handleAutoSync()
+            }
+        }
+        
+        print("✅ 워치 알림 시스템 설정 완료")
     }
     
     // MARK: - Watch Command Handlers
@@ -464,6 +463,7 @@ extension PlayerViewModel {
         }
         
         // 음악 목록 전송
+        print("   - 음악 목록 전송 시작")
         await sendMusicListToWatch()
         
         // 현재 재생 중인 음악이 있다면 전체 상태도 함께 전송
@@ -474,6 +474,33 @@ extension PlayerViewModel {
         
         print("✅ 워치 음악 목록 요청 처리 완료")
     }
+    
+    /// 자동 동기화 처리
+    internal func handleAutoSync() async {
+        print("🔄 handleAutoSync 시작")
+        
+        // 연결 상태 확인
+        print("   - watchService.isConnected: \(watchService.isConnected)")
+        print("   - watchService.isReachable: \(watchService.isReachable)")
+        
+        guard watchService.isConnected && watchService.isReachable else {
+            print("⚠️ 워치 연결 안됨 - 자동 동기화 건너뜀")
+            return
+        }
+        
+        // 음악 목록 전송
+        print("   - 음악 목록 전송 시작")
+        await sendMusicListToWatch()
+        
+        // 현재 재생 중인 음악이 있다면 전체 상태도 함께 전송
+        if let currentMusic = currentMusic {
+            print("   - 현재 재생 중인 음악이 있어 전체 상태도 전송합니다: \(currentMusic.title)")
+            await sendCompleteStateToWatch()
+        }
+        
+        print("✅ handleAutoSync 완료")
+    }
+
 }
 
 // MARK: - Watch Integration Support
@@ -534,27 +561,5 @@ extension PlayerViewModel {
         // watchService.setMessageDelegate(self)
         
         // TODO: WatchMessageDelegate 구현이 필요하면 추가
-    }
-}
-
-// MARK: - Watch Integration Support
-
-extension PlayerViewModel {
-    
-    /// 워치 연결 복원시 전체 상태 동기화
-    internal func syncCompleteStateToWatch() async {
-        print("🔄 워치와 전체 상태 동기화 시작")
-        
-        await withTaskGroup(of: Void.self) { group in
-            // 음악 목록 전송
-            group.addTask { await self.sendMusicListToWatch() }
-            
-            // 현재 재생 상태가 있으면 모든 정보 전송
-            if self.currentMusic != nil {
-                group.addTask { await self.sendCompleteStateToWatch() }
-            }
-        }
-        
-        print("✅ 워치 전체 상태 동기화 완료")
     }
 }
