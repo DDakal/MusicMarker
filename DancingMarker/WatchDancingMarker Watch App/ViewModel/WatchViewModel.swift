@@ -107,10 +107,8 @@ class WatchViewModel: ObservableObject {
                 self.isPlaying = isPlaying
                 
                 if isPlaying {
-                    print("▶️ 워치: 타이머 시작")
                     self.startTimer()
                 } else {
-                    print("⏸️ 워치: 타이머 정지")
                     self.stopTimer()
                 }
             }

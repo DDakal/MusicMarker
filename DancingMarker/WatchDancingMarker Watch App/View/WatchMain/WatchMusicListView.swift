@@ -65,8 +65,7 @@ struct WatchMusicListView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing){
-                    // 음원이 있고, 현재 재생 중이거나 재생할 음원이 있을 때만 버튼 표시
-                    if !viewModel.musicList.isEmpty && viewModel.musicTitle != "" {
+                    if !viewModel.musicList.isEmpty && !viewModel.musicTitle.isEmpty {
                         Button {
                             navigationManager.push(to: .playing)
                         } label: {
@@ -85,16 +84,24 @@ struct WatchMusicListView: View {
                                         .animation(animation.speed(1.3), value: drawingHeight)
                                 }
                                 .frame(width:20)
-                                .onAppear{
-                                    print(" 애니메이션 바 onAppear - drawingHeight: \(drawingHeight)")
-                                    drawingHeight.toggle()
-                                    print("   - onAppear 후 drawingHeight: \(drawingHeight)")
+                                .onAppear {
+                                    print("🎯 재생 중 애니메이션 바 onAppear")
+                                    startAnimationTimer()
                                 }
-                                .onChange(of: drawingHeight) { oldValue, newValue in
-                                    print(" drawingHeight 변화 감지: \(oldValue) -> \(newValue)")
+                                .onDisappear {
+                                    print("🎯 재생 중 애니메이션 바 onDisappear")
+                                    stopAnimationTimer()
+                                }
+                                .onChange(of: viewModel.isPlaying) { oldValue, newValue in
+                                    print("🎯 isPlaying 변경: \(oldValue) -> \(newValue)")
+                                    if newValue {
+                                        startAnimationTimer()
+                                    } else {
+                                        stopAnimationTimer()
+                                    }
                                 }
                             } else {
-                                // 정지 상태일 때 - 정지 바
+                                // 정지 상태일 때 - 정지 바 (항상 표시)
                                 HStack(spacing:1.6) {
                                     stopBar()
                                     stopBar()
@@ -174,16 +181,23 @@ struct WatchMusicListView: View {
         // 기존 타이머가 있으면 해제
         animationTimer?.invalidate()
         
+        // 즉시 애니메이션 시작
+        drawingHeight.toggle()
+        
         // 0.5초마다 drawingHeight 토글 (애니메이션 지속)
         animationTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
-            drawingHeight.toggle()
+            DispatchQueue.main.async {
+                self.drawingHeight.toggle()
+            }
         }
-        print("✅ 애니메이션 타이머 시작")
+        print("✅ 애니메이션 타이머 시작 - drawingHeight: \(drawingHeight)")
     }
     
     private func stopAnimationTimer() {
         animationTimer?.invalidate()
         animationTimer = nil
+        // 정지 상태로 애니메이션 초기화
+        drawingHeight = false
         print("⏸️ 애니메이션 타이머 정지")
     }
     

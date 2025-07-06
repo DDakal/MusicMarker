@@ -34,6 +34,7 @@ extension PlayerViewModel {
             await sendMusicListToWatch()
             await sendMarkersToWatch()
             await sendPlayingStateToWatch()
+            await sendMusicTitleToWatch() 
             
             print("음악 재생 시작: \(musicData.title)")
             
