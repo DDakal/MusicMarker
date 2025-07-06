@@ -221,22 +221,10 @@ extension PlayerViewModel {
 
 extension PlayerViewModel {
     
-    /// 새 음악 재생 시 Control Center 설정
-    func setupControlCenterForNewMusic(_ musicData: MusicData) async {
-        // ✅ Audio Session 설정을 여기서 하지 않음 (setupRemoteControlHandlers에서 처리)
-        await updateControlCenterNowPlaying()
-        print("새 음악에 대한 Control Center 설정 완료: \(musicData.title)")
-    }
-    
     /// 음악 중지 시 Control Center 정리
     func cleanupControlCenterOnStop() async {
         await clearControlCenterInfo()
         print("음악 중지에 따른 Control Center 정리 완료")
-    }
-    
-    /// 재생 상태 변경 시 Control Center 업데이트
-    func notifyControlCenterOfPlaybackStateChange() async {
-        await updateControlCenterNowPlaying()
     }
     
     /// 마커 이동 시 Control Center 업데이트

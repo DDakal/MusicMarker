@@ -170,7 +170,7 @@ final class AudioService: AudioPlayable {
         }
     }
     
-    /// 볼륨을 설정합니다 (새로 추가된 메서드)
+    /// 볼륨을 설정합니다 
     func setVolume(_ volume: Float) async throws {
         guard let player = audioPlayer else {
             throw DancingMarkerError.audioInitializationFailed
@@ -180,7 +180,7 @@ final class AudioService: AudioPlayable {
         player.volume = clampedVolume
     }
     
-    /// 현재 재생 시간을 가져옵니다 (새로 추가된 메서드)
+    /// 현재 재생 시간을 가져옵니다 
     func getCurrentTime() async throws -> TimeInterval {
         guard let player = audioPlayer else {
             throw DancingMarkerError.audioInitializationFailed

@@ -144,42 +144,6 @@ extension PlayerViewModel {
             await sendPlayingStateToWatch()
         }
     }
-    
-    /// 워치에 Control Center와 함께 상태를 업데이트합니다
-    func updateWatchAndControlCenter() async {
-        guard let music = currentMusic else { return }
-        
-        await withTaskGroup(of: Void.self) { group in
-            // 워치 업데이트
-            group.addTask {
-                await self.sendPlayingStateToWatch()
-            }
-            
-            // Control Center 업데이트
-            group.addTask {
-                await self.updateControlCenterForWatch(music: music)
-            }
-        }
-    }
-    
-    /// Control Center 정보 업데이트 (워치용 - 내부 에러 처리)
-    private func updateControlCenterForWatch(music: MusicData) async {
-        do {
-            let nowPlayingInfo = NowPlayingInfo(
-                title: music.title,
-                artist: music.artist,
-                currentTime: self.currentTime,
-                duration: self.duration,
-                isPlaying: self.isPlaying,
-                playbackRate: self.playbackRate,
-                albumArtData: music.albumArt
-            )
-            
-            try await self.liveActivityService.updateNowPlayingInfo(nowPlayingInfo)
-        } catch {
-            print("Control Center 업데이트 실패: \(error.localizedDescription)")
-        }
-    }
 }
 
 // MARK: - Watch Notification Handlers
