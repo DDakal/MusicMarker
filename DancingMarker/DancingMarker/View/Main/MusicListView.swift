@@ -8,7 +8,6 @@
 import SwiftUI
 import SwiftData
 import AVFoundation
-import MediaPlayer
 
 class SheetState: ObservableObject {
     @Published var musicToEdit: Music? = nil
@@ -17,13 +16,11 @@ class SheetState: ObservableObject {
     func editMusic(_ music: Music) {
         musicToEdit = music
         isPresented = true
-        print("🔍 SheetState - editMusic 설정: \(music.title)")
     }
     
     func dismiss() {
         musicToEdit = nil
         isPresented = false
-        print("🔍 SheetState - dismiss")
     }
 }
 
@@ -134,7 +131,6 @@ struct MusicListView: View {
             switch result {
             case .success(let urls):
                 if let url = urls.first {
-                    // 파일 선택 후 바로 새 음원을 추가하는 메서드 호출
                     Task {
                         await addMusic(from: url)
                     }
@@ -150,32 +146,6 @@ struct MusicListView: View {
             NavigationStack {
                 if let music = sheetState.musicToEdit {
                     MusicEditView(music: music, didSaveMusic: $didSaveMusic)
-                        .onAppear {
-                            print("✅ 음원 편집 뷰 표시: \(music.title)")
-                        }
-                } else {
-                    VStack(spacing: 20) {
-                        Text("데이터 로딩 중...")
-                            .font(.title2)
-                            .foregroundColor(.white)
-                        
-                        ProgressView()
-                            .scaleEffect(1.5)
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        
-                        Button("닫기") {
-                            sheetState.dismiss()
-                        }
-                        .padding()
-                        .background(Color.red)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.black)
-                    .onAppear {
-                        print("🚨 예상치 못한 상황 발생")
-                    }
                 }
             }
         }
@@ -184,7 +154,6 @@ struct MusicListView: View {
     
     // MARK: - Private Methods
     
-    /// 음원 선택 처리 (새로운 아키텍처)
     private func handleMusicSelection(_ music: Music) async {
         do {
             let musicData = MusicData(
@@ -198,12 +167,8 @@ struct MusicListView: View {
             
             if playerViewModel.currentMusic == nil || playerViewModel.currentMusic?.id != musicData.id {
                 await playerViewModel.playMusic(musicData)
-                print("음원 \(musicData.title)으로 바뀜")
             } else if !playerViewModel.isPlaying {
                 try await playerViewModel.resumeMusic()
-                print("음원 \(musicData.title) 재생됨")
-            } else {
-                print("이미 재생 중인 음원 \(musicData.title)")
             }
             
             navigationManager.push(to: .playing)
@@ -213,7 +178,6 @@ struct MusicListView: View {
         }
     }
     
-    /// 컨텍스트 메뉴 생성
     private func musicContextMenu(music: Music) -> some View {
         Group {
             Button(action: {
@@ -234,47 +198,35 @@ struct MusicListView: View {
         }
     }
     
-    /// 음원 삭제 처리
     private func deleteMusic(_ music: Music) async {
         if playerViewModel.currentMusic?.id == music.id {
             await playerViewModel.stopMusic()
-            print("재생 중인 음원이 삭제되어 재생을 중지했습니다.")
         }
         
         if let index = musicList.firstIndex(of: music) {
             modelContext.delete(musicList[index])
             do {
                 try modelContext.save()
-                await sendMusicListToWatch()
+                await playerViewModel.sendMusicListToWatch()
             } catch {
                 print("음원 삭제 중 오류 발생: \(error)")
             }
         }
     }
     
-    /// 워치로 음원 리스트 전송 (3단계 동기화)
-    private func sendMusicListToWatch() async {
-        // ✅ 3단계 동기화 시스템 사용
-        await playerViewModel.sendMusicListToWatch()
-    }
-    
-    /// 새로운 음원 추가
     private func addMusic(from url: URL) async {
-        // 보안 범위 설정 시작
         guard url.startAccessingSecurityScopedResource() else {
             print("Failed to start accessing security scoped resource at \(url)")
             return
         }
         
         defer {
-            // 보안 범위 접근 종료
             url.stopAccessingSecurityScopedResource()
         }
         
         do {
             let (title, artist, albumArt) = try await fetchMusicMetadata(from: url)
             let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-            
             let uniqueFileURL = documentsDirectory.appendingUniquePathComponent(url.lastPathComponent)
             
             try FileManager.default.copyItem(at: url, to: uniqueFileURL)
@@ -290,14 +242,13 @@ struct MusicListView: View {
             modelContext.insert(newMusic)
             try modelContext.save()
             
-            await sendMusicListToWatch()
+            await playerViewModel.sendMusicListToWatch()
             print("✅ 새 음원 추가 완료: \(title)")
         } catch {
             print("Failed to add music: \(error.localizedDescription)")
         }
     }
     
-    /// 음원 메타데이터 추출
     private func fetchMusicMetadata(from url: URL) async throws -> (String, String, Data?) {
         let asset = AVAsset(url: url)
         let metadata = try await asset.load(.commonMetadata)
@@ -334,7 +285,7 @@ struct MusicListView: View {
     }
 }
 
-// ✅ URL 확장 (기존 코드 유지)
+// URL 확장
 extension URL {
     func appendingUniquePathComponent(_ component: String) -> URL {
         var newURL = self.appendingPathComponent(component)
