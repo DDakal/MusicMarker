@@ -4,7 +4,7 @@ import SwiftData
 struct WatchMusicListView: View {
     
     @EnvironmentObject var viewModel: WatchViewModel
-    @State private var navigationManager = WatchNavigationManager()  // @State로 변경
+    @State private var navigationManager = WatchNavigationManager()
     @Environment(\.scenePhase) var scenePhase
     
     @State private var drawingHeight = true

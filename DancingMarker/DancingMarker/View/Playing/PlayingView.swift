@@ -389,24 +389,29 @@ struct PlayingView: View {
         }
     }
     
-    /// 마커 편집 버튼 생성 (수정된 버전)
+    /// 마커 편집 버튼 생성 (개선된 버전)
     @ViewBuilder
     private func editMarkerButton(for marker: TimeInterval, index: Int) -> some View {
         HStack(spacing: 6) {
-            Circle()
-                .fill(.inactiveGray)
-                .frame(width: 40, height: 40)
-                .overlay {
-                    Image("backward1SecIcon")
-                }
-                .onTapGesture {
-                    // ✅ PlayerViewModel의 래퍼 메서드 사용
+            // 뒤로 버튼
+            Button(action: {
+                withAnimation(.easeInOut(duration: 0.2)) {
                     playerViewModel.decreaseEditingMarkerTime()
-                    print("마커 편집 시간 1초 감소")
                 }
+            }) {
+                Circle()
+                    .fill(playerViewModel.canDecreaseEditingMarker ? .inactiveGray : .buttonDarkGray)
+                    .frame(width: 40, height: 40)
+                    .overlay {
+                        Image("backward1SecIcon")
+                            .opacity(playerViewModel.canDecreaseEditingMarker ? 1.0 : 0.3)
+                    }
+            }
+            .disabled(!playerViewModel.canDecreaseEditingMarker)
+            .scaleEffect(playerViewModel.canDecreaseEditingMarker ? 1.0 : 0.9)
             
+            // 시간 표시
             HStack(spacing: 8) {
-                // ✅ MarkerService의 현재 편집 시간을 표시
                 Text(formattedEditingTime(index: index))
                     .font(.title3)
                     .italic()
@@ -417,32 +422,39 @@ struct PlayingView: View {
             .cornerRadius(12)
             .padding(.horizontal, 6)
             
-            Circle()
-                .fill(.inactiveGray)
-                .frame(width: 40, height: 40)
-                .overlay {
-                    Image("forward1SecIcon")
-                }
-                .onTapGesture {
-                    // ✅ PlayerViewModel의 래퍼 메서드 사용  
+            // 앞으로 버튼
+            Button(action: {
+                withAnimation(.easeInOut(duration: 0.2)) {
                     playerViewModel.increaseEditingMarkerTime()
-                    print("마커 편집 시간 1초 증가")
                 }
-            
-            Circle()
-                .fill(.buttonDarkGray)
-                .frame(width: 40, height: 40)
-                .overlay {
-                    Image(systemName: "checkmark")
-                        .foregroundColor(Color.green)
-                }
-                .padding(.leading, 10)
-                .onTapGesture {
-                    Task {
-                        print("마커 편집 저장 버튼 클릭")
-                        await playerViewModel.saveEditingMarker()
+            }) {
+                Circle()
+                    .fill(playerViewModel.canIncreaseEditingMarker ? .inactiveGray : .buttonDarkGray)
+                    .frame(width: 40, height: 40)
+                    .overlay {
+                        Image("forward1SecIcon")
+                            .opacity(playerViewModel.canIncreaseEditingMarker ? 1.0 : 0.3)
                     }
+            }
+            .disabled(!playerViewModel.canIncreaseEditingMarker)
+            .scaleEffect(playerViewModel.canIncreaseEditingMarker ? 1.0 : 0.9)
+            
+            // 저장 버튼
+            Button(action: {
+                Task {
+                    print("마커 편집 저장 버튼 클릭")
+                    await playerViewModel.saveEditingMarker()
                 }
+            }) {
+                Circle()
+                    .fill(.buttonDarkGray)
+                    .frame(width: 40, height: 40)
+                    .overlay {
+                        Image(systemName: "checkmark")
+                            .foregroundColor(Color.green)
+                    }
+            }
+            .padding(.leading, 10)
         }
     }
     
