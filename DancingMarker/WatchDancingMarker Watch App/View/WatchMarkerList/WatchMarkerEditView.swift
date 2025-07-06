@@ -76,15 +76,16 @@ struct WatchMarkerEditView: View {
                 // MARK: 저장하기 버튼
                 HStack{
                     Button {
-                        // 마커 시간 수정한 후 저장
-                        viewModel.connectivityManager.sendMarkerEditSuccessToIOS(forEdit: [index, count])
+                        // ✅ 수정: data의 절대값을 전송하도록 변경
+                        let finalTime = Int(data)
+                        viewModel.connectivityManager.sendMarkerEditSuccessToIOS(forEdit: [index, finalTime])
                         dismiss()
                         navigationPath.removeLast(navigationPath.count) // 루트로 이동
                     } label: {
                         Text("Local_Done")
                             .font(.system(size: 17, weight: .regular))
                             .fixedSize()
-                            .foregroundColor(data != initialData ? .white : .inactiveGray) // 처음의 시간이 아니라면 색상으로 활성화/비활성화 여부
+                            .foregroundColor(data != initialData ? .white : .inactiveGray)
                     }
                     .buttonStyle(
                         CommonButtonStyle(
@@ -128,7 +129,6 @@ struct WatchMarkerEditView: View {
         DispatchQueue.main.async{
             count += 1
             data += 1
-            viewModel.connectivityManager.sendMarkerEditToIOS(forEdit: [index, count])
         }
     }
     
@@ -137,7 +137,6 @@ struct WatchMarkerEditView: View {
         DispatchQueue.main.async{
             count -= 1
             data -= 1
-            viewModel.connectivityManager.sendMarkerEditToIOS(forEdit: [index, count])
         }
     }
     

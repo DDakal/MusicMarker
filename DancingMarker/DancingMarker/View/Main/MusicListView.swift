@@ -8,20 +8,32 @@
 import SwiftUI
 import SwiftData
 import AVFoundation
-import MediaPlayer
+
+class SheetState: ObservableObject {
+    @Published var musicToEdit: Music? = nil
+    @Published var isPresented: Bool = false
+    
+    func editMusic(_ music: Music) {
+        musicToEdit = music
+        isPresented = true
+    }
+    
+    func dismiss() {
+        musicToEdit = nil
+        isPresented = false
+    }
+}
 
 struct MusicListView: View {
     @Environment(NavigationManager.self) var navigationManager
     @Environment(\.modelContext) private var modelContext
-    @EnvironmentObject var playerModel: PlayerModel
-
+    @EnvironmentObject var playerViewModel: PlayerViewModel
+    
     @Query var musicList: [Music] = []
-
+    
     @State private var isFileImporterPresented: Bool = false
-    @State private var isMusicEditViewPresented: Bool = false
-    @State private var selectedFileURL: URL? = nil
     @State private var didSaveMusic: Bool = false
-    @State private var selectedMusic: Music? = nil
+    @StateObject private var sheetState = SheetState()
     
     var body: some View {
         VStack {
@@ -74,55 +86,20 @@ struct MusicListView: View {
                             musicContextMenu(music: music)
                         }
                         Spacer()
-                        
                     }
-                    //MARK: - 코드 정리 필요
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        let tappedMusic = music
-                        
-                        if playerModel.music == nil || playerModel.music?.id != tappedMusic.id {
-                            // 새로운 곡이 선택되었거나 처음 재생하는 경우
-                            playerModel.stopAudio()
-                            playerModel.stopTimer()
-                            
-                            // 오디오 세션 활성화
-                            try? AVAudioSession.sharedInstance().setActive(true)
-                            
-                            playerModel.music = tappedMusic
-                            playerModel.initAudioPlayer(for: tappedMusic)
-                            playerModel.isPlaying = true
-                            playerModel.playAudio()
-                            
-                            // Now Playing 정보 설정 및 업데이트
-                            playerModel.updateNowPlayingControlCenter()
-                            
-                            print("음원 \(playerModel.music?.title)으로 바뀜")
-                        } else if !playerModel.isPlaying {
-                            // 동일한 곡이지만 정지된 상태에서 재생을 눌렀을 때
-                            playerModel.isPlaying = true
-                            playerModel.playAudio()
-                            
-                            // Now Playing 정보 업데이트
-                            playerModel.updateNowPlayingControlCenter()
-                            
-                            print("음원 \(playerModel.music?.title) 재생됨")
-                        } else {
-                            // 동일한 곡이 이미 재생 중인 경우
-                            print("이미 재생 중인 음원 \(playerModel.music?.title)")
+                        Task {
+                            await handleMusicSelection(music)
                         }
-                        
-                        // 재생 정보를 보내고, PlayingView로 이동
-                        playerModel.sendPlayingInformation()
-                        navigationManager.push(to: .playing)
                     }
-
                 }
                 .listStyle(.inset)
                 
-                if playerModel.music != nil {
+                // 현재 음원이 있을 때 NowPlayingView 표시
+                if playerViewModel.currentMusic != nil {
                     NowPlayingView()
-                        .frame(height: 240) // 미니 플레이어의 높이 조정
+                        .frame(height: 240)
                         .background(.nowPlayingGray)
                         .clipShape(
                             .rect(
@@ -136,127 +113,120 @@ struct MusicListView: View {
             }
         }
         .navigationTitle("Local_TitleList")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: {
-                        isFileImporterPresented.toggle()
-                    }) {
-                        Text("Local_Add")
-                            .foregroundStyle(.accent)
-                    }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: {
+                    isFileImporterPresented.toggle()
+                }) {
+                    Text("Local_Add")
+                        .foregroundStyle(.accent)
                 }
             }
-            .fileImporter(
-                isPresented: $isFileImporterPresented,
-                allowedContentTypes: [.audio],
-                allowsMultipleSelection: false
-            ) { result in
-                switch result {
-                case .success(let urls):
-                    if let url = urls.first {
-                        // 파일 선택 후 바로 새 음원을 추가하는 메서드 호출
-                        Task {
-                            await addMusic(from: url)
-                            didSaveMusic = true
-                        }
-                    }
-                case .failure(let error):
-                    print("Failed to import file: \(error.localizedDescription)")
-                }
-            }
-            .sheet(isPresented: $isMusicEditViewPresented, onDismiss: {
-                selectedMusic = nil
-                if !didSaveMusic && selectedFileURL != nil {
-                    isFileImporterPresented = true
-                }
-                selectedFileURL = nil
-            }) {
-                NavigationStack {
-                    if let selectedMusic = selectedMusic {
-                        // Existing music
-                        MusicEditView(
-                            music: selectedMusic,
-                            didSaveMusic: $didSaveMusic
-                        )
-                    } else if let url = selectedFileURL {
-                        // New music from URL
-                        MusicEditView(
-                            fileURL: url,
-                            didSaveMusic: $didSaveMusic
-                        )
+        }
+        .fileImporter(
+            isPresented: $isFileImporterPresented,
+            allowedContentTypes: [.audio],
+            allowsMultipleSelection: false
+        ) { result in
+            switch result {
+            case .success(let urls):
+                if let url = urls.first {
+                    Task {
+                        await addMusic(from: url)
                     }
                 }
+            case .failure(let error):
+                print("Failed to import file: \(error.localizedDescription)")
             }
+        }
+        .sheet(isPresented: $sheetState.isPresented, onDismiss: {
+            sheetState.dismiss()
+            didSaveMusic = false
+        }) {
+            NavigationStack {
+                if let music = sheetState.musicToEdit {
+                    MusicEditView(music: music, didSaveMusic: $didSaveMusic)
+                }
+            }
+        }
         .edgesIgnoringSafeArea(.bottom)
     }
     
-    @ViewBuilder
-    private func tipButton() -> some View {
-        TipButtonView()
-    }
+    // MARK: - Private Methods
     
-    private func addEditedMusic(_ music: Music) {
-        modelContext.insert(music)
-        try? modelContext.save()
-        playerModel.sendMusicListToWatch(with: musicList)
+    private func handleMusicSelection(_ music: Music) async {
+        do {
+            let musicData = MusicData(
+                id: music.id,
+                title: music.title,
+                artist: music.artist,
+                fileName: music.fileName,
+                markers: music.markers,
+                albumArt: music.albumArt
+            )
+            
+            if playerViewModel.currentMusic == nil || playerViewModel.currentMusic?.id != musicData.id {
+                await playerViewModel.playMusic(musicData)
+            } else if !playerViewModel.isPlaying {
+                try await playerViewModel.resumeMusic()
+            }
+            
+            navigationManager.push(to: .playing)
+            
+        } catch {
+            print("음원 재생 중 오류 발생: \(error)")
+        }
     }
     
     private func musicContextMenu(music: Music) -> some View {
         Group {
             Button(action: {
-                selectedMusic = music
-                isMusicEditViewPresented = true
+                sheetState.editMusic(music)
             }) {
                 Text("Local_Edit")
                 Image(systemName: "pencil")
             }
+            
             Button(role: .destructive, action: {
-                DispatchQueue.main.async {
-                    if let index = self.musicList.firstIndex(of: music) {
-                        // 현재 삭제하려는 곡이 재생 중인 곡이라면, 플레이어를 정지하고 playerModel을 초기화
-                        if playerModel.music?.id == music.id {
-                            playerModel.stopAudio()       // 재생 중인 오디오를 정지
-                            playerModel.stopTimer()       // 타이머 정지
-                            playerModel.music = nil       // 음악을 nil로 설정
-                            playerModel.updateNowPlayingControlCenter() // Now Playing 정보 업데이트
-                        }
-                        
-                        // 음원 리스트에서 삭제
-                        modelContext.delete(musicList[index])
-                        do {
-                            try modelContext.save()
-                        } catch {
-                            print("Failed to fetch music metadata: \(error.localizedDescription)")
-                        }
-                    }
-                    
-                    // 워치로 업데이트된 음악 리스트 전송
-                    playerModel.sendMusicListToWatch(with: musicList)
+                Task {
+                    await deleteMusic(music)
                 }
             }) {
                 Text("Local_Delete")
                 Image(systemName: "trash")
             }
-            
+        }
+    }
+    
+    private func deleteMusic(_ music: Music) async {
+        if playerViewModel.currentMusic?.id == music.id {
+            await playerViewModel.stopMusic()
+        }
+        
+        if let index = musicList.firstIndex(of: music) {
+            modelContext.delete(musicList[index])
+            do {
+                try modelContext.save()
+                await playerViewModel.sendMusicListToWatch()
+            } catch {
+                print("음원 삭제 중 오류 발생: \(error)")
+            }
         }
     }
     
     private func addMusic(from url: URL) async {
-        // 보안 범위 설정 시작
         guard url.startAccessingSecurityScopedResource() else {
             print("Failed to start accessing security scoped resource at \(url)")
             return
         }
         
         defer {
-            // 보안 범위 접근 종료
             url.stopAccessingSecurityScopedResource()
         }
         
         do {
             let (title, artist, albumArt) = try await fetchMusicMetadata(from: url)
             let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-            
             let uniqueFileURL = documentsDirectory.appendingUniquePathComponent(url.lastPathComponent)
             
             try FileManager.default.copyItem(at: url, to: uniqueFileURL)
@@ -272,9 +242,10 @@ struct MusicListView: View {
             modelContext.insert(newMusic)
             try modelContext.save()
             
-            playerModel.sendMusicListToWatch(with: musicList)
+            await playerViewModel.sendMusicListToWatch()
+            print("✅ 새 음원 추가 완료: \(title)")
         } catch {
-            print("Failed to fetch music metadata: \(error.localizedDescription)")
+            print("Failed to add music: \(error.localizedDescription)")
         }
     }
     
@@ -305,7 +276,7 @@ struct MusicListView: View {
             title = url.deletingPathExtension().lastPathComponent
         }
         
-        // artist는 메타데이터가 없을 경우 기본값 유지하거나 다른 처리를 할 수 있음
+        // artist는 메타데이터가 없을 경우 기본값 설정
         if artist == nil || artist == "Unknown Artist" {
             artist = "Unknown Artist"
         }
@@ -314,13 +285,13 @@ struct MusicListView: View {
     }
 }
 
+// URL 확장
 extension URL {
     func appendingUniquePathComponent(_ component: String) -> URL {
         var newURL = self.appendingPathComponent(component)
         let fileManager = FileManager.default
         var fileExists = fileManager.fileExists(atPath: newURL.path)
         
-        // Loop to find a unique name
         while fileExists {
             let baseName = newURL.deletingPathExtension().lastPathComponent
             let extensionName = newURL.pathExtension

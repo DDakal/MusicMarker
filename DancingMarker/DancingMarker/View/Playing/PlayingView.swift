@@ -11,13 +11,17 @@ import AVFoundation
 struct PlayingView: View {
     @Environment(NavigationManager.self) var navigationManager
     @Environment(\.modelContext) private var modelContext
-    @EnvironmentObject var playerModel: PlayerModel
+    @EnvironmentObject var playerViewModel: PlayerViewModel
+    
+    // 로컬 드래그 상태
+    @State private var dragProgress: Double = 0.0
+    @State private var isDragging: Bool = false
 
     var body: some View {
         VStack {
             /// 음원 정보
             HStack(spacing: 10) {
-                if let music = playerModel.music {
+                if let music = playerViewModel.currentMusic {
                     
                     if let albumArtData = music.albumArt, let albumArt = UIImage(data: albumArtData) {
                         Image(uiImage: albumArt)
@@ -61,35 +65,42 @@ struct PlayingView: View {
                 .overlay(
                     HStack(spacing: 10) {
                         Button(action: {
-                            playerModel.decreasePlaybackRate()
+                            Task {
+                                await decreasePlaybackRate()
+                            }
                         }) {
                             Image(systemName: "minus")
                                 .frame(width: 30, height: 30)
-                                .foregroundStyle(playerModel.playbackRate <= 0.5 ? .inactiveGray : .white)
+                                .foregroundStyle(playerViewModel.playbackRate <= 0.5 ? .inactiveGray : .white)
                         }
                         .padding(10)
-                        .disabled(playerModel.playbackRate <= 0.5)
+                        .disabled(playerViewModel.playbackRate <= 0.5)
+                        
                         Spacer()
                         
                         Button(action: {
-                            playerModel.playbackRate = 1.0
-                            playerModel.updateAudioPlayer()
+                            Task {
+                                await resetPlaybackRate()
+                            }
                         }) {
-                            Text(String(format: "x%.1f", playerModel.playbackRate))
+                            Text(String(format: "x%.1f", playerViewModel.playbackRate))
                                 .font(.title3)
                                 .foregroundStyle(.white)
                         }
+                        
                         Spacer()
                         
                         Button(action: {
-                            playerModel.increasePlaybackRate()
+                            Task {
+                                await increasePlaybackRate()
+                            }
                         }) {
                             Image(systemName: "plus")
                                 .frame(width: 30, height: 30)
-                                .foregroundStyle(playerModel.playbackRate >= 1.5 ? .inactiveGray : .white)
+                                .foregroundStyle(playerViewModel.playbackRate >= 1.5 ? .inactiveGray : .white)
                         }
                         .padding(10)
-                        .disabled(playerModel.playbackRate >= 1.5)
+                        .disabled(playerViewModel.playbackRate >= 1.5)
                     }
                     .padding(.horizontal, 20)
                 )
@@ -105,7 +116,7 @@ struct PlayingView: View {
                         
                         Rectangle()
                             .foregroundStyle(.white)
-                            .frame(width: geometry.size.width * CGFloat(playerModel.progress), height: geometry.size.height)
+                            .frame(width: geometry.size.width * CGFloat(isDragging ? dragProgress : playerViewModel.progress), height: geometry.size.height)
                     }
                     .cornerRadius(12)
                     .contentShape(
@@ -115,13 +126,29 @@ struct PlayingView: View {
                     .highPriorityGesture(
                         DragGesture(minimumDistance: 0)
                             .onChanged({ value in
-                                DispatchQueue.main.async {
-                                    let newProgress = min(max(0, Double(value.location.x / geometry.size.width)), 1.0)
-                                    playerModel.progress = newProgress
-                                    let newTime = newProgress * playerModel.duration
-                                    playerModel.currentTime = newTime
-                                    playerModel.formattedProgress = playerModel.formattedTime(newTime)
-                                    playerModel.updateAudioPlayer(with: newTime)
+                                // 드래그 중: 로컬 상태만 업데이트 (즉시 반응)
+                                isDragging = true
+                                dragProgress = min(max(0, Double(value.location.x / geometry.size.width)), 1.0)
+                                
+                                // 시간 표시만 업데이트 (실제 seek는 안함)
+                                let newTime = dragProgress * playerViewModel.duration
+                                playerViewModel.updateSliderUI(newTime: newTime)
+                            })
+                            .onEnded({ value in
+                                // 손가락을 뗐을 때만 실제 seek 연산
+                                let newProgress = min(max(0, Double(value.location.x / geometry.size.width)), 1.0)
+                                let newTime = newProgress * playerViewModel.duration
+                                
+                                Task {
+                                    do {
+                                        try await playerViewModel.seek(to: newTime)
+                                        isDragging = false
+                                        playerViewModel.setDragging(false)
+                                    } catch {
+                                        print("시간 이동 중 오류: \(error)")
+                                        isDragging = false
+                                        playerViewModel.setDragging(false)
+                                    }
                                 }
                             })
                     )
@@ -130,20 +157,27 @@ struct PlayingView: View {
                 .padding(.bottom, 3)
                 
                 HStack {
-                    Text("\(playerModel.formattedProgress)")
+                    Text("\(playerViewModel.formattedProgress)")
                     Spacer()
-                    Text("\(playerModel.formattedDuration)")
+                    Text("\(playerViewModel.formattedDuration)")
                 }
             }
             .padding(.bottom, 40)
             
+            /// 재생 제어 버튼들
             HStack {
                 Circle()
                     .foregroundStyle(.buttonDarkGray)
                     .frame(width: 60)
                     .overlay(
                         Button(action: {
-                            playerModel.backward5Sec()
+                            Task {
+                                do {
+                                    try await playerViewModel.skipBackward()
+                                } catch {
+                                    print("5초 뒤로 이동 중 오류: \(error)")
+                                }
+                            }
                         }) {
                             Image(systemName: "gobackward.5")
                                 .resizable()
@@ -152,6 +186,7 @@ struct PlayingView: View {
                                 .foregroundStyle(.white)
                         }
                     )
+                
                 Spacer()
                 
                 Circle()
@@ -159,9 +194,11 @@ struct PlayingView: View {
                     .frame(width: 80)
                     .overlay(
                         Button(action: {
-                            playerModel.togglePlayback()
+                            Task {
+                                await handlePlayPauseToggle()
+                            }
                         }) {
-                            Image(systemName: playerModel.isPlaying ? "pause.fill" : "play.fill")
+                            Image(systemName: playerViewModel.isPlaying ? "pause.fill" : "play.fill")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 30)
@@ -169,6 +206,7 @@ struct PlayingView: View {
                         }
                         .frame(width: 30)
                     )
+                
                 Spacer()
                 
                 Circle()
@@ -176,7 +214,13 @@ struct PlayingView: View {
                     .frame(width: 60)
                     .overlay(
                         Button(action: {
-                            playerModel.forward5Sec()
+                            Task {
+                                do {
+                                    try await playerViewModel.skipForward()
+                                } catch {
+                                    print("5초 앞으로 이동 중 오류: \(error)")
+                                }
+                            }
                         }) {
                             Image(systemName: "goforward.5")
                                 .resizable()
@@ -201,11 +245,57 @@ struct PlayingView: View {
                         .bold()
                     Text("Local_Back")
                 }
-                .foregroundStyle(.accent) // 색상 지정
+                .foregroundStyle(.accent)
                 .onTapGesture {
                     navigationManager.pop()
                 }
             }
+        }
+    }
+    
+    // MARK: - Private Methods
+    
+    /// 재생/일시정지 토글 처리
+    private func handlePlayPauseToggle() async {
+        do {
+            if playerViewModel.isPlaying {
+                playerViewModel.pauseMusic()
+            } else {
+                if playerViewModel.currentMusic != nil {
+                    try await playerViewModel.resumeMusic()
+                }
+            }
+        } catch {
+            print("재생/일시정지 토글 중 오류: \(error)")
+        }
+    }
+    
+    /// 재생 속도 감소
+    private func decreasePlaybackRate() async {
+        let newRate = max(0.5, playerViewModel.playbackRate - 0.1)
+        do {
+            try await playerViewModel.setPlaybackRate(newRate)
+        } catch {
+            print("재생 속도 변경 중 오류: \(error)")
+        }
+    }
+    
+    /// 재생 속도 증가
+    private func increasePlaybackRate() async {
+        let newRate = min(1.5, playerViewModel.playbackRate + 0.1)
+        do {
+            try await playerViewModel.setPlaybackRate(newRate)
+        } catch {
+            print("재생 속도 변경 중 오류: \(error)")
+        }
+    }
+    
+    /// 재생 속도 리셋
+    private func resetPlaybackRate() async {
+        do {
+            try await playerViewModel.setPlaybackRate(1.0)
+        } catch {
+            print("재생 속도 리셋 중 오류: \(error)")
         }
     }
     
@@ -221,12 +311,12 @@ struct PlayingView: View {
             }
             
             VStack(spacing: 16) {
-                if let music = playerModel.music {
+                if let music = playerViewModel.currentMusic {
                     ForEach(0..<3, id: \.self) { index in
-                        if music.markers[index] != -1{
-                            playerModel.markerButton(for: music.markers[index], index: index)
+                        if music.markers[index] != -1 {
+                            markerButton(for: music.markers[index], index: index)
                         } else {
-                            playerModel.addMarkerButton(index: index)
+                            addMarkerButton(index: index)
                         }
                     }
                 } else {
@@ -234,8 +324,152 @@ struct PlayingView: View {
                 }
             }
             .padding(.bottom, 8)
-
         }
+    }
+    
+    /// 마커 버튼 생성 (연타 방지 추가)
+    @ViewBuilder
+    private func markerButton(for time: TimeInterval, index: Int) -> some View {
+        if playerViewModel.isEditingMarker && playerViewModel.editingMarkerIndex == index {
+            editMarkerButton(for: time, index: index)
+        } else {
+            Button(action: {
+                // ✅ moveToMarker 내부에서 연타 방지 처리
+                Task {
+                    await playerViewModel.moveToMarker(at: index)
+                }
+            }) {
+                HStack(spacing: 8) {
+                    Image("addedMarker")
+                    Text(playerViewModel.formattedTime(time))
+                        .font(.title3)
+                        .italic()
+                        .foregroundColor(.black)
+                }
+                .frame(width: 360, height: 60)
+                .background(.accent)
+                .cornerRadius(12)
+            }
+            .contextMenu {
+                Button(action: {
+                    playerViewModel.startMarkerEditing(at: index)
+                }) {
+                    Text("Local_MarkerEdit")
+                    Image(systemName: "pencil")
+                }
+                Button(role: .destructive, action: {
+                    Task {
+                        await playerViewModel.deleteMarker(at: index)
+                    }
+                }) {
+                    Text("Local_MarkerReset")
+                    Image(systemName: "eraser")
+                }
+            }
+        }
+    }
+    
+    /// 마커 추가 버튼 생성 (기존 디자인 복원)
+    @ViewBuilder
+    private func addMarkerButton(index: Int) -> some View {
+        Button(action: {
+            Task {
+                await playerViewModel.addMarkerAtCurrentTime(at: index)
+            }
+        }) {
+            HStack(spacing: 8) {
+                Image("emptyMarker")
+                Text("Local_MarkerAdd")
+                    .font(.title3)
+                    .foregroundColor(.white)
+            }
+            .frame(width: 360, height: 60)
+            .background(Color.buttonDarkGray)
+            .cornerRadius(12)
+        }
+    }
+    
+    /// 마커 편집 버튼 생성 (개선된 버전)
+    @ViewBuilder
+    private func editMarkerButton(for marker: TimeInterval, index: Int) -> some View {
+        HStack(spacing: 6) {
+            // 뒤로 버튼
+            Button(action: {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    playerViewModel.decreaseEditingMarkerTime()
+                }
+            }) {
+                Circle()
+                    .fill(playerViewModel.canDecreaseEditingMarker ? .inactiveGray : .buttonDarkGray)
+                    .frame(width: 40, height: 40)
+                    .overlay {
+                        Image("backward1SecIcon")
+                            .opacity(playerViewModel.canDecreaseEditingMarker ? 1.0 : 0.3)
+                    }
+            }
+            .disabled(!playerViewModel.canDecreaseEditingMarker)
+            .scaleEffect(playerViewModel.canDecreaseEditingMarker ? 1.0 : 0.9)
+            
+            // 시간 표시
+            HStack(spacing: 8) {
+                Text(formattedEditingTime(index: index))
+                    .font(.title3)
+                    .italic()
+                    .foregroundColor(.black)
+            }
+            .frame(width: 200, height: 60)
+            .background(.accent)
+            .cornerRadius(12)
+            .padding(.horizontal, 6)
+            
+            // 앞으로 버튼
+            Button(action: {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    playerViewModel.increaseEditingMarkerTime()
+                }
+            }) {
+                Circle()
+                    .fill(playerViewModel.canIncreaseEditingMarker ? .inactiveGray : .buttonDarkGray)
+                    .frame(width: 40, height: 40)
+                    .overlay {
+                        Image("forward1SecIcon")
+                            .opacity(playerViewModel.canIncreaseEditingMarker ? 1.0 : 0.3)
+                    }
+            }
+            .disabled(!playerViewModel.canIncreaseEditingMarker)
+            .scaleEffect(playerViewModel.canIncreaseEditingMarker ? 1.0 : 0.9)
+            
+            // 저장 버튼
+            Button(action: {
+                Task {
+                    print("마커 편집 저장 버튼 클릭")
+                    await playerViewModel.saveEditingMarker()
+                }
+            }) {
+                Circle()
+                    .fill(.buttonDarkGray)
+                    .frame(width: 40, height: 40)
+                    .overlay {
+                        Image(systemName: "checkmark")
+                            .foregroundColor(Color.green)
+                    }
+            }
+            .padding(.leading, 10)
+        }
+    }
+    
+    /// 편집 중인 마커의 포맷된 시간을 반환합니다
+    private func formattedEditingTime(index: Int) -> String {
+        if let currentEditingTime = playerViewModel.currentEditingTime,
+           playerViewModel.isEditingMarker && playerViewModel.editingMarkerIndex == index {
+            return playerViewModel.formattedTime(currentEditingTime)
+        }
+        return playerViewModel.formattedTime(playerViewModel.markers[index])
+    }
+    
+    /// 현재 시간에 마커 추가
+    private func addMarkerAtCurrentTime(index: Int) async {
+        await playerViewModel.addMarkerAtCurrentTime(at: index)
     }
     
     @ViewBuilder

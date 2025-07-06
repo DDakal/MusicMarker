@@ -26,6 +26,9 @@ class WatchViewModel: ObservableObject {
     @Published var crownVolume: Float = 0.5  // 초기 볼륨 값 (0.0 ~ 1.0)
     @Published var lastSentCrownValue: Float = 0.5  // 마지막으로 전송된 Crown 값
 
+    @Published private var isMarkerSeeking: Bool = false
+    @Published var hasSelectedMusic: Bool = false  // ★ 추가
+    
     private var timer: Timer?
     
     init(connectivityManager: WatchConnectivityManager) {
@@ -98,13 +101,20 @@ class WatchViewModel: ObservableObject {
     }
     
     @objc func updateIsPlaying(_ notification: Notification) {
+        
         if let isPlaying = notification.object as? Bool {
-            self.isPlaying = isPlaying
-            if isPlaying {
-                startTimer()
-            } else{
-                stopTimer()
+            DispatchQueue.main.async {
+                self.isPlaying = isPlaying
+                
+                if isPlaying {
+                    self.startTimer()
+                } else {
+                    self.stopTimer()
+                }
             }
+        } else {
+            print("❌ 워치: isPlaying 값 추출 실패")
+            print("   - notification.object 타입: \(type(of: notification.object))")
         }
     }
     
@@ -131,8 +141,10 @@ class WatchViewModel: ObservableObject {
     @objc func updateMusicTitle(_ notification: Notification) {
         if let musicTitle = notification.object as? String {
             self.musicTitle = musicTitle
+            self.hasSelectedMusic = !musicTitle.isEmpty  // ★ 추가
         }
     }
+    
     @objc func setVolumeBySystem(_ notification: Notification) {
         if let systemVolume = notification.object as? Float {
             self.crownVolume = systemVolume * 60
@@ -146,27 +158,35 @@ class WatchViewModel: ObservableObject {
     func playForward() {
         connectivityManager.sendForwardToIOS()
     }
+    
     func playBackward() {
         connectivityManager.sendBackwardToIOS()
     }
+    
     func decreasePlaybackRate() {
         connectivityManager.sendDecreasePlaybackToIOS()
     }
+    
     func increasePlaybackRate() {
         connectivityManager.sendIncreasePlaybackToIOS()
     }
+    
     func originalPlaybckRate() {
         connectivityManager.sendOriginalPlaybackToIOS()
     }
+    
     func requireMusicList() {
         //        connectivityManager.
     }
+    
     func sendUUID(id: String) {
         connectivityManager.sendUUIDPlayToIOS(id)
     }
+    
     func deletemarker(index: Int){
         connectivityManager.sendMarkerDeleteToIOS(index)
     }
+    
     func changeVolume(){
         let volumeToSend = self.crownVolume / 60
         connectivityManager.sendVolumeChangeToIOS(volumeToSend)
@@ -213,6 +233,24 @@ class WatchViewModel: ObservableObject {
         progress = currentTime / duration
         formattedProgress = formattedTime(currentTime)
     }
+    
+    func withMarkerSeekingProtection<T>(_ operation: () async throws -> T) async rethrows -> T? {
+        guard !isMarkerSeeking else {
+            print("⚠️ 마커 이동 중 - 추가 요청 무시")
+            return nil
+        }
+        
+        isMarkerSeeking = true
+        
+        // 0.8초 후 플래그 해제 (충분한 시간 확보)
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(800))
+            self.isMarkerSeeking = false
+            print("✅ 마커 연타 방지 플래그 해제")
+        }
+        
+        return try await operation()
+    }
 }
 
 extension UserDefaults {
@@ -230,5 +268,85 @@ extension UserDefaults {
     
     func clearMusicList() {
         removeObject(forKey: Keys.musicList)
+    }
+}
+
+// MARK: - ApplicationContext 처리 메서드들
+
+extension WatchViewModel {
+    
+    /// ApplicationContext에서 음악 목록을 로드합니다
+    func loadMusicListFromApplicationContext() {
+        if let musicList = connectivityManager.getMusicListFromApplicationContext() {
+            print("✅ WatchViewModel: ApplicationContext에서 음악 목록 로드: \(musicList.count)개")
+            
+            // UserDefaults에 저장
+            UserDefaults.standard.clearMusicList()
+            UserDefaults.standard.saveMusicList(musicList)
+            
+            // ViewModel 업데이트
+            DispatchQueue.main.async {
+                self.musicList = musicList
+            }
+            
+            return
+        }
+        
+        print("ℹ️ WatchViewModel: ApplicationContext에 음악 목록 없음")
+    }
+    
+    /// ApplicationContext가 유효한지 확인합니다
+    func isApplicationContextValid() -> Bool {
+        return connectivityManager.isApplicationContextValid()
+    }
+    
+    /// ApplicationContext에서 마지막 업데이트 시간을 가져옵니다
+    func getLastUpdateTimeFromApplicationContext() -> TimeInterval? {
+        return connectivityManager.getLastUpdateTimeFromApplicationContext()
+    }
+    
+    /// 통합 동기화 메서드 (ApplicationContext + 실시간 요청)
+    func syncMusicListOnAppear() async {
+        print(" WatchViewModel: 통합 동기화 시작")
+        
+        // 1단계: ApplicationContext 먼저 확인
+        loadMusicListFromApplicationContext()
+        
+        // 2단계: 연결 대기 후 실시간 요청
+        await waitForConnectionAndRequestSync()
+    }
+    
+    /// 연결 대기 후 실시간 동기화 요청
+    private func waitForConnectionAndRequestSync() async {
+        print("   - 연결 대기 시작...")
+        
+        // 연결 대기 (최대 3초)
+        for attempt in 1...30 {
+            if connectivityManager.isReachable {
+                print("✅ 워치 연결됨! (시도 \(attempt)번째)")
+                break
+            }
+            
+            if attempt == 30 {
+                print("⚠️ 워치 연결 시간 초과 - ApplicationContext 데이터 사용")
+                return
+            }
+            
+            // ✅ 0.1초 대기 (100ms)
+            try? await Task.sleep(for: .milliseconds(100))
+        }
+        
+        // 실시간 동기화 요청
+        print("   - iOS 앱에 실시간 동기화 요청")
+        connectivityManager.sendRequireMusicListToIOS()
+    }
+
+    /// 워치에 현재 재생 상태를 전송합니다
+    func sendPlayingStateToWatch() async {
+        print("🎯 iOS: sendPlayingStateToWatch 시작")
+        print("   - isPlaying: \(isPlaying)")
+        print("   - currentTime: \(currentTime)")
+        print("   - duration: \(duration)")
+        
     }
 }
