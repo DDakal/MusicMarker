@@ -13,7 +13,7 @@ struct ContentView: View {
     @State private var showMusicList = false
     @State private var currentView: PathType? = nil
     @Query var musicList: [Music] = []
-    @EnvironmentObject var playerModel: PlayerModel
+    @EnvironmentObject var playerViewModel: PlayerViewModel
     
     var body: some View {
         NavigationStack(path: $navigationManager.path) {
@@ -27,8 +27,13 @@ struct ContentView: View {
             
         }
         .environment(navigationManager)
-        .onAppear {
-            playerModel.sendMusicListToWatch(with: musicList)
+        .task {
+            do {
+                try await playerViewModel.sendMusicListToWatch(musicList)
+                print("ContentView에서 워치로 음악 리스트 전송 완료")
+            } catch {
+                print("ContentView에서 워치 음악 리스트 전송 실패: \(error)")
+            }
         }
     }
 }

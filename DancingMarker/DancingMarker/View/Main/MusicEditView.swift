@@ -7,20 +7,14 @@
 
 import SwiftUI
 import SwiftData
-import AVFoundation
 
 struct MusicEditView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject var playerModel: PlayerModel
+    @EnvironmentObject var playerViewModel: PlayerViewModel
     
-    @Query var musicList: [Music] = []
-    
-    // 편집 모드: 기존 음원 수정 시 music이 전달되고,
-    // 새 음원 추가 시에는 fileURL이 전달됩니다.
-    let music: Music?
-    let fileURL: URL?
-    // 새 음원 추가용 binding (기존 음원 수정 시엔 사용하지 않음)
+    // 기존 음원 편집 전용
+    let music: Music
     @Binding var didSaveMusic: Bool
     
     @State private var selectedImgData: Data?
@@ -29,22 +23,41 @@ struct MusicEditView: View {
     @State private var albumArt: UIImage? = nil
     @State private var isImagePickerPresented: Bool = false
     
+    // 변경사항 추적을 위한 초기값 저장
+    @State private var initialTitle: String = ""
+    @State private var initialArtist: String = ""
+    @State private var albumArtChanged: Bool = false
+    
+    // 변경사항이 있는지 확인하는 computed property
+    private var hasChanges: Bool {
+        let titleChanged = title != initialTitle
+        let artistChanged = artist != initialArtist
+        
+        return titleChanged || artistChanged || albumArtChanged
+    }
+    
+    // 저장 버튼 활성화 조건
+    private var canSave: Bool {
+        let hasRequiredFields = !title.isEmpty && !artist.isEmpty
+        return hasRequiredFields && hasChanges
+    }
+
     init(music: Music, didSaveMusic: Binding<Bool>) {
         self.music = music
-        self.fileURL = nil
         self._didSaveMusic = didSaveMusic
         _title = State(initialValue: music.title)
         _artist = State(initialValue: music.artist)
+        
+        // 앨범아트 초기화
+        var initialAlbumArt: UIImage? = nil
         if let artData = music.albumArt, let image = UIImage(data: artData) {
-            _albumArt = State(initialValue: image)
+            initialAlbumArt = image
         }
-    }
-    
-    init(fileURL: URL, didSaveMusic: Binding<Bool>) {
-        self.music = nil
-        self.fileURL = fileURL
-        self._didSaveMusic = didSaveMusic
-        // 초기값은 onAppear에서 fileURL 기반으로 불러옵니다.
+        _albumArt = State(initialValue: initialAlbumArt)
+        
+        // 초기값 설정
+        _initialTitle = State(initialValue: music.title)
+        _initialArtist = State(initialValue: music.artist)
     }
     
     var body: some View {
@@ -61,16 +74,15 @@ struct MusicEditView: View {
                             .cornerRadius(12)
                     } else {
                         RoundedRectangle(cornerRadius: 12)
-                            .foregroundStyle(.editViewAlbumGray)  // 배경 색 적용
+                            .foregroundStyle(.editViewAlbumGray)
                             .frame(width: 160, height: 160)
                             .overlay {
                                 Image(systemName: "music.note")
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(width: 40, height: 40)  // 사이즈 조정
-                                    .foregroundStyle(.white)  // 흰색 아이콘
+                                    .frame(width: 40, height: 40)
+                                    .foregroundStyle(.white)
                             }
-                        
                     }
                     
                     Button("Local_ChangeCoverImage") {
@@ -87,7 +99,7 @@ struct MusicEditView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Local_MusicTitle")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)  // 제목 스타일
+                        .foregroundStyle(.secondary)
                     
                     HStack {
                         TextField("Local_EnterMusicTitleMessage", text: $title)
@@ -110,7 +122,7 @@ struct MusicEditView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Local_MusicArtist")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)  // 제목 스타일
+                        .foregroundStyle(.secondary)
                     
                     HStack {
                         TextField("Local_EnterMusicArtistMessage", text: $artist)
@@ -131,23 +143,9 @@ struct MusicEditView: View {
                 Spacer()
                 
                 Button(action: {
-                    guard !title.isEmpty, !artist.isEmpty else { return }
+                    guard canSave else { return }
                     Task {
-                        if let existingMusic = music {
-                            // 기존 음원 수정: Music 객체 업데이트
-                            existingMusic.title = title
-                            existingMusic.artist = artist
-                            existingMusic.albumArt = albumArt?.pngData()
-                            do {
-                                try modelContext.save()
-                            } catch {
-                                print("음원 수정 실패: \(error.localizedDescription)")
-                            }
-                        } else if let fileURL = fileURL {
-                            // 새 음원 추가: 파일 복사 후 새 Music 객체 생성
-                            await addMusic(from: fileURL)
-                            didSaveMusic = true
-                        }
+                        await saveMusic()
                         dismiss()
                     }
                 }) {
@@ -159,13 +157,13 @@ struct MusicEditView: View {
                     }
                     .frame(height: 49)
                     .frame(maxWidth: .infinity)
-                    .background(title.isEmpty || artist.isEmpty ? Color.gray.opacity(0.3) : Color.accentColor)
-                    .foregroundColor(title.isEmpty || artist.isEmpty ? Color.white : Color.black)
+                    .background(canSave ? Color.accentColor : Color.gray.opacity(0.3))
+                    .foregroundColor(canSave ? Color.black : Color.white)
                     .cornerRadius(12)
                     .padding(.bottom, 53)
                 }
                 .buttonStyle(.plain)
-                .disabled(title.isEmpty || artist.isEmpty)
+                .disabled(!canSave)
             }
             .padding(.horizontal, 16)
             .navigationTitle("Local_EditMusicNavigationTitle")
@@ -185,91 +183,44 @@ struct MusicEditView: View {
         }
         .onChange(of: selectedImgData) {
             if let data = selectedImgData, let image = UIImage(data: data) {
-                albumArt = image 
+                albumArt = image
+                albumArtChanged = true
             }
         }
         .onAppear {
-            if music == nil, let fileURL = fileURL {
-                Task {
-                    do {
-                        let (metaTitle, metaArtist, metaAlbumArtData) = try await fetchMusicMetadata(from: fileURL)
-                        await MainActor.run {
-                            if title.isEmpty { title = metaTitle }
-                            if artist.isEmpty { artist = metaArtist }
-                            if albumArt == nil, let data = metaAlbumArtData, let image = UIImage(data: data) {
-                                albumArt = image
-                            }
-                        }
-                    } catch {
-                        print("메타데이터 로드 실패: \(error.localizedDescription)")
-                    }
-                }
-            }
+            albumArtChanged = false
         }
     }
     
-    private func addMusic(from url: URL) async {
-        guard url.startAccessingSecurityScopedResource() else {
-            print("Failed to start accessing security scoped resource at \(url)")
-            return
-        }
+    // MARK: - Private Methods
+    
+    private func saveMusic() async {
+        music.title = title
+        music.artist = artist
+        music.albumArt = albumArt?.pngData()
         
         do {
-            // AVAsset에서 메타데이터를 가져오되, 사용자 입력을 우선적으로 사용할 예정
-            let (metadataTitle, metadataArtist, metadataAlbumArt) = try await fetchMusicMetadata(from: url)
-            
-            // 사용자가 입력한 값이 있다면 그것을, 아니면 메타데이터를 사용하도록 결정
-            let finalTitle = title.isEmpty ? metadataTitle : title
-            let finalArtist = artist.isEmpty ? metadataArtist : artist
-            let finalAlbumArt: Data?
-            if let userAlbumArt = albumArt {
-                finalAlbumArt = userAlbumArt.pngData()
-            } else {
-                finalAlbumArt = metadataAlbumArt
-            }
-            
-            let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-            let uniqueFileURL = documentsDirectory.appendingUniquePathComponent(url.lastPathComponent)
-            
-            try FileManager.default.copyItem(at: url, to: uniqueFileURL)
-            
-            let newMusic = Music(
-                title: finalTitle,
-                artist: finalArtist,
-                fileName: uniqueFileURL.lastPathComponent,
-                markers: [-1, -1, -1],
-                albumArt: finalAlbumArt
-            )
-            
-            modelContext.insert(newMusic)
             try modelContext.save()
             
-            playerModel.sendMusicListToWatch(with: musicList)
+            // PlayerViewModel의 currentMusic 업데이트
+            if playerViewModel.currentMusic?.id == music.id {
+                let updatedMusicData = MusicData(
+                    id: music.id,
+                    title: music.title,
+                    artist: music.artist,
+                    fileName: music.fileName,
+                    markers: music.markers,
+                    albumArt: music.albumArt
+                )
+                playerViewModel.currentMusic = updatedMusicData
+                
+                // Control Center 업데이트
+                await playerViewModel.updateControlCenterNowPlaying()
+                
+                print("✅ 음원 수정 후 PlayerViewModel 업데이트 완료: \(updatedMusicData.title)")
+            }
         } catch {
-            print("Failed to add music: \(error.localizedDescription)")
+            print("음원 수정 실패: \(error.localizedDescription)")
         }
-    }
-    
-    private func fetchMusicMetadata(from url: URL) async throws -> (String, String, Data?) {
-        let asset = AVAsset(url: url)
-        let metadata = try await asset.load(.commonMetadata)
-        
-        var title: String = "Unknown Title"
-        var artist: String = "Unknown Artist"
-        var albumArt: Data? = nil
-        
-        for item in metadata {
-            if item.commonKey == .commonKeyTitle {
-                title = try await item.load(.stringValue) ?? "Unknown Title"
-            }
-            if item.commonKey == .commonKeyArtist {
-                artist = try await item.load(.stringValue) ?? "Unknown Artist"
-            }
-            if item.commonKey == .commonKeyArtwork {
-                albumArt = try await item.load(.dataValue)
-            }
-        }
-        
-        return (title, artist, albumArt)
     }
 }
