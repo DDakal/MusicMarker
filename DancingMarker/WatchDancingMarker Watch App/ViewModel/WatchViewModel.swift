@@ -27,6 +27,7 @@ class WatchViewModel: ObservableObject {
     @Published var lastSentCrownValue: Float = 0.5  // 마지막으로 전송된 Crown 값
 
     @Published private var isMarkerSeeking: Bool = false
+    @Published var hasSelectedMusic: Bool = false  // ★ 추가
     
     private var timer: Timer?
     
@@ -100,7 +101,6 @@ class WatchViewModel: ObservableObject {
     }
     
     @objc func updateIsPlaying(_ notification: Notification) {
-        print("   - notification.object: \(String(describing: notification.object))")
         
         if let isPlaying = notification.object as? Bool {
             DispatchQueue.main.async {
@@ -141,6 +141,7 @@ class WatchViewModel: ObservableObject {
     @objc func updateMusicTitle(_ notification: Notification) {
         if let musicTitle = notification.object as? String {
             self.musicTitle = musicTitle
+            self.hasSelectedMusic = !musicTitle.isEmpty  // ★ 추가
         }
     }
     

@@ -64,52 +64,30 @@ struct WatchMusicListView: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing){
-                    if !viewModel.musicList.isEmpty && !viewModel.musicTitle.isEmpty {
+                ToolbarItem(placement: .topBarTrailing) {
+                    if !viewModel.musicList.isEmpty && viewModel.hasSelectedMusic {
                         Button {
                             navigationManager.push(to: .playing)
                         } label: {
                             if viewModel.isPlaying {
-                                // 재생 중일 때 - 애니메이션 바
-                                HStack(spacing:1.6) {
-                                    bar(low: 0.4)
-                                        .animation(animation.speed(1.5), value: drawingHeight)
-                                    bar(low: 0.3)
-                                        .animation(animation.speed(1.2), value: drawingHeight)
-                                    bar(low: 0.5)
-                                        .animation(animation.speed(1.0), value: drawingHeight)
-                                    bar(low: 0.3)
-                                        .animation(animation.speed(1.7), value: drawingHeight)
-                                    bar(low: 0.3)
-                                        .animation(animation.speed(1.3), value: drawingHeight)
+                                HStack(spacing: 1.6) {
+                                    bar(low: 0.4).animation(animation.speed(1.5), value: drawingHeight)
+                                    bar(low: 0.3).animation(animation.speed(1.2), value: drawingHeight)
+                                    bar(low: 0.5).animation(animation.speed(1.0), value: drawingHeight)
+                                    bar(low: 0.3).animation(animation.speed(1.7), value: drawingHeight)
+                                    bar(low: 0.3).animation(animation.speed(1.3), value: drawingHeight)
                                 }
-                                .frame(width:20)
-                                .onAppear {
-                                    print("🎯 재생 중 애니메이션 바 onAppear")
-                                    startAnimationTimer()
-                                }
-                                .onDisappear {
-                                    print("🎯 재생 중 애니메이션 바 onDisappear")
-                                    stopAnimationTimer()
-                                }
-                                .onChange(of: viewModel.isPlaying) { oldValue, newValue in
-                                    print("🎯 isPlaying 변경: \(oldValue) -> \(newValue)")
-                                    if newValue {
-                                        startAnimationTimer()
-                                    } else {
-                                        stopAnimationTimer()
-                                    }
+                                .frame(width: 20)
+                                .onAppear { startAnimationTimer() }
+                                .onDisappear { stopAnimationTimer() }
+                                .onChange(of: viewModel.isPlaying) { _, newValue in
+                                    newValue ? startAnimationTimer() : stopAnimationTimer()
                                 }
                             } else {
-                                // 정지 상태일 때 - 정지 바 (항상 표시)
-                                HStack(spacing:1.6) {
-                                    stopBar()
-                                    stopBar()
-                                    stopBar()
-                                    stopBar()
-                                    stopBar()
+                                HStack(spacing: 1.6) {
+                                    stopBar(); stopBar(); stopBar(); stopBar(); stopBar()
                                 }
-                                .frame(width:20)
+                                .frame(width: 20)
                             }
                         }
                         .frame(width: 32, height: 32)
