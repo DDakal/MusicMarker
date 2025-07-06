@@ -17,15 +17,22 @@ extension PlayerViewModel {
     
     /// 워치에 현재 재생 상태를 전송합니다
     func sendPlayingStateToWatch() async {
+        print("🎯 iOS: sendPlayingStateToWatch 시작")
+        print("   - isPlaying: \(isPlaying)")
+        print("   - currentTime: \(currentTime)")
+        print("   - duration: \(duration)")
+        print("   - watchService.isConnected: \(watchService.isConnected)")
+        print("   - watchService.isReachable: \(watchService.isReachable)")
+        
         do {
             try await watchService.sendPlayingState(
                 isPlaying: isPlaying,
                 currentTime: currentTime,
                 duration: duration
             )
-            print("워치에 재생 상태 전송 완료")
+            print("✅ iOS: 워치에 재생 상태 전송 완료")
         } catch {
-            print("워치 재생 상태 전송 실패: \(error.localizedDescription)")
+            print("❌ iOS: 워치 재생 상태 전송 실패: \(error.localizedDescription)")
         }
     }
     

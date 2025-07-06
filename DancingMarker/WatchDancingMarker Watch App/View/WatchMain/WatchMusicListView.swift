@@ -65,11 +65,13 @@ struct WatchMusicListView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing){
-                    if viewModel.musicTitle != "" {
+                    // 음원이 있고, 현재 재생 중이거나 재생할 음원이 있을 때만 버튼 표시
+                    if !viewModel.musicList.isEmpty && viewModel.musicTitle != "" {
                         Button {
                             navigationManager.push(to: .playing)
                         } label: {
                             if viewModel.isPlaying {
+                                // 재생 중일 때 - 애니메이션 바
                                 HStack(spacing:1.6) {
                                     bar(low: 0.4)
                                         .animation(animation.speed(1.5), value: drawingHeight)
@@ -84,9 +86,15 @@ struct WatchMusicListView: View {
                                 }
                                 .frame(width:20)
                                 .onAppear{
+                                    print(" 애니메이션 바 onAppear - drawingHeight: \(drawingHeight)")
                                     drawingHeight.toggle()
+                                    print("   - onAppear 후 drawingHeight: \(drawingHeight)")
                                 }
-                            } else{
+                                .onChange(of: drawingHeight) { oldValue, newValue in
+                                    print(" drawingHeight 변화 감지: \(oldValue) -> \(newValue)")
+                                }
+                            } else {
+                                // 정지 상태일 때 - 정지 바
                                 HStack(spacing:1.6) {
                                     stopBar()
                                     stopBar()
@@ -129,12 +137,12 @@ struct WatchMusicListView: View {
                 print("onAppear")
                 DispatchQueue.main.async {
                     viewModel.connectivityManager.sendRequireMusicListToIOS()
-                    print("onAppear - 음악 목록: \(viewModel.musicList)")
+                    print("afterOnAppear - 음악 목록: \(viewModel.musicList)")
                     afterOnAppear = false
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     viewModel.connectivityManager.sendRequireMusicListToIOS()
-                    print("onAppear (0.5초 후) - 음악 목록: \(viewModel.musicList)")
+                    print("afterOnAppear (0.5초 후) - 음악 목록: \(viewModel.musicList)")
                     afterOnAppear = false
                 }
             }
@@ -156,6 +164,27 @@ struct WatchMusicListView: View {
     
     var animation: Animation {
         return .linear(duration: 0.5).repeatForever()
+    }
+    
+    // MARK: - Animation Timer
+    
+    @State private var animationTimer: Timer?
+    
+    private func startAnimationTimer() {
+        // 기존 타이머가 있으면 해제
+        animationTimer?.invalidate()
+        
+        // 0.5초마다 drawingHeight 토글 (애니메이션 지속)
+        animationTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
+            drawingHeight.toggle()
+        }
+        print("✅ 애니메이션 타이머 시작")
+    }
+    
+    private func stopAnimationTimer() {
+        animationTimer?.invalidate()
+        animationTimer = nil
+        print("⏸️ 애니메이션 타이머 정지")
     }
     
     // MARK: - Private Methods

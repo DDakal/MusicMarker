@@ -100,13 +100,23 @@ class WatchViewModel: ObservableObject {
     }
     
     @objc func updateIsPlaying(_ notification: Notification) {
+        print("   - notification.object: \(String(describing: notification.object))")
+        
         if let isPlaying = notification.object as? Bool {
-            self.isPlaying = isPlaying
-            if isPlaying {
-                startTimer()
-            } else {
-                stopTimer()
+            DispatchQueue.main.async {
+                self.isPlaying = isPlaying
+                
+                if isPlaying {
+                    print("▶️ 워치: 타이머 시작")
+                    self.startTimer()
+                } else {
+                    print("⏸️ 워치: 타이머 정지")
+                    self.stopTimer()
+                }
             }
+        } else {
+            print("❌ 워치: isPlaying 값 추출 실패")
+            print("   - notification.object 타입: \(type(of: notification.object))")
         }
     }
     
@@ -330,5 +340,14 @@ extension WatchViewModel {
         // 실시간 동기화 요청
         print("   - iOS 앱에 실시간 동기화 요청")
         connectivityManager.sendRequireMusicListToIOS()
+    }
+
+    /// 워치에 현재 재생 상태를 전송합니다
+    func sendPlayingStateToWatch() async {
+        print("🎯 iOS: sendPlayingStateToWatch 시작")
+        print("   - isPlaying: \(isPlaying)")
+        print("   - currentTime: \(currentTime)")
+        print("   - duration: \(duration)")
+        
     }
 }

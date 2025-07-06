@@ -96,11 +96,14 @@ final class WatchService: NSObject, ObservableObject, WatchConnectivityManageabl
         replyHandler: @escaping ([String : Any]) -> Void
     ) {
         guard let action = message["action"] as? String else {
+            print("❌ WatchService: action 추출 실패")
             replyHandler(["success": false])
             return
         }
         
         print("🎯 WatchService: 메시지 수신 - \(action)")
+        print("   - 전체 메시지: \(message)")
+        print("   - session.isReachable: \(session.isReachable)")
         
         DispatchQueue.main.async {
             // 1. 먼저 delegate 방식으로 처리 시도
