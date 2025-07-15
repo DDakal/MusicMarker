@@ -224,6 +224,12 @@ class WatchViewModel: ObservableObject {
     
     private func updateTime() {
         guard isPlaying else { return }
+        
+        guard connectivityManager.isReachable else { 
+            stopTimer()
+            return 
+        }
+        
         currentTime += 1
         if currentTime >= duration {
             currentTime = 0
