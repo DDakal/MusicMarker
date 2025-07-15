@@ -370,29 +370,32 @@ final class WatchService: NSObject, ObservableObject, WatchConnectivityManageabl
     // MARK: - Private Helper Methods
     
     private func sendMessage(_ message: [String: Any]) async throws {
-        print("🎯 WatchService: 메시지 전송 시도")
-        print("   - 메시지 액션: \(message["action"] ?? "Unknown")")
+        print("�� WatchService: 메시지 전송 시도")
         
-        // WCManager의 세션 상태 확인
         let wcManagerSession = WCSession.default
-        print("   - WCSession.default.isReachable: \(wcManagerSession.isReachable)")
-        print("   - WCSession.default.activationState: \(wcManagerSession.activationState.rawValue)")
-        
         guard wcManagerSession.isReachable else {
-            print("🚨 WatchService: 워치에 연결할 수 없음 (isReachable: false)")
             throw DancingMarkerError.watchNotConnected
         }
         
         return try await withCheckedThrowingContinuation { continuation in
+            var hasResumed = false  // 🛡️ 간단한 플래그
+            
             wcManagerSession.sendMessage(message) { replyHandler in
-                print("✅ WatchService: 메시지 전송 성공, 응답: \(replyHandler)")
-                continuation.resume()
-            } errorHandler: { error in
-                print("🚨 WatchService: 메시지 전송 실패")
-                print("   - 원본 에러: \(error.localizedDescription)")
-                print("   - 에러 코드: \(error._code)")
-                print("   - 에러 도메인: \(error._domain)")
+                guard !hasResumed else { 
+                    print("⚠️ 이미 처리됨 - 무시")
+                    return 
+                }
+                hasResumed = true
+                print("✅ WatchService: 메시지 전송 성공")
+                continuation.resume(returning: ())
                 
+            } errorHandler: { error in
+                guard !hasResumed else { 
+                    print("⚠️ 이미 처리됨 - 무시") 
+                    return 
+                }
+                hasResumed = true
+                print("🚨 WatchService: 메시지 전송 실패: \(error)")
                 continuation.resume(throwing: DancingMarkerError.watchSendFailed)
             }
         }
