@@ -27,7 +27,7 @@ class WatchViewModel: ObservableObject {
     @Published var lastSentCrownValue: Float = 0.5  // 마지막으로 전송된 Crown 값
 
     @Published private var isMarkerSeeking: Bool = false
-    @Published var hasSelectedMusic: Bool = false  // ★ 추가
+    @Published var hasSelectedMusic: Bool = false
     
     private var timer: Timer?
     
@@ -101,7 +101,6 @@ class WatchViewModel: ObservableObject {
     }
     
     @objc func updateIsPlaying(_ notification: Notification) {
-        
         if let isPlaying = notification.object as? Bool {
             DispatchQueue.main.async {
                 self.isPlaying = isPlaying
@@ -125,6 +124,11 @@ class WatchViewModel: ObservableObject {
                 self.duration = playingTimes[1]
                 self.progress = self.currentTime / self.duration
                 self.formattedProgress = self.formattedTime(self.currentTime)
+                
+                // duration > 0이면 음원이 로드된 상태
+                if self.duration > 0 {
+                    self.hasSelectedMusic = true
+                }
             }
         }
     }
@@ -135,13 +139,13 @@ class WatchViewModel: ObservableObject {
             UserDefaults.standard.clearMusicList()
             UserDefaults.standard.saveMusicList(musics)
             self.musicList = musics
+            self.hasSelectedMusic = false
         }
     }
     
     @objc func updateMusicTitle(_ notification: Notification) {
         if let musicTitle = notification.object as? String {
             self.musicTitle = musicTitle
-            self.hasSelectedMusic = !musicTitle.isEmpty  // ★ 추가
         }
     }
     
@@ -181,6 +185,7 @@ class WatchViewModel: ObservableObject {
     
     func sendUUID(id: String) {
         connectivityManager.sendUUIDPlayToIOS(id)
+        self.hasSelectedMusic = true
     }
     
     func deletemarker(index: Int){
