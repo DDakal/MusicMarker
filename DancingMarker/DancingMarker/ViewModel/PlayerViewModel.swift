@@ -277,6 +277,130 @@ extension PlayerViewModel {
             print("❌ UI 음원 편집 저장 실패: \(error.localizedDescription)")
         }
     }
+
+    /// 음원 선택해서 재생 (View에서 호출)
+    public func selectAndPlayMusic(
+        _ music: Music,
+        navigationManager: NavigationManager
+    ) async {
+        let musicData = MusicData(
+            id: music.id,
+            title: music.title,
+            artist: music.artist,
+            fileName: music.fileName,
+            markers: music.markers,
+            albumArt: music.albumArt
+        )
+        
+        do {
+            if currentMusic == nil || currentMusic?.id != musicData.id {
+                await playMusic(musicData)
+            } else if !isPlaying {
+                try await resumeMusic()
+            }
+            
+            navigationManager.push(to: .playing)
+            print("✅ UI에서 음원 선택: \(musicData.title)")
+            
+        } catch {
+            print("❌ UI 음원 선택 중 오류: \(error.localizedDescription)")
+        }
+    }
+    
+    /// 음원 삭제 (View에서 호출)
+    public func deleteMusicFromList(
+        _ music: Music,
+        modelContext: ModelContext
+    ) async {
+        // 현재 재생 중인 음악이면 정지
+        if currentMusic?.id == music.id {
+            await stopMusic()
+        }
+        
+        do {
+            modelContext.delete(music)
+            try modelContext.save()
+            await sendMusicListToWatch()
+            print("✅ UI에서 음원 삭제: \(music.title)")
+        } catch {
+            print("❌ UI 음원 삭제 중 오류: \(error)")
+        }
+    }
+    
+    /// 새 음원 추가 (View에서 호출) 
+    public func addMusicToList(
+        from url: URL,
+        modelContext: ModelContext
+    ) async {
+        guard url.startAccessingSecurityScopedResource() else {
+            print("❌ Security scoped resource 접근 실패")
+            return
+        }
+        
+        defer {
+            url.stopAccessingSecurityScopedResource()
+        }
+        
+        do {
+            let (title, artist, albumArt) = try await fetchMusicMetadata(from: url)
+            let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            let uniqueFileURL = documentsDirectory.appendingUniquePathComponent(url.lastPathComponent)
+            
+            try FileManager.default.copyItem(at: url, to: uniqueFileURL)
+            
+            let newMusic = Music(
+                title: title,
+                artist: artist,
+                fileName: uniqueFileURL.lastPathComponent,
+                markers: [-1, -1, -1],
+                albumArt: albumArt
+            )
+            
+            modelContext.insert(newMusic)
+            try modelContext.save()
+            
+            await sendMusicListToWatch()
+            print("✅ UI에서 새 음원 추가: \(title)")
+        } catch {
+            print("❌ UI 음원 추가 실패: \(error.localizedDescription)")
+        }
+    }
+    
+    // MARK: - Private Helpers
+    
+    private func fetchMusicMetadata(from url: URL) async throws -> (String, String, Data?) {
+        let asset = AVAsset(url: url)
+        let metadata = try await asset.load(.commonMetadata)
+        
+        var title: String? = nil
+        var artist: String? = nil
+        var albumArt: Data? = nil
+        
+        for item in metadata {
+            if item.commonKey == .commonKeyTitle,
+               let loadedTitle = try await item.load(.stringValue) {
+                title = loadedTitle
+            }
+            if item.commonKey == .commonKeyArtist,
+               let loadedArtist = try await item.load(.stringValue) {
+                artist = loadedArtist
+            }
+            if item.commonKey == .commonKeyArtwork {
+                albumArt = try await item.load(.dataValue)
+            }
+        }
+        
+        // 기본값 처리
+        if title == nil || title == "Unknown Title" {
+            title = url.deletingPathExtension().lastPathComponent
+        }
+        
+        if artist == nil || artist == "Unknown Artist" {
+            artist = "Unknown Artist"
+        }
+        
+        return (title!, artist!, albumArt)
+    }
 }
 
 // MARK: - WatchMessageDelegate Implementation

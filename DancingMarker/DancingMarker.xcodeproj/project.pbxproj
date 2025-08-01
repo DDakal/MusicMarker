@@ -63,6 +63,8 @@
 		514F1E3E2E3CB52000690DB5 /* AlbumArtEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E3D2E3CB52000690DB5 /* AlbumArtEditor.swift */; };
 		514F1E402E3CB55D00690DB5 /* MusicTextFiedlEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E3F2E3CB55D00690DB5 /* MusicTextFiedlEditor.swift */; };
 		514F1E422E3CB58200690DB5 /* SaveButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E412E3CB58200690DB5 /* SaveButton.swift */; };
+		514F1E462E3CC0EE00690DB5 /* MusicListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E452E3CC0EE00690DB5 /* MusicListItem.swift */; };
+		514F1E482E3CC12400690DB5 /* URL+Unique.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E472E3CC12400690DB5 /* URL+Unique.swift */; };
 		516D95502D533F5D00AA8EAA /* TextMarquee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516D954F2D533F5D00AA8EAA /* TextMarquee.swift */; };
 		51CD43CA2DFB327900BC8EDF /* PlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CD43C92DFB327900BC8EDF /* PlayerViewModel.swift */; };
 		51CD44D52DFB35A800BC8EDF /* PlayerViewModel+Audio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CD44D42DFB35A800BC8EDF /* PlayerViewModel+Audio.swift */; };
@@ -160,6 +162,8 @@
 		514F1E3D2E3CB52000690DB5 /* AlbumArtEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumArtEditor.swift; sourceTree = "<group>"; };
 		514F1E3F2E3CB55D00690DB5 /* MusicTextFiedlEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicTextFiedlEditor.swift; sourceTree = "<group>"; };
 		514F1E412E3CB58200690DB5 /* SaveButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveButton.swift; sourceTree = "<group>"; };
+		514F1E452E3CC0EE00690DB5 /* MusicListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicListItem.swift; sourceTree = "<group>"; };
+		514F1E472E3CC12400690DB5 /* URL+Unique.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Unique.swift"; sourceTree = "<group>"; };
 		51675E272CA2F0E800D8D08F /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		516D954F2D533F5D00AA8EAA /* TextMarquee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextMarquee.swift; sourceTree = "<group>"; };
 		51CD43C92DFB327900BC8EDF /* PlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewModel.swift; sourceTree = "<group>"; };
@@ -265,9 +269,9 @@
 		510D902A2CA2F1C8002E82CC /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				514F1E432E3CBF4E00690DB5 /* MusicList */,
 				514F1E3B2E3CB4DC00690DB5 /* MusicEdit */,
 				512224C12D8C68C900AABC82 /* SelectGalleryView.swift */,
-				510D90282CA2F1C8002E82CC /* MusicListView.swift */,
 				510D90292CA2F1C8002E82CC /* NowPlayingView.swift */,
 			);
 			path = Main;
@@ -296,6 +300,7 @@
 			children = (
 				51EF633B2D99715C00967EC8 /* View+.swift */,
 				512224BF2D8C685500AABC82 /* UIImage+.swift */,
+				514F1E472E3CC12400690DB5 /* URL+Unique.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -370,6 +375,23 @@
 				514F1E3D2E3CB52000690DB5 /* AlbumArtEditor.swift */,
 				514F1E3F2E3CB55D00690DB5 /* MusicTextFiedlEditor.swift */,
 				514F1E412E3CB58200690DB5 /* SaveButton.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		514F1E432E3CBF4E00690DB5 /* MusicList */ = {
+			isa = PBXGroup;
+			children = (
+				514F1E442E3CBF5E00690DB5 /* Components */,
+				510D90282CA2F1C8002E82CC /* MusicListView.swift */,
+			);
+			path = MusicList;
+			sourceTree = "<group>";
+		};
+		514F1E442E3CBF5E00690DB5 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				514F1E452E3CC0EE00690DB5 /* MusicListItem.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -683,6 +705,7 @@
 				514F1E342E3C9FE200690DB5 /* AddMarkerButton.swift in Sources */,
 				510D90322CA2F1C8002E82CC /* TipPopupView.swift in Sources */,
 				512CEE652DF12BF0001A800B /* DataRepository.swift in Sources */,
+				514F1E462E3CC0EE00690DB5 /* MusicListItem.swift in Sources */,
 				512CEE692DF12E06001A800B /* MusicData.swift in Sources */,
 				514F1E362E3C9FFE00690DB5 /* MarkerButton.swift in Sources */,
 				512CEE5D2DF092A8001A800B /* AudioService.swift in Sources */,
@@ -691,6 +714,7 @@
 				51CD43CA2DFB327900BC8EDF /* PlayerViewModel.swift in Sources */,
 				514F1E382E3CA04C00690DB5 /* EditMarkerButton.swift in Sources */,
 				51CD44D72DFB3B6A00BC8EDF /* PlayerViewModel+Timer.swift in Sources */,
+				514F1E482E3CC12400690DB5 /* URL+Unique.swift in Sources */,
 				512CED4A2DF08E59001A800B /* Errors.swift in Sources */,
 				510D902B2CA2F1C8002E82CC /* MusicEditView.swift in Sources */,
 				514F1E322E3C9FBD00690DB5 /* TipButtonView.swift in Sources */,
