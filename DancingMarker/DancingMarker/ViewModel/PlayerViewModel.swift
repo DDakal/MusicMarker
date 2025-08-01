@@ -66,8 +66,13 @@ final class PlayerViewModel: ObservableObject {
     /// Timer는 thread-safe하므로 nonisolated context에서도 안전하게 접근 가능
     nonisolated(unsafe) internal var timer: Timer?
     
-    // private을 internal로 변경
     internal var isMarkerSeeking: Bool = false
+
+    /// MarkerService 인스턴스에 직접 접근할 수 있도록 하는 computed property
+    /// PlayingView에서 편집 중인 마커에 직접 접근할 때 사용됩니다
+    var markerServiceInstance: (any MarkerManageable)? {
+        return markerService
+    }
     
     // MARK: - Initialization
     
@@ -174,25 +179,227 @@ extension PlayerViewModel {
     }
 }
 
-// MARK: - Placeholder Methods for Extensions
+// MARK: - UI Actions (View 전용 Public 인터페이스)
 
 extension PlayerViewModel {
     
-    // 모든 handler 메서드들은 각각의 extension에서 구현됨:
-    // - PlayerViewModel+Audio.swift: handlePlayToggle, handleForward5Seconds, handleBackward5Seconds
-    // - PlayerViewModel+Marker.swift: handleMarkerPlay, handleMarkerSave, handleMarkerDelete
-    // - PlayerViewModel+Watch.swift: 기타 워치 관련 handler들
-    // - PlayerViewModel+LiveActivity.swift: RemoteControlHandler
-}
-
-// MARK: - Computed Properties for Service Access
-
-extension PlayerViewModel {
+    /// 재생 속도 증가 (View에서 호출)
+    public func increasePlaybackSpeed() async {
+        let newRate = min(1.5, playbackRate + 0.1)
+        do {
+            try await setPlaybackRate(newRate)
+            await sendPlaybackRateToWatch()
+            print("UI에서 속도 증가: \(newRate)x")
+        } catch {
+            print("UI 속도 증가 중 오류: \(error)")
+        }
+    }
     
-    /// MarkerService 인스턴스에 직접 접근할 수 있도록 하는 computed property
-    /// PlayingView에서 편집 중인 마커에 직접 접근할 때 사용됩니다
-    var markerServiceInstance: (any MarkerManageable)? {
-        return markerService
+    /// 재생 속도 감소 (View에서 호출)
+    public func decreasePlaybackSpeed() async {
+        let newRate = max(0.5, playbackRate - 0.1)
+        do {
+            try await setPlaybackRate(newRate)
+            await sendPlaybackRateToWatch()
+            print("UI에서 속도 감소: \(newRate)x")
+        } catch {
+            print("UI 속도 감소 중 오류: \(error)")
+        }
+    }
+    
+    /// 재생 속도 리셋 (View에서 호출)
+    public func resetPlaybackSpeed() async {
+        do {
+            try await setPlaybackRate(1.0)
+            await sendPlaybackRateToWatch()
+            print("UI에서 속도 리셋: 1.0x")
+        } catch {
+            print("UI 속도 리셋 중 오류: \(error)")
+        }
+    }
+    
+    /// 재생/일시정지 토글 (View에서 호출)
+    public func togglePlayback() async {
+        do {
+            if isPlaying {
+                pauseMusic()
+                print("UI에서 일시정지")
+            } else {
+                if currentMusic != nil {
+                    try await resumeMusic()
+                    print("UI에서 재생")
+                } else {
+                    print("UI: 재생할 음악이 없음")
+                }
+            }
+            
+            await sendPlayingStateToWatch()
+            
+        } catch {
+            print("UI 재생 토글 중 오류: \(error)")
+        }
+    }
+
+    /// 음원 편집 저장 (View에서 호출) 
+    public func saveMusicEdit(
+        music: Music,
+        title: String,
+        artist: String,
+        albumArt: UIImage?
+    ) async {
+        // 음원 정보 업데이트
+        music.title = title
+        music.artist = artist
+        music.albumArt = albumArt?.pngData()
+        
+        do {
+            // Core Data 저장
+            try modelContext.save()
+            
+            // PlayerViewModel의 currentMusic 업데이트
+            if currentMusic?.id == music.id {
+                let updatedMusicData = MusicData(
+                    id: music.id,
+                    title: music.title,
+                    artist: music.artist,
+                    fileName: music.fileName,
+                    markers: music.markers,
+                    albumArt: music.albumArt
+                )
+                currentMusic = updatedMusicData
+                
+                // Control Center 업데이트
+                await updateControlCenterNowPlaying()
+                
+                print("✅ UI에서 음원 편집 완료: \(updatedMusicData.title)")
+            }
+        } catch {
+            print("❌ UI 음원 편집 저장 실패: \(error.localizedDescription)")
+        }
+    }
+
+    /// 음원 선택해서 재생 (View에서 호출)
+    public func selectAndPlayMusic(
+        _ music: Music,
+        navigationManager: NavigationManager
+    ) async {
+        let musicData = MusicData(
+            id: music.id,
+            title: music.title,
+            artist: music.artist,
+            fileName: music.fileName,
+            markers: music.markers,
+            albumArt: music.albumArt
+        )
+        
+        do {
+            if currentMusic == nil || currentMusic?.id != musicData.id {
+                await playMusic(musicData)
+            } else if !isPlaying {
+                try await resumeMusic()
+            }
+            
+            navigationManager.push(to: .playing)
+            print("✅ UI에서 음원 선택: \(musicData.title)")
+            
+        } catch {
+            print("❌ UI 음원 선택 중 오류: \(error.localizedDescription)")
+        }
+    }
+    
+    /// 음원 삭제 (View에서 호출)
+    public func deleteMusicFromList(
+        _ music: Music,
+        modelContext: ModelContext
+    ) async {
+        // 현재 재생 중인 음악이면 정지
+        if currentMusic?.id == music.id {
+            await stopMusic()
+        }
+        
+        do {
+            modelContext.delete(music)
+            try modelContext.save()
+            await sendMusicListToWatch()
+            print("✅ UI에서 음원 삭제: \(music.title)")
+        } catch {
+            print("❌ UI 음원 삭제 중 오류: \(error)")
+        }
+    }
+    
+    /// 새 음원 추가 (View에서 호출) 
+    public func addMusicToList(
+        from url: URL,
+        modelContext: ModelContext
+    ) async {
+        guard url.startAccessingSecurityScopedResource() else {
+            print("❌ Security scoped resource 접근 실패")
+            return
+        }
+        
+        defer {
+            url.stopAccessingSecurityScopedResource()
+        }
+        
+        do {
+            let (title, artist, albumArt) = try await fetchMusicMetadata(from: url)
+            let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            let uniqueFileURL = documentsDirectory.appendingUniquePathComponent(url.lastPathComponent)
+            
+            try FileManager.default.copyItem(at: url, to: uniqueFileURL)
+            
+            let newMusic = Music(
+                title: title,
+                artist: artist,
+                fileName: uniqueFileURL.lastPathComponent,
+                markers: [-1, -1, -1],
+                albumArt: albumArt
+            )
+            
+            modelContext.insert(newMusic)
+            try modelContext.save()
+            
+            await sendMusicListToWatch()
+            print("✅ UI에서 새 음원 추가: \(title)")
+        } catch {
+            print("❌ UI 음원 추가 실패: \(error.localizedDescription)")
+        }
+    }
+    
+    // MARK: - Private Helpers
+    
+    private func fetchMusicMetadata(from url: URL) async throws -> (String, String, Data?) {
+        let asset = AVAsset(url: url)
+        let metadata = try await asset.load(.commonMetadata)
+        
+        var title: String? = nil
+        var artist: String? = nil
+        var albumArt: Data? = nil
+        
+        for item in metadata {
+            if item.commonKey == .commonKeyTitle,
+               let loadedTitle = try await item.load(.stringValue) {
+                title = loadedTitle
+            }
+            if item.commonKey == .commonKeyArtist,
+               let loadedArtist = try await item.load(.stringValue) {
+                artist = loadedArtist
+            }
+            if item.commonKey == .commonKeyArtwork {
+                albumArt = try await item.load(.dataValue)
+            }
+        }
+        
+        // 기본값 처리
+        if title == nil || title == "Unknown Title" {
+            title = url.deletingPathExtension().lastPathComponent
+        }
+        
+        if artist == nil || artist == "Unknown Artist" {
+            artist = "Unknown Artist"
+        }
+        
+        return (title!, artist!, albumArt)
     }
 }
 
