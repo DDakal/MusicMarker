@@ -66,8 +66,13 @@ final class PlayerViewModel: ObservableObject {
     /// Timer는 thread-safe하므로 nonisolated context에서도 안전하게 접근 가능
     nonisolated(unsafe) internal var timer: Timer?
     
-    // private을 internal로 변경
     internal var isMarkerSeeking: Bool = false
+
+    /// MarkerService 인스턴스에 직접 접근할 수 있도록 하는 computed property
+    /// PlayingView에서 편집 중인 마커에 직접 접근할 때 사용됩니다
+    var markerServiceInstance: (any MarkerManageable)? {
+        return markerService
+    }
     
     // MARK: - Initialization
     
@@ -234,27 +239,43 @@ extension PlayerViewModel {
             print("UI 재생 토글 중 오류: \(error)")
         }
     }
-}
 
-// MARK: - Placeholder Methods for Extensions
-
-extension PlayerViewModel {
-    
-    // 모든 handler 메서드들은 각각의 extension에서 구현됨:
-    // - PlayerViewModel+Audio.swift: handlePlayToggle, handleForward5Seconds, handleBackward5Seconds
-    // - PlayerViewModel+Marker.swift: handleMarkerPlay, handleMarkerSave, handleMarkerDelete
-    // - PlayerViewModel+Watch.swift: 기타 워치 관련 handler들
-    // - PlayerViewModel+LiveActivity.swift: RemoteControlHandler
-}
-
-// MARK: - Computed Properties for Service Access
-
-extension PlayerViewModel {
-    
-    /// MarkerService 인스턴스에 직접 접근할 수 있도록 하는 computed property
-    /// PlayingView에서 편집 중인 마커에 직접 접근할 때 사용됩니다
-    var markerServiceInstance: (any MarkerManageable)? {
-        return markerService
+    /// 음원 편집 저장 (View에서 호출) 
+    public func saveMusicEdit(
+        music: Music,
+        title: String,
+        artist: String,
+        albumArt: UIImage?
+    ) async {
+        // 음원 정보 업데이트
+        music.title = title
+        music.artist = artist
+        music.albumArt = albumArt?.pngData()
+        
+        do {
+            // Core Data 저장
+            try modelContext.save()
+            
+            // PlayerViewModel의 currentMusic 업데이트
+            if currentMusic?.id == music.id {
+                let updatedMusicData = MusicData(
+                    id: music.id,
+                    title: music.title,
+                    artist: music.artist,
+                    fileName: music.fileName,
+                    markers: music.markers,
+                    albumArt: music.albumArt
+                )
+                currentMusic = updatedMusicData
+                
+                // Control Center 업데이트
+                await updateControlCenterNowPlaying()
+                
+                print("✅ UI에서 음원 편집 완료: \(updatedMusicData.title)")
+            }
+        } catch {
+            print("❌ UI 음원 편집 저장 실패: \(error.localizedDescription)")
+        }
     }
 }
 

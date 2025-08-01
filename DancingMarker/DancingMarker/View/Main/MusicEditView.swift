@@ -65,105 +65,44 @@ struct MusicEditView: View {
             Color.editViewBGBlack.edgesIgnoringSafeArea(.all)
             
             VStack {
-                VStack {
-                    if let albumArt = albumArt {
-                        Image(uiImage: albumArt)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 160, height: 160)
-                            .cornerRadius(12)
-                    } else {
-                        RoundedRectangle(cornerRadius: 12)
-                            .foregroundStyle(.editViewAlbumGray)
-                            .frame(width: 160, height: 160)
-                            .overlay {
-                                Image(systemName: "music.note")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 40, height: 40)
-                                    .foregroundStyle(.white)
-                            }
-                    }
-                    
-                    Button("Local_ChangeCoverImage") {
-                        isImagePickerPresented = true
-                    }
-                    .font(.caption)
-                    .foregroundStyle(.markerPurple)
-                    .underline(true, color: .markerPurple)
-                    .buttonStyle(.plain)
-                }
-                .padding(.top, 67)
-                .padding(.bottom, 43)
+                // 앨범아트 편집
+                AlbumArtEditor(
+                    albumArt: $albumArt,
+                    isImagePickerPresented: $isImagePickerPresented,
+                    albumArtChanged: $albumArtChanged
+                )
                 
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Local_MusicTitle")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    
-                    HStack {
-                        TextField("Local_EnterMusicTitleMessage", text: $title)
-                            .frame(height: 34)
-                            .background(.clear)
-                            .autocorrectionDisabled(true)
-                            .textInputAutocapitalization(.never)
-                        
-                        if !title.isEmpty {
-                            Button(action: { title = "" }) {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundStyle(.gray)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                }
+                // 제목 입력
+                MusicTextFieldEditor(
+                    label: "Local_MusicTitle",
+                    placeholder: "Local_EnterMusicTitleMessage",
+                    text: $title
+                )
                 .padding(.bottom, 16)
                 
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Local_MusicArtist")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    
-                    HStack {
-                        TextField("Local_EnterMusicArtistMessage", text: $artist)
-                            .frame(height: 34)
-                            .background(Color.clear)
-                            .autocorrectionDisabled(true)
-                            .textInputAutocapitalization(.never)
-                        
-                        if !artist.isEmpty {
-                            Button(action: { artist = "" }) {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundStyle(.gray)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                }
+                // 아티스트 입력
+                MusicTextFieldEditor(
+                    label: "Local_MusicArtist",
+                    placeholder: "Local_EnterMusicArtistMessage",
+                    text: $artist
+                )
+                
                 Spacer()
                 
-                Button(action: {
+                // 저장 버튼
+                SaveButton(canSave: canSave) {
                     guard canSave else { return }
                     Task {
-                        await saveMusic()
+                        await playerViewModel.saveMusicEdit(  // ✅ ViewModel로 이동
+                            music: music,
+                            title: title,
+                            artist: artist,
+                            albumArt: albumArt
+                        )
+                        didSaveMusic = true
                         dismiss()
                     }
-                }) {
-                    HStack {
-                        Spacer()
-                        Text("Local_Done")
-                            .fontWeight(.bold)
-                        Spacer()
-                    }
-                    .frame(height: 49)
-                    .frame(maxWidth: .infinity)
-                    .background(canSave ? Color.accentColor : Color.gray.opacity(0.3))
-                    .foregroundColor(canSave ? Color.black : Color.white)
-                    .cornerRadius(12)
-                    .padding(.bottom, 53)
                 }
-                .buttonStyle(.plain)
-                .disabled(!canSave)
             }
             .padding(.horizontal, 16)
             .navigationTitle("Local_EditMusicNavigationTitle")
@@ -172,12 +111,13 @@ struct MusicEditView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Text("Local_Cancel")
-                    .foregroundStyle(.accent)
-                    .onTapGesture {
-                        dismiss()
-                    }
+                        .foregroundStyle(.accent)
+                        .onTapGesture {
+                            dismiss()
+                        }
                 }
-            }}
+            }
+        }
         .sheet(isPresented: $isImagePickerPresented) {
             SelectGalleryView(selectedImgData: $selectedImgData)
         }
@@ -189,38 +129,6 @@ struct MusicEditView: View {
         }
         .onAppear {
             albumArtChanged = false
-        }
-    }
-    
-    // MARK: - Private Methods
-    
-    private func saveMusic() async {
-        music.title = title
-        music.artist = artist
-        music.albumArt = albumArt?.pngData()
-        
-        do {
-            try modelContext.save()
-            
-            // PlayerViewModel의 currentMusic 업데이트
-            if playerViewModel.currentMusic?.id == music.id {
-                let updatedMusicData = MusicData(
-                    id: music.id,
-                    title: music.title,
-                    artist: music.artist,
-                    fileName: music.fileName,
-                    markers: music.markers,
-                    albumArt: music.albumArt
-                )
-                playerViewModel.currentMusic = updatedMusicData
-                
-                // Control Center 업데이트
-                await playerViewModel.updateControlCenterNowPlaying()
-                
-                print("✅ 음원 수정 후 PlayerViewModel 업데이트 완료: \(updatedMusicData.title)")
-            }
-        } catch {
-            print("음원 수정 실패: \(error.localizedDescription)")
         }
     }
 }
