@@ -60,6 +60,9 @@
 		514F1E362E3C9FFE00690DB5 /* MarkerButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E352E3C9FFE00690DB5 /* MarkerButton.swift */; };
 		514F1E382E3CA04C00690DB5 /* EditMarkerButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E372E3CA04C00690DB5 /* EditMarkerButton.swift */; };
 		514F1E3A2E3CA06600690DB5 /* MarkerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E392E3CA06600690DB5 /* MarkerListView.swift */; };
+		514F1E3E2E3CB52000690DB5 /* AlbumArtEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E3D2E3CB52000690DB5 /* AlbumArtEditor.swift */; };
+		514F1E402E3CB55D00690DB5 /* MusicTextFiedlEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E3F2E3CB55D00690DB5 /* MusicTextFiedlEditor.swift */; };
+		514F1E422E3CB58200690DB5 /* SaveButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E412E3CB58200690DB5 /* SaveButton.swift */; };
 		516D95502D533F5D00AA8EAA /* TextMarquee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516D954F2D533F5D00AA8EAA /* TextMarquee.swift */; };
 		51CD43CA2DFB327900BC8EDF /* PlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CD43C92DFB327900BC8EDF /* PlayerViewModel.swift */; };
 		51CD44D52DFB35A800BC8EDF /* PlayerViewModel+Audio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CD44D42DFB35A800BC8EDF /* PlayerViewModel+Audio.swift */; };
@@ -154,6 +157,9 @@
 		514F1E352E3C9FFE00690DB5 /* MarkerButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkerButton.swift; sourceTree = "<group>"; };
 		514F1E372E3CA04C00690DB5 /* EditMarkerButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditMarkerButton.swift; sourceTree = "<group>"; };
 		514F1E392E3CA06600690DB5 /* MarkerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkerListView.swift; sourceTree = "<group>"; };
+		514F1E3D2E3CB52000690DB5 /* AlbumArtEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumArtEditor.swift; sourceTree = "<group>"; };
+		514F1E3F2E3CB55D00690DB5 /* MusicTextFiedlEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicTextFiedlEditor.swift; sourceTree = "<group>"; };
+		514F1E412E3CB58200690DB5 /* SaveButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveButton.swift; sourceTree = "<group>"; };
 		51675E272CA2F0E800D8D08F /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		516D954F2D533F5D00AA8EAA /* TextMarquee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextMarquee.swift; sourceTree = "<group>"; };
 		51CD43C92DFB327900BC8EDF /* PlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewModel.swift; sourceTree = "<group>"; };
@@ -259,8 +265,8 @@
 		510D902A2CA2F1C8002E82CC /* Main */ = {
 			isa = PBXGroup;
 			children = (
+				514F1E3B2E3CB4DC00690DB5 /* MusicEdit */,
 				512224C12D8C68C900AABC82 /* SelectGalleryView.swift */,
-				510D90272CA2F1C8002E82CC /* MusicEditView.swift */,
 				510D90282CA2F1C8002E82CC /* MusicListView.swift */,
 				510D90292CA2F1C8002E82CC /* NowPlayingView.swift */,
 			);
@@ -345,6 +351,25 @@
 				514F1E352E3C9FFE00690DB5 /* MarkerButton.swift */,
 				514F1E372E3CA04C00690DB5 /* EditMarkerButton.swift */,
 				514F1E392E3CA06600690DB5 /* MarkerListView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		514F1E3B2E3CB4DC00690DB5 /* MusicEdit */ = {
+			isa = PBXGroup;
+			children = (
+				514F1E3C2E3CB4FE00690DB5 /* Components */,
+				510D90272CA2F1C8002E82CC /* MusicEditView.swift */,
+			);
+			path = MusicEdit;
+			sourceTree = "<group>";
+		};
+		514F1E3C2E3CB4FE00690DB5 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				514F1E3D2E3CB52000690DB5 /* AlbumArtEditor.swift */,
+				514F1E3F2E3CB55D00690DB5 /* MusicTextFiedlEditor.swift */,
+				514F1E412E3CB58200690DB5 /* SaveButton.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -662,6 +687,7 @@
 				514F1E362E3C9FFE00690DB5 /* MarkerButton.swift in Sources */,
 				512CEE5D2DF092A8001A800B /* AudioService.swift in Sources */,
 				5131FFF52E0640540049E281 /* PlayerViewModel+LiveActivity.swift in Sources */,
+				514F1E422E3CB58200690DB5 /* SaveButton.swift in Sources */,
 				51CD43CA2DFB327900BC8EDF /* PlayerViewModel.swift in Sources */,
 				514F1E382E3CA04C00690DB5 /* EditMarkerButton.swift in Sources */,
 				51CD44D72DFB3B6A00BC8EDF /* PlayerViewModel+Timer.swift in Sources */,
@@ -678,8 +704,10 @@
 				512224C02D8C685E00AABC82 /* UIImage+.swift in Sources */,
 				5131FFF12E061A670049E281 /* PlayerViewModel+Watch.swift in Sources */,
 				90A4722F2C450867008577A2 /* WCManager.swift in Sources */,
+				514F1E402E3CB55D00690DB5 /* MusicTextFiedlEditor.swift in Sources */,
 				512CED4E2DF08EC6001A800B /* MarkerManageable.swift in Sources */,
 				512CED522DF08EDF001A800B /* ControlCenterManageable.swift in Sources */,
+				514F1E3E2E3CB52000690DB5 /* AlbumArtEditor.swift in Sources */,
 				5104B7F62C3D67F2008E10E8 /* Music.swift in Sources */,
 				512CED502DF08ED3001A800B /* WatchConnectivityManageable.swift in Sources */,
 				514F1E302E3C9E3C00690DB5 /* ProgressSliderView.swift in Sources */,
