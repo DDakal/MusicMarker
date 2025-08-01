@@ -174,6 +174,68 @@ extension PlayerViewModel {
     }
 }
 
+// MARK: - UI Actions (View 전용 Public 인터페이스)
+
+extension PlayerViewModel {
+    
+    /// 재생 속도 증가 (View에서 호출)
+    public func increasePlaybackSpeed() async {
+        let newRate = min(1.5, playbackRate + 0.1)
+        do {
+            try await setPlaybackRate(newRate)
+            await sendPlaybackRateToWatch()
+            print("UI에서 속도 증가: \(newRate)x")
+        } catch {
+            print("UI 속도 증가 중 오류: \(error)")
+        }
+    }
+    
+    /// 재생 속도 감소 (View에서 호출)
+    public func decreasePlaybackSpeed() async {
+        let newRate = max(0.5, playbackRate - 0.1)
+        do {
+            try await setPlaybackRate(newRate)
+            await sendPlaybackRateToWatch()
+            print("UI에서 속도 감소: \(newRate)x")
+        } catch {
+            print("UI 속도 감소 중 오류: \(error)")
+        }
+    }
+    
+    /// 재생 속도 리셋 (View에서 호출)
+    public func resetPlaybackSpeed() async {
+        do {
+            try await setPlaybackRate(1.0)
+            await sendPlaybackRateToWatch()
+            print("UI에서 속도 리셋: 1.0x")
+        } catch {
+            print("UI 속도 리셋 중 오류: \(error)")
+        }
+    }
+    
+    /// 재생/일시정지 토글 (View에서 호출)
+    public func togglePlayback() async {
+        do {
+            if isPlaying {
+                pauseMusic()
+                print("UI에서 일시정지")
+            } else {
+                if currentMusic != nil {
+                    try await resumeMusic()
+                    print("UI에서 재생")
+                } else {
+                    print("UI: 재생할 음악이 없음")
+                }
+            }
+            
+            await sendPlayingStateToWatch()
+            
+        } catch {
+            print("UI 재생 토글 중 오류: \(error)")
+        }
+    }
+}
+
 // MARK: - Placeholder Methods for Extensions
 
 extension PlayerViewModel {
