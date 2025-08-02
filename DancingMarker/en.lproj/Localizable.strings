@@ -29,7 +29,7 @@
 "Local_EditMusicNavigationTitle" = "Edit Music";
 
 // Watch OS
-"Local_Watch_FirstAtMobileMessage" = "Please add music\nthe mobile app.";
+"Local_Watch_FirstAtMobileMessage" = "Please add music\nto the mobile app.";
 "Local_Watch_ManagementMarker" = "Manage Marker";
 "Local_Watch_MarkerNone" = "Empty";
 "Local_Watch_ClearMarkerMessage" = "Clear the Marker?";
