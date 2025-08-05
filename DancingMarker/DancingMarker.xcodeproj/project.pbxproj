@@ -51,6 +51,9 @@
 		5131FFEF2E0618210049E281 /* PlayerViewModel+Marker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5131FFEE2E0618210049E281 /* PlayerViewModel+Marker.swift */; };
 		5131FFF12E061A670049E281 /* PlayerViewModel+Watch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5131FFF02E061A670049E281 /* PlayerViewModel+Watch.swift */; };
 		5131FFF52E0640540049E281 /* PlayerViewModel+LiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5131FFF42E0640540049E281 /* PlayerViewModel+LiveActivity.swift */; };
+		51447EF42E41E6EF00ED1669 /* WatchEmptyMusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51447EF32E41E6EF00ED1669 /* WatchEmptyMusicView.swift */; };
+		51447EF62E41E70900ED1669 /* WatchMusicGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51447EF52E41E70900ED1669 /* WatchMusicGrid.swift */; };
+		51447EF82E41E74100ED1669 /* WatchPlayingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51447EF72E41E74100ED1669 /* WatchPlayingIndicator.swift */; };
 		514F1E2A2E3C9C2100690DB5 /* MusicInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E292E3C9C2100690DB5 /* MusicInfoView.swift */; };
 		514F1E2C2E3C9DD100690DB5 /* SpeedControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E2B2E3C9DD100690DB5 /* SpeedControlView.swift */; };
 		514F1E2E2E3C9E0400690DB5 /* PlaybackControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E2D2E3C9E0400690DB5 /* PlaybackControlsView.swift */; };
@@ -150,6 +153,9 @@
 		5131FFEE2E0618210049E281 /* PlayerViewModel+Marker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayerViewModel+Marker.swift"; sourceTree = "<group>"; };
 		5131FFF02E061A670049E281 /* PlayerViewModel+Watch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayerViewModel+Watch.swift"; sourceTree = "<group>"; };
 		5131FFF42E0640540049E281 /* PlayerViewModel+LiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayerViewModel+LiveActivity.swift"; sourceTree = "<group>"; };
+		51447EF32E41E6EF00ED1669 /* WatchEmptyMusicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchEmptyMusicView.swift; sourceTree = "<group>"; };
+		51447EF52E41E70900ED1669 /* WatchMusicGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchMusicGrid.swift; sourceTree = "<group>"; };
+		51447EF72E41E74100ED1669 /* WatchPlayingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchPlayingIndicator.swift; sourceTree = "<group>"; };
 		514F1E292E3C9C2100690DB5 /* MusicInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicInfoView.swift; sourceTree = "<group>"; };
 		514F1E2B2E3C9DD100690DB5 /* SpeedControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedControlView.swift; sourceTree = "<group>"; };
 		514F1E2D2E3C9E0400690DB5 /* PlaybackControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackControlsView.swift; sourceTree = "<group>"; };
@@ -261,6 +267,7 @@
 		510D90252CA2F1C0002E82CC /* WatchMain */ = {
 			isa = PBXGroup;
 			children = (
+				51447EF22E41E6C200ED1669 /* Components */,
 				510D90242CA2F1C0002E82CC /* WatchMusicListView.swift */,
 			);
 			path = WatchMain;
@@ -342,6 +349,16 @@
 				901BF9842C29804B00C02FF9 /* Assets.xcassets */,
 			);
 			path = Resource;
+			sourceTree = "<group>";
+		};
+		51447EF22E41E6C200ED1669 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				51447EF32E41E6EF00ED1669 /* WatchEmptyMusicView.swift */,
+				51447EF52E41E70900ED1669 /* WatchMusicGrid.swift */,
+				51447EF72E41E74100ED1669 /* WatchPlayingIndicator.swift */,
+			);
+			path = Components;
 			sourceTree = "<group>";
 		};
 		514F1E282E3C9C0600690DB5 /* Components */ = {
@@ -754,11 +771,14 @@
 				902077062C458ABB00988D2B /* WatchViewModel.swift in Sources */,
 				1FA811892D534029004B4807 /* MarkerResetAlert.swift in Sources */,
 				510D90262CA2F1C0002E82CC /* WatchMusicListView.swift in Sources */,
+				51447EF62E41E70900ED1669 /* WatchMusicGrid.swift in Sources */,
+				51447EF42E41E6EF00ED1669 /* WatchEmptyMusicView.swift in Sources */,
 				512CED492DF08E59001A800B /* Errors.swift in Sources */,
 				510D901A2CA2F1C0002E82CC /* WatchMarkerDetailView.swift in Sources */,
 				510D901B2CA2F1C0002E82CC /* WatchMarkerEditView.swift in Sources */,
 				510D901C2CA2F1C0002E82CC /* WatchMarkerListView.swift in Sources */,
 				5104B7F82C3D6C3F008E10E8 /* Music.swift in Sources */,
+				51447EF82E41E74100ED1669 /* WatchPlayingIndicator.swift in Sources */,
 				90A472312C450A68008577A2 /* WatchDancingMarkerApp.swift in Sources */,
 				901BF9B62C2A533200C02FF9 /* WatchNavigationManager.swift in Sources */,
 				1FA811862D533EC5004B4807 /* CommonButtonStyle.swift in Sources */,
