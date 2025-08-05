@@ -69,6 +69,8 @@
 		514F1E462E3CC0EE00690DB5 /* MusicListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E452E3CC0EE00690DB5 /* MusicListItem.swift */; };
 		514F1E482E3CC12400690DB5 /* URL+Unique.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E472E3CC12400690DB5 /* URL+Unique.swift */; };
 		516D95502D533F5D00AA8EAA /* TextMarquee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516D954F2D533F5D00AA8EAA /* TextMarquee.swift */; };
+		517F19962E4259DA000B721E /* MarkerTimeControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 517F19952E4259DA000B721E /* MarkerTimeControl.swift */; };
+		517F19982E425A15000B721E /* MarkerSaveButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 517F19972E425A15000B721E /* MarkerSaveButton.swift */; };
 		51C107222E41ED1900999C0B /* WatchPlaybackControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C107212E41ED1900999C0B /* WatchPlaybackControls.swift */; };
 		51C107242E41ED6900999C0B /* WatchMusicInfoHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C107232E41ED6900999C0B /* WatchMusicInfoHeader.swift */; };
 		51C107262E41ED9700999C0B /* WatchMusicTimeDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C107252E41ED9700999C0B /* WatchMusicTimeDisplay.swift */; };
@@ -175,6 +177,8 @@
 		514F1E472E3CC12400690DB5 /* URL+Unique.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Unique.swift"; sourceTree = "<group>"; };
 		51675E272CA2F0E800D8D08F /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		516D954F2D533F5D00AA8EAA /* TextMarquee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextMarquee.swift; sourceTree = "<group>"; };
+		517F19952E4259DA000B721E /* MarkerTimeControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkerTimeControl.swift; sourceTree = "<group>"; };
+		517F19972E425A15000B721E /* MarkerSaveButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkerSaveButton.swift; sourceTree = "<group>"; };
 		51C107212E41ED1900999C0B /* WatchPlaybackControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchPlaybackControls.swift; sourceTree = "<group>"; };
 		51C107232E41ED6900999C0B /* WatchMusicInfoHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchMusicInfoHeader.swift; sourceTree = "<group>"; };
 		51C107252E41ED9700999C0B /* WatchMusicTimeDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchMusicTimeDisplay.swift; sourceTree = "<group>"; };
@@ -253,7 +257,6 @@
 			isa = PBXGroup;
 			children = (
 				510D90162CA2F1C0002E82CC /* WatchMarkerDetailView.swift */,
-				510D90172CA2F1C0002E82CC /* WatchMarkerEditView.swift */,
 				510D90182CA2F1C0002E82CC /* WatchMarkerListView.swift */,
 				1FA811872D534012004B4807 /* Alert */,
 			);
@@ -428,6 +431,24 @@
 			path = Components;
 			sourceTree = "<group>";
 		};
+		517F19932E42552E000B721E /* WatchMarkerEdit */ = {
+			isa = PBXGroup;
+			children = (
+				517F19942E425558000B721E /* Components */,
+				510D90172CA2F1C0002E82CC /* WatchMarkerEditView.swift */,
+			);
+			path = WatchMarkerEdit;
+			sourceTree = "<group>";
+		};
+		517F19942E425558000B721E /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				517F19952E4259DA000B721E /* MarkerTimeControl.swift */,
+				517F19972E425A15000B721E /* MarkerSaveButton.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
 		518D7F012CA2E1D700612544 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
@@ -590,6 +611,7 @@
 				510D90252CA2F1C0002E82CC /* WatchMain */,
 				510D90202CA2F1C0002E82CC /* WatchPlaying */,
 				510D90192CA2F1C0002E82CC /* WatchMarkerList */,
+				517F19932E42552E000B721E /* WatchMarkerEdit */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -799,6 +821,8 @@
 				5104B7F82C3D6C3F008E10E8 /* Music.swift in Sources */,
 				51447EF82E41E74100ED1669 /* WatchPlayingIndicator.swift in Sources */,
 				90A472312C450A68008577A2 /* WatchDancingMarkerApp.swift in Sources */,
+				517F19982E425A15000B721E /* MarkerSaveButton.swift in Sources */,
+				517F19962E4259DA000B721E /* MarkerTimeControl.swift in Sources */,
 				901BF9B62C2A533200C02FF9 /* WatchNavigationManager.swift in Sources */,
 				1FA811862D533EC5004B4807 /* CommonButtonStyle.swift in Sources */,
 				510D90212CA2F1C0002E82CC /* WatchPlayingMarkerView.swift in Sources */,

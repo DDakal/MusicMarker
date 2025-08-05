@@ -25,7 +25,7 @@ struct EditMarkerButton: View {
                 }
             }) {
                 Circle()
-                    .fill(canDecrease ? Color.gray.opacity(0.6) : Color.gray.opacity(0.9))
+                    .fill(.inactiveGray)
                     .frame(width: 40, height: 40)
                     .overlay {
                         Image("backward1SecIcon")
@@ -43,7 +43,7 @@ struct EditMarkerButton: View {
                     .foregroundColor(.black)
             }
             .frame(width: 200, height: 60)
-            .background(Color.yellow)  // .accent 대신
+            .background(Color.accentColor)
             .cornerRadius(12)
             .padding(.horizontal, 6)
             
@@ -54,7 +54,7 @@ struct EditMarkerButton: View {
                 }
             }) {
                 Circle()
-                    .fill(canIncrease ? Color.gray.opacity(0.6) : Color.gray.opacity(0.9))
+                    .fill(.inactiveGray)
                     .frame(width: 40, height: 40)
                     .overlay {
                         Image("forward1SecIcon")
@@ -72,7 +72,7 @@ struct EditMarkerButton: View {
                 }
             }) {
                 Circle()
-                    .fill(Color.gray.opacity(0.9))
+                    .fill(.buttonDarkGray)
                     .frame(width: 40, height: 40)
                     .overlay {
                         Image(systemName: "checkmark")

@@ -668,7 +668,6 @@ extension Notification.Name {
     static let sendMusicTitle = Notification.Name("SendMusicTitle")
     static let sendSystemVolume = Notification.Name("SendSystemVolume")
     
-    // ✅ 새로운 알림 추가
     static let triggerAutoSync = Notification.Name("TriggerAutoSync")
-    static let requireCurrentState = Notification.Name("SendRequireCurrentState")  // 🆕 추가
+    static let requireCurrentState = Notification.Name("SendRequireCurrentState")
 }
