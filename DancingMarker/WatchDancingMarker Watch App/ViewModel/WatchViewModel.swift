@@ -361,3 +361,43 @@ extension WatchViewModel {
         
     }
 }
+
+extension WatchViewModel {
+    
+    // MARK: - Immediate Sync Methods
+    
+    /// 앞으로/뒤로 이동 후 즉시 iOS 상태 요청
+    func requestImmediateSync() {
+        print("🔄 워치: 즉시 상태 동기화 요청")
+        DispatchQueue.main.async {
+            self.connectivityManager.sendRequireCurrentStateToIOS()
+        }
+    }
+    
+    /// 빠른 연타 방지를 위한 debounce 동기화
+    func requestSyncWithDebounce() {
+        print("🔄 워치: debounce 동기화 요청")
+        
+        // 기존 타이머 취소
+        debounceTimer?.invalidate()
+        
+        // 0.5초 후 동기화 (마지막 동작 후에만)
+        debounceTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { [weak self] _ in
+            self?.requestImmediateSync()
+        }
+    }
+    
+    // MARK: - Private Properties
+    
+    /// debounce를 위한 타이머
+    private var debounceTimer: Timer? {
+        get {
+            objc_getAssociatedObject(self, &debounceTimerKey) as? Timer
+        }
+        set {
+            objc_setAssociatedObject(self, &debounceTimerKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+}
+
+private var debounceTimerKey: UInt8 = 0

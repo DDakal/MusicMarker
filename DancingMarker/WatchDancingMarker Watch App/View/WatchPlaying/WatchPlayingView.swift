@@ -82,28 +82,28 @@ struct WatchPlayingView: View {
 // MARK: - Playback Actions Extension
 extension WatchPlayingView {
     
-    // ✅ 누락된 함수들 추가
     private func performBackward() async throws {
         viewModel.playBackward()
+        viewModel.requestSyncWithDebounce()
+    }
+    
+    private func performForward() async throws {
+        viewModel.playForward()
+        viewModel.requestSyncWithDebounce()
     }
     
     private func performPlayToggle() async {
         let wasPlaying = viewModel.isPlaying
         viewModel.playToggle()
+        viewModel.requestImmediateSync()
         
         if !wasPlaying {
             trackPlayEvent()
         }
     }
     
-    private func performForward() async throws {
-        viewModel.playForward()
-    }
-    
-    // ✅ Mixpanel 없이 간단한 로깅으로 대체
     private func trackPlayEvent() {
         print("📊 워치에서 노래 재생됨")
-        // 나중에 watchOS용 분석 도구로 교체 가능
     }
 }
 

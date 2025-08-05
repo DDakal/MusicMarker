@@ -330,6 +330,18 @@ extension PlayerViewModel {
             }
         }
         
+        // ✅ 즉시 상태 요청 처리 추가
+        NotificationCenter.default.addObserver(
+            forName: .requireCurrentState,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            print("🔄 iOS: 워치에서 즉시 상태 요청 수신")
+            Task { @MainActor in
+                await self?.handleCurrentStateRequest()
+            }
+        }
+        
         print("✅ 워치 알림 시스템 설정 완료")
     }
     
@@ -472,6 +484,19 @@ extension PlayerViewModel {
         print("✅ handleAutoSync 완료")
     }
 
+    // MARK: - Immediate State Request Handler
+    
+    /// 워치에서 즉시 상태 요청을 받았을 때 처리
+    @MainActor
+    private func handleCurrentStateRequest() async {
+        print("🚀 iOS: 워치에 즉시 상태 전송 시작")
+        await sendPlayingStateToWatch()
+        
+        // 추가로 다른 중요한 상태들도 전송
+        await sendPlaybackRateToWatch()
+        await sendMarkersToWatch()
+        print("✅ iOS: 워치에 즉시 상태 전송 완료")
+    }
 }
 
 // MARK: - Watch Integration Support
