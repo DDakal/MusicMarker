@@ -176,6 +176,12 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
             }
             replyHandler(["success": true])
             
+        case "SendRequireCurrentState":
+            print("🔄 WCManager: 워치에서 현재 상태 즉시 요청 수신")
+            // PlayerViewModel에 즉시 상태 전송 요청
+            NotificationCenter.default.post(name: .requireCurrentState, object: nil)
+            replyHandler(["success": true])
+            
         default:
             print("⚠️ WCManager: 알 수 없는 액션 - \(action)")
             replyHandler(["success": false])
@@ -451,6 +457,18 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
             print(error.localizedDescription)
         }
     }
+    
+    func sendRequireCurrentStateToIOS() {
+        let message = ["action": "SendRequireCurrentState"]
+        
+        print("📤 워치: iOS에 현재 상태 요청 전송")
+        session.sendMessage(message) { replyHandler in
+            print("✅ 워치: 현재 상태 요청 성공")
+            print("   - 응답: \(replyHandler)")
+        } errorHandler: { error in
+            print("❌ 워치: 현재 상태 요청 실패: \(error.localizedDescription)")
+        }
+    }
     #endif
     
     // MARK: - Common Methods (Both iOS and watchOS)
@@ -650,6 +668,6 @@ extension Notification.Name {
     static let sendMusicTitle = Notification.Name("SendMusicTitle")
     static let sendSystemVolume = Notification.Name("SendSystemVolume")
     
-    // ✅ 새로운 알림 추가
     static let triggerAutoSync = Notification.Name("TriggerAutoSync")
+    static let requireCurrentState = Notification.Name("SendRequireCurrentState")
 }
