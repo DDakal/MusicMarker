@@ -69,6 +69,9 @@
 		514F1E462E3CC0EE00690DB5 /* MusicListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E452E3CC0EE00690DB5 /* MusicListItem.swift */; };
 		514F1E482E3CC12400690DB5 /* URL+Unique.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E472E3CC12400690DB5 /* URL+Unique.swift */; };
 		516D95502D533F5D00AA8EAA /* TextMarquee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516D954F2D533F5D00AA8EAA /* TextMarquee.swift */; };
+		51C107222E41ED1900999C0B /* WatchPlaybackControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C107212E41ED1900999C0B /* WatchPlaybackControls.swift */; };
+		51C107242E41ED6900999C0B /* WatchMusicInfoHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C107232E41ED6900999C0B /* WatchMusicInfoHeader.swift */; };
+		51C107262E41ED9700999C0B /* WatchMusicTimeDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C107252E41ED9700999C0B /* WatchMusicTimeDisplay.swift */; };
 		51CD43CA2DFB327900BC8EDF /* PlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CD43C92DFB327900BC8EDF /* PlayerViewModel.swift */; };
 		51CD44D52DFB35A800BC8EDF /* PlayerViewModel+Audio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CD44D42DFB35A800BC8EDF /* PlayerViewModel+Audio.swift */; };
 		51CD44D72DFB3B6A00BC8EDF /* PlayerViewModel+Timer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51CD44D62DFB3B6A00BC8EDF /* PlayerViewModel+Timer.swift */; };
@@ -172,6 +175,9 @@
 		514F1E472E3CC12400690DB5 /* URL+Unique.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Unique.swift"; sourceTree = "<group>"; };
 		51675E272CA2F0E800D8D08F /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		516D954F2D533F5D00AA8EAA /* TextMarquee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextMarquee.swift; sourceTree = "<group>"; };
+		51C107212E41ED1900999C0B /* WatchPlaybackControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchPlaybackControls.swift; sourceTree = "<group>"; };
+		51C107232E41ED6900999C0B /* WatchMusicInfoHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchMusicInfoHeader.swift; sourceTree = "<group>"; };
+		51C107252E41ED9700999C0B /* WatchMusicTimeDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchMusicTimeDisplay.swift; sourceTree = "<group>"; };
 		51CD43C92DFB327900BC8EDF /* PlayerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewModel.swift; sourceTree = "<group>"; };
 		51CD44D42DFB35A800BC8EDF /* PlayerViewModel+Audio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayerViewModel+Audio.swift"; sourceTree = "<group>"; };
 		51CD44D62DFB3B6A00BC8EDF /* PlayerViewModel+Timer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayerViewModel+Timer.swift"; sourceTree = "<group>"; };
@@ -257,6 +263,7 @@
 		510D90202CA2F1C0002E82CC /* WatchPlaying */ = {
 			isa = PBXGroup;
 			children = (
+				51C107202E41ECDA00999C0B /* Components */,
 				510D901D2CA2F1C0002E82CC /* WatchPlayingMarkerView.swift */,
 				510D901E2CA2F1C0002E82CC /* WatchPlayingSpeedView.swift */,
 				510D901F2CA2F1C0002E82CC /* WatchPlayingView.swift */,
@@ -463,6 +470,16 @@
 				901BF9982C29809A00C02FF9 /* Assets.xcassets */,
 			);
 			path = Resource;
+			sourceTree = "<group>";
+		};
+		51C107202E41ECDA00999C0B /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				51C107212E41ED1900999C0B /* WatchPlaybackControls.swift */,
+				51C107232E41ED6900999C0B /* WatchMusicInfoHeader.swift */,
+				51C107252E41ED9700999C0B /* WatchMusicTimeDisplay.swift */,
+			);
+			path = Components;
 			sourceTree = "<group>";
 		};
 		51CAA1042C392B2500406BB8 /* Models */ = {
@@ -769,8 +786,10 @@
 				512CEE682DF12E06001A800B /* MusicData.swift in Sources */,
 				90A472322C450AB6008577A2 /* WCManager.swift in Sources */,
 				902077062C458ABB00988D2B /* WatchViewModel.swift in Sources */,
+				51C107262E41ED9700999C0B /* WatchMusicTimeDisplay.swift in Sources */,
 				1FA811892D534029004B4807 /* MarkerResetAlert.swift in Sources */,
 				510D90262CA2F1C0002E82CC /* WatchMusicListView.swift in Sources */,
+				51C107242E41ED6900999C0B /* WatchMusicInfoHeader.swift in Sources */,
 				51447EF62E41E70900ED1669 /* WatchMusicGrid.swift in Sources */,
 				51447EF42E41E6EF00ED1669 /* WatchEmptyMusicView.swift in Sources */,
 				512CED492DF08E59001A800B /* Errors.swift in Sources */,
@@ -786,6 +805,7 @@
 				1FA8118B2D534047004B4807 /* MarkerEditAlert.swift in Sources */,
 				510D90222CA2F1C0002E82CC /* WatchPlayingSpeedView.swift in Sources */,
 				512CEE6C2DF12F65001A800B /* MusicCoreData.xcdatamodeld in Sources */,
+				51C107222E41ED1900999C0B /* WatchPlaybackControls.swift in Sources */,
 				510D90232CA2F1C0002E82CC /* WatchPlayingView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
