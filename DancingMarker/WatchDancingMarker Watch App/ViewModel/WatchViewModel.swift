@@ -438,3 +438,36 @@ extension WatchViewModel {
         return markers[index] == "99:59"
     }
 }
+
+extension WatchViewModel {
+    
+    // MARK: - Marker Edit Actions (View 전용 Public 인터페이스)
+    
+    /// 마커 편집 완료 (View에서 호출)
+    func saveMarkerEdit(index: Int, time: Int) {
+        communicationService.sendMarkerEditSuccess(index: index, time: time)
+        print("✅ ViewModel: 마커 \(index) 편집 완료 - 시간: \(time)")
+    }
+    
+    // MARK: - Music List Sync Actions (View 전용 Public 인터페이스)
+    
+    /// 음악 목록 동기화 요청 (View에서 호출)
+    func requestMusicList() {
+        communicationService.requestMusicList()
+        print("✅ ViewModel: 음악 목록 요청")
+    }
+    
+    /// 연결 상태 확인 (View에서 호출)
+    var isConnected: Bool {
+        communicationService.isReachable
+    }
+    
+    /// 안전한 음악 목록 동기화 (연결 상태 확인 후 요청)
+    func requestMusicListIfConnected() {
+        guard isConnected else {
+            print("⚠️ ViewModel: 워치 연결 안됨 - 동기화 건너뜀")
+            return
+        }
+        requestMusicList()
+    }
+}

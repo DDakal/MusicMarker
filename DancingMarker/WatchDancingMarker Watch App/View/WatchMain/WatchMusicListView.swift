@@ -83,7 +83,8 @@ struct WatchMusicListView: View {
     
     private func requestMusicListSync() {
         DispatchQueue.main.async {
-            viewModel.connectivityManager.sendRequireMusicListToIOS()
+            // ✅ 새로운 방식 - ViewModel의 깔끔한 인터페이스 사용
+            viewModel.requestMusicList()
             print("음악 목록 요청 - 현재 목록: \(viewModel.musicList)")
         }
     }
@@ -95,19 +96,20 @@ extension WatchMusicListView {
     func performInitialSync() async {
         print("🎯 앱 시작 - 초기 음악 목록 동기화")
         await syncMusicList()
-        hasInitialized = true  // ✅ 같은 파일이므로 접근 가능
+        hasInitialized = true
     }
     
     func syncMusicList() async {
-        guard viewModel.connectivityManager.isReachable else {
+        // ✅ 새로운 방식 - ViewModel의 깔끔한 인터페이스 사용
+        guard viewModel.isConnected else {
             print("⚠️ 워치 연결 안됨 - 동기화 건너뜀")
             return
         }
         
-        viewModel.connectivityManager.sendRequireMusicListToIOS()
+        viewModel.requestMusicList()
         
         try? await Task.sleep(nanoseconds: 500_000_000)
-        viewModel.connectivityManager.sendRequireMusicListToIOS()
+        viewModel.requestMusicList()
         
         print("✅ 음악 목록 동기화 요청 완료")
     }
