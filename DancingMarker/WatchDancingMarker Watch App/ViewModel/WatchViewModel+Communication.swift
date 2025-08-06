@@ -154,6 +154,28 @@ extension WatchViewModel {
         }
     }
     
+    // MARK: - Combined Playback Actions (View에서 호출)
+    
+    /// 뒤로 이동 + 동기화 조합 (View에서 호출)
+    func performBackward() async {
+        playBackward()
+        requestSyncWithDebounce()
+    }
+    
+    /// 앞으로 이동 + 동기화 조합 (View에서 호출)
+    func performForward() async {
+        playForward()
+        requestSyncWithDebounce()
+    }
+    
+    /// 재생 토글 + 동기화 조합 (View에서 호출)
+    func performPlayToggle() async -> Bool {
+        let wasPlaying = isPlaying
+        playToggle()
+        requestImmediateSync()
+        return !wasPlaying
+    }
+    
     // MARK: - Private Properties
     
     /// debounce를 위한 타이머

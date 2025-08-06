@@ -50,4 +50,26 @@ extension WatchViewModel {
     func forceFullSync() async {
         await syncService.forceFullSync()
     }
+    
+    // MARK: - View Lifecycle Methods (WatchMusicListView에서 사용)
+    
+    /// 앱이 활성화될 때 동기화 (WatchMusicListView.handleSceneActivation에서 호출)
+    func handleAppActivation() {
+        print("🔄 앱 활성화 - 동기화 시작")
+        requestMusicList()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.requestMusicList()
+        }
+    }
+    
+    /// 화면이 나타날 때 동기화 (WatchMusicListView.handleOnAppear에서 호출)
+    func handleViewAppear() {
+        print("🔄 화면 표시 - 동기화 시작")
+        requestMusicList()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.requestMusicList()
+        }
+    }
 }

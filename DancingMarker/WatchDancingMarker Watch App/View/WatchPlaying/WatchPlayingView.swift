@@ -30,14 +30,17 @@ struct WatchPlayingView: View {
             WatchPlaybackControls(
                 isPlaying: viewModel.isPlaying,
                 progress: viewModel.progress,
-                onBackward: {                    
-                    try await performBackward()
+                onBackward: {
+                    await viewModel.performBackward()
                 },
                 onPlayToggle: {
-                    await performPlayToggle()
+                    let newlyStarted = await viewModel.performPlayToggle()
+                    if newlyStarted {
+                        trackPlayEvent()  // UI 관련 로직은 View에서 OK
+                    }
                 },
                 onForward: {
-                    try await performForward()
+                    await viewModel.performForward()
                 }
             )
             
@@ -77,37 +80,17 @@ struct WatchPlayingView: View {
                 .background(Color.black)
         }
     }
-}
-
-// MARK: - Playback Actions Extension
-extension WatchPlayingView {
     
-    private func performBackward() async throws {
-        viewModel.playBackward()
-        viewModel.requestSyncWithDebounce()
-    }
-    
-    private func performForward() async throws {
-        viewModel.playForward()
-        viewModel.requestSyncWithDebounce()
-    }
-    
-    private func performPlayToggle() async {
-        let wasPlaying = viewModel.isPlaying
-        viewModel.playToggle()
-        viewModel.requestImmediateSync()
-        
-        if !wasPlaying {
-            trackPlayEvent()
-        }
-    }
+    // MARK: - UI Helper Methods (UI 관련만)
     
     private func trackPlayEvent() {
         print("📊 워치에서 노래 재생됨")
+        // Mixpanel 등 분석 도구 호출
     }
 }
 
 // MARK: - CircleProgressView
+
 struct CircleProgressView: View {
     var progress: Double
     
