@@ -9,7 +9,10 @@ import SwiftData
 
 class WatchViewModel: ObservableObject {
     
-    var connectivityManager: WatchConnectivityManager
+    // MARK: - Services
+    
+    private let communicationService: any WatchCommunicatable
+    var connectivityManager: WatchConnectivityManager  // 기존 코드 호환성을 위해 임시 유지
     @Published var musicTitle: String  = ""
     @Published var markers: [String] = ["99:59", "99:59", "99:59"]
     @Published var timeintervalMarkers: [TimeInterval] = [0.0, 0.0, 0.0]
@@ -33,6 +36,7 @@ class WatchViewModel: ObservableObject {
     
     init(connectivityManager: WatchConnectivityManager) {
         self.connectivityManager = connectivityManager
+        self.communicationService = WatchCommunicationService(connectivityManager: connectivityManager)
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(updateMarkers(_:)),
@@ -155,28 +159,30 @@ class WatchViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Communication Methods (Service 위임)
+    
     func playToggle() {
-        connectivityManager.sendPlayToggleToIOS()
+        communicationService.sendPlayToggle()
     }
     
     func playForward() {
-        connectivityManager.sendForwardToIOS()
+        communicationService.sendForward()
     }
     
     func playBackward() {
-        connectivityManager.sendBackwardToIOS()
+        communicationService.sendBackward()
     }
     
     func decreasePlaybackRate() {
-        connectivityManager.sendDecreasePlaybackToIOS()
+        communicationService.sendDecreasePlayback()
     }
     
     func increasePlaybackRate() {
-        connectivityManager.sendIncreasePlaybackToIOS()
+        communicationService.sendIncreasePlayback()
     }
     
     func originalPlaybckRate() {
-        connectivityManager.sendOriginalPlaybackToIOS()
+        communicationService.sendOriginalPlayback()
     }
     
     func requireMusicList() {
@@ -184,17 +190,17 @@ class WatchViewModel: ObservableObject {
     }
     
     func sendUUID(id: String) {
-        connectivityManager.sendUUIDPlayToIOS(id)
+        communicationService.sendMusicSelection(id)
         self.hasSelectedMusic = true
     }
     
     func deletemarker(index: Int){
-        connectivityManager.sendMarkerDeleteToIOS(index)
+        communicationService.sendMarkerDelete(at: index)
     }
     
     func changeVolume(){
         let volumeToSend = self.crownVolume / 60
-        connectivityManager.sendVolumeChangeToIOS(volumeToSend)
+        communicationService.sendVolumeChange(volumeToSend)
     }
     
     func handleCrownValueChange(_ newValue: Float) {
@@ -202,7 +208,7 @@ class WatchViewModel: ObservableObject {
         let threshold: Float = 0.05  // 변화 임계값
         if abs(newValue - lastSentCrownValue) >= threshold {
             let volumeToSend = self.crownVolume / 60
-            connectivityManager.sendVolumeChangeToIOS(volumeToSend)
+            communicationService.sendVolumeChange(volumeToSend)
             lastSentCrownValue = newValue  // 마지막 전송 값 업데이트
         }
     }
@@ -370,7 +376,7 @@ extension WatchViewModel {
     func requestImmediateSync() {
         print("🔄 워치: 즉시 상태 동기화 요청")
         DispatchQueue.main.async {
-            self.connectivityManager.sendRequireCurrentStateToIOS()
+            self.communicationService.requestCurrentState()
         }
     }
     
@@ -401,3 +407,34 @@ extension WatchViewModel {
 }
 
 private var debounceTimerKey: UInt8 = 0
+
+extension WatchViewModel {
+    
+    // MARK: - Marker Actions (View 전용 Public 인터페이스)
+    
+    /// 마커 저장 또는 재생 (View에서 호출)
+    func handleMarkerTap(at index: Int) {
+        if markers[index] == "99:59" {
+            saveMarker(at: index)
+        } else {
+            playMarker(at: index)
+        }
+    }
+    
+    /// 마커 저장 (View에서 호출)
+    func saveMarker(at index: Int) {
+        communicationService.sendMarkerSave(at: index)
+        print("✅ ViewModel: 마커 \(index) 저장 요청")
+    }
+    
+    /// 마커 재생 (View에서 호출)
+    func playMarker(at index: Int) {
+        communicationService.sendMarkerPlay(at: index)
+        print("✅ ViewModel: 마커 \(index) 재생 요청")
+    }
+    
+    /// 마커가 비어있는지 확인
+    func isMarkerEmpty(at index: Int) -> Bool {
+        return markers[index] == "99:59"
+    }
+}
