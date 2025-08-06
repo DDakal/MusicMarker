@@ -20,8 +20,9 @@ final class WatchTimerService: WatchTimerable {
     
     // MARK: - Initialization
     
-    init(syncService: any WatchSyncable) {
+    init(syncService: any WatchSyncable, delegate: WatchTimerDelegate? = nil) {
         self.syncService = syncService
+        self.delegate = delegate
     }
     
     // MARK: - Timer Control

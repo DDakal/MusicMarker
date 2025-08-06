@@ -79,18 +79,12 @@ extension WatchViewModel {
         }
     }
     
-    // MARK: - Data Update Handlers (iOS에서 받는 데이터 업데이트)
+    // MARK: - Data Update Handlers 
     
     private func handleUpdateMarkers(_ notification: Notification) {
         if let markers = notification.object as? [TimeInterval] {
             self.timeintervalMarkers = markers
-            for index in markers.indices {
-                if markers[index] != -1 {
-                    self.markers[index] = formattedTime(markers[index])
-                } else {
-                    self.markers[index] = "99:59"
-                }
-            }
+            self.markers = dataService.processMarkers(markers)
         }
     }
     
@@ -104,23 +98,21 @@ extension WatchViewModel {
         if let isPlaying = notification.object as? Bool {
             self.isPlaying = isPlaying
             
-            if isPlaying {
-                startTimer()
-            } else {
-                stopTimer()
-            }
+            timerService.syncTimerWithPlayingState(isPlaying: isPlaying)
         } else {
             print("❌ 워치: isPlaying 값 추출 실패")
             print("   - notification.object 타입: \(type(of: notification.object))")
         }
     }
-    
+        
     private func handleUpdatePlayingTimes(_ notification: Notification) {
         if let playingTimes = notification.object as? [TimeInterval] {
-            self.currentTime = playingTimes[0]
-            self.duration = playingTimes[1]
-            self.progress = self.currentTime / self.duration
-            self.formattedProgress = self.formattedTime(self.currentTime)
+            let processed = dataService.processPlayingTimes(playingTimes)
+            
+            self.currentTime = processed.currentTime
+            self.duration = processed.duration
+            self.progress = processed.progress
+            self.formattedProgress = processed.formattedProgress
             
             // duration > 0이면 음원이 로드된 상태
             if self.duration > 0 {
@@ -128,12 +120,11 @@ extension WatchViewModel {
             }
         }
     }
-    
+        
     private func handleUpdateMusicList(_ notification: Notification) {
         if let musics = notification.object as? [[String]] {
-            // UserDefaults를 초기화하고 새로운 musicList를 저장합니다.
-            UserDefaults.standard.clearMusicList()
-            UserDefaults.standard.saveMusicList(musics)
+            dataService.clearMusicList()
+            dataService.saveMusicList(musics)
             self.musicList = musics
             self.hasSelectedMusic = false
         }
@@ -155,10 +146,6 @@ extension WatchViewModel {
     
     /// 시간을 포맷팅합니다
     func formattedTime(_ time: TimeInterval) -> String {
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.minute, .second]
-        formatter.unitsStyle = .positional
-        formatter.zeroFormattingBehavior = [.pad]
-        return formatter.string(from: time)!
+        return dataService.formattedTime(time)
     }
-} 
+}

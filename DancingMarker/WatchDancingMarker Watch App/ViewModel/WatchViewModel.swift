@@ -10,10 +10,12 @@ import SwiftData
 
 class WatchViewModel: ObservableObject {
     
-    // MARK: - Services
+    // MARK: - Services (모든 Service 주입)
     
     internal let communicationService: any WatchCommunicatable
-    var connectivityManager: WatchConnectivityManager  // 기존 코드 호환성을 위해 임시 유지
+    internal let syncService: any WatchSyncable
+    internal let dataService: any WatchDataManageable  
+    internal let timerService: any WatchTimerable
     
     // MARK: - Published Properties (UI 상태만)
     
@@ -42,13 +44,19 @@ class WatchViewModel: ObservableObject {
     // MARK: - Initialization
     
     init(connectivityManager: WatchConnectivityManager) {
-        self.connectivityManager = connectivityManager
         self.communicationService = WatchCommunicationService(connectivityManager: connectivityManager)
+        self.syncService = WatchSyncService(connectivityManager: connectivityManager)
+        self.dataService = WatchDataService()
+        self.timerService = WatchTimerService(syncService: self.syncService)
         
         // UserDefaults에서 음악 목록 로드
-        self.musicList = UserDefaults.standard.getMusicList()
+        self.musicList = dataService.getMusicList()
         
-        // 초기화 작업 (Extension에서 구현)
+        if let timer = timerService as? WatchTimerService {
+            timer.delegate = self
+        }
+        
+        // 초기화 작업
         setupNotificationObservers()
     }
     
@@ -83,5 +91,28 @@ extension UserDefaults {
     
     func clearMusicList() {
         removeObject(forKey: Keys.musicList)
+    }
+}
+
+// MARK: - WatchTimerDelegate
+
+extension WatchViewModel: WatchTimerDelegate {
+    func timerDidUpdateTime() {
+        // 시간 업데이트 로직 (기존 updateTime 내용)
+        currentTime += 1
+        if currentTime >= duration {
+            currentTime = 0
+            timerService.stopTimer()
+            isPlaying = false
+            print("⏰ 재생 완료")
+        }
+        
+        progress = duration > 0 ? currentTime / duration : 0
+        formattedProgress = dataService.formattedTime(currentTime)
+    }
+    
+    func timerDidComplete() {
+        isPlaying = false
+        print("⏰ 타이머 완료")
     }
 }

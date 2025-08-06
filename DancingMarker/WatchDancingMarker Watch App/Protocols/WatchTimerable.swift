@@ -10,6 +10,9 @@ import Foundation
 /// 워치 타이머 관리를 담당하는 프로토콜
 protocol WatchTimerable {
     
+    // MARK: - Delegate
+    var delegate: WatchTimerDelegate? { get set }
+    
     // MARK: - Timer Control
     
     /// 타이머를 시작합니다
