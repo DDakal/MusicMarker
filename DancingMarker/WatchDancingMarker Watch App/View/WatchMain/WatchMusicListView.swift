@@ -27,7 +27,10 @@ struct WatchMusicListView: View {
                     if !viewModel.musicList.isEmpty && viewModel.hasSelectedMusic {
                         WatchPlayingIndicator(
                             isPlaying: viewModel.isPlaying,
-                            onTap: { navigationManager.push(to: .playing) }
+                            onTap: { 
+                                viewModel.requestImmediateSync()
+                                navigationManager.push(to: .playing) 
+                            }
                         )
                     }
                 }
