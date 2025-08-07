@@ -31,6 +31,16 @@
 		510D90312CA2F1C8002E82CC /* PlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510D902E2CA2F1C8002E82CC /* PlayingView.swift */; };
 		510D90322CA2F1C8002E82CC /* TipPopupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510D902F2CA2F1C8002E82CC /* TipPopupView.swift */; };
 		510D90352CA2F1C8002E82CC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510D90332CA2F1C8002E82CC /* ContentView.swift */; };
+		510FA4392E43AB2200287EAD /* WatchViewModel+Communication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510FA4382E43AB2200287EAD /* WatchViewModel+Communication.swift */; };
+		510FA43B2E43AB3A00287EAD /* WatchViewModel+Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510FA43A2E43AB3A00287EAD /* WatchViewModel+Data.swift */; };
+		510FA43D2E43AB8E00287EAD /* WatchViewModel+Sync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510FA43C2E43AB8E00287EAD /* WatchViewModel+Sync.swift */; };
+		510FA43F2E43ABB100287EAD /* WatchViewModel+Timer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510FA43E2E43ABB100287EAD /* WatchViewModel+Timer.swift */; };
+		510FA4412E43B52B00287EAD /* WatchSyncable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510FA4402E43B52B00287EAD /* WatchSyncable.swift */; };
+		510FA4432E43B54200287EAD /* WatchSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510FA4422E43B54200287EAD /* WatchSyncService.swift */; };
+		510FA4452E43B55500287EAD /* WatchDataManageable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510FA4442E43B55500287EAD /* WatchDataManageable.swift */; };
+		510FA4472E43B56500287EAD /* WatchDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510FA4462E43B56500287EAD /* WatchDataService.swift */; };
+		510FA4492E43B57900287EAD /* WatchTimerable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510FA4482E43B57900287EAD /* WatchTimerable.swift */; };
+		510FA44B2E43B59400287EAD /* WatchTimerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510FA44A2E43B59400287EAD /* WatchTimerService.swift */; };
 		512224C02D8C685E00AABC82 /* UIImage+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 512224BF2D8C685500AABC82 /* UIImage+.swift */; };
 		512224C22D8C68D100AABC82 /* SelectGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 512224C12D8C68C900AABC82 /* SelectGalleryView.swift */; };
 		512CED492DF08E59001A800B /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 512CED482DF08E59001A800B /* Errors.swift */; };
@@ -54,6 +64,8 @@
 		51447EF42E41E6EF00ED1669 /* WatchEmptyMusicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51447EF32E41E6EF00ED1669 /* WatchEmptyMusicView.swift */; };
 		51447EF62E41E70900ED1669 /* WatchMusicGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51447EF52E41E70900ED1669 /* WatchMusicGrid.swift */; };
 		51447EF82E41E74100ED1669 /* WatchPlayingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51447EF72E41E74100ED1669 /* WatchPlayingIndicator.swift */; };
+		5149F3A42E43A3EE00482C2A /* WatchCommunicatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5149F3A32E43A3EE00482C2A /* WatchCommunicatable.swift */; };
+		5149F3A62E43A40E00482C2A /* WatchCommunicationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5149F3A52E43A40E00482C2A /* WatchCommunicationService.swift */; };
 		514F1E2A2E3C9C2100690DB5 /* MusicInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E292E3C9C2100690DB5 /* MusicInfoView.swift */; };
 		514F1E2C2E3C9DD100690DB5 /* SpeedControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E2B2E3C9DD100690DB5 /* SpeedControlView.swift */; };
 		514F1E2E2E3C9E0400690DB5 /* PlaybackControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E2D2E3C9E0400690DB5 /* PlaybackControlsView.swift */; };
@@ -141,6 +153,16 @@
 		510D902E2CA2F1C8002E82CC /* PlayingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayingView.swift; sourceTree = "<group>"; };
 		510D902F2CA2F1C8002E82CC /* TipPopupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipPopupView.swift; sourceTree = "<group>"; };
 		510D90332CA2F1C8002E82CC /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		510FA4382E43AB2200287EAD /* WatchViewModel+Communication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WatchViewModel+Communication.swift"; sourceTree = "<group>"; };
+		510FA43A2E43AB3A00287EAD /* WatchViewModel+Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WatchViewModel+Data.swift"; sourceTree = "<group>"; };
+		510FA43C2E43AB8E00287EAD /* WatchViewModel+Sync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WatchViewModel+Sync.swift"; sourceTree = "<group>"; };
+		510FA43E2E43ABB100287EAD /* WatchViewModel+Timer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WatchViewModel+Timer.swift"; sourceTree = "<group>"; };
+		510FA4402E43B52B00287EAD /* WatchSyncable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSyncable.swift; sourceTree = "<group>"; };
+		510FA4422E43B54200287EAD /* WatchSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSyncService.swift; sourceTree = "<group>"; };
+		510FA4442E43B55500287EAD /* WatchDataManageable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchDataManageable.swift; sourceTree = "<group>"; };
+		510FA4462E43B56500287EAD /* WatchDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchDataService.swift; sourceTree = "<group>"; };
+		510FA4482E43B57900287EAD /* WatchTimerable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTimerable.swift; sourceTree = "<group>"; };
+		510FA44A2E43B59400287EAD /* WatchTimerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTimerService.swift; sourceTree = "<group>"; };
 		512224BF2D8C685500AABC82 /* UIImage+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+.swift"; sourceTree = "<group>"; };
 		512224C12D8C68C900AABC82 /* SelectGalleryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectGalleryView.swift; sourceTree = "<group>"; };
 		512CED482DF08E59001A800B /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
@@ -161,6 +183,8 @@
 		51447EF32E41E6EF00ED1669 /* WatchEmptyMusicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchEmptyMusicView.swift; sourceTree = "<group>"; };
 		51447EF52E41E70900ED1669 /* WatchMusicGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchMusicGrid.swift; sourceTree = "<group>"; };
 		51447EF72E41E74100ED1669 /* WatchPlayingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchPlayingIndicator.swift; sourceTree = "<group>"; };
+		5149F3A32E43A3EE00482C2A /* WatchCommunicatable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchCommunicatable.swift; sourceTree = "<group>"; };
+		5149F3A52E43A40E00482C2A /* WatchCommunicationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchCommunicationService.swift; sourceTree = "<group>"; };
 		514F1E292E3C9C2100690DB5 /* MusicInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicInfoView.swift; sourceTree = "<group>"; };
 		514F1E2B2E3C9DD100690DB5 /* SpeedControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedControlView.swift; sourceTree = "<group>"; };
 		514F1E2D2E3C9E0400690DB5 /* PlaybackControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackControlsView.swift; sourceTree = "<group>"; };
@@ -371,6 +395,28 @@
 			path = Components;
 			sourceTree = "<group>";
 		};
+		5149F3A12E43A1A100482C2A /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				5149F3A52E43A40E00482C2A /* WatchCommunicationService.swift */,
+				510FA4422E43B54200287EAD /* WatchSyncService.swift */,
+				510FA4462E43B56500287EAD /* WatchDataService.swift */,
+				510FA44A2E43B59400287EAD /* WatchTimerService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		5149F3A22E43A1C800482C2A /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				5149F3A32E43A3EE00482C2A /* WatchCommunicatable.swift */,
+				510FA4402E43B52B00287EAD /* WatchSyncable.swift */,
+				510FA4442E43B55500287EAD /* WatchDataManageable.swift */,
+				510FA4482E43B57900287EAD /* WatchTimerable.swift */,
+			);
+			path = Protocols;
+			sourceTree = "<group>";
+		};
 		514F1E282E3C9C0600690DB5 /* Components */ = {
 			isa = PBXGroup;
 			children = (
@@ -453,6 +499,10 @@
 			isa = PBXGroup;
 			children = (
 				902077052C458ABB00988D2B /* WatchViewModel.swift */,
+				510FA4382E43AB2200287EAD /* WatchViewModel+Communication.swift */,
+				510FA43A2E43AB3A00287EAD /* WatchViewModel+Data.swift */,
+				510FA43C2E43AB8E00287EAD /* WatchViewModel+Sync.swift */,
+				510FA43E2E43ABB100287EAD /* WatchViewModel+Timer.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -586,6 +636,8 @@
 		901BF9932C29809900C02FF9 /* WatchDancingMarker Watch App */ = {
 			isa = PBXGroup;
 			children = (
+				5149F3A22E43A1C800482C2A /* Protocols */,
+				5149F3A12E43A1A100482C2A /* Services */,
 				510D90152CA2F1A7002E82CC /* Application */,
 				1FA811842D53398B004B4807 /* Common */,
 				518D7F012CA2E1D700612544 /* ViewModel */,
@@ -805,22 +857,34 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				510FA4412E43B52B00287EAD /* WatchSyncable.swift in Sources */,
+				510FA43B2E43AB3A00287EAD /* WatchViewModel+Data.swift in Sources */,
+				510FA4492E43B57900287EAD /* WatchTimerable.swift in Sources */,
 				512CEE682DF12E06001A800B /* MusicData.swift in Sources */,
 				90A472322C450AB6008577A2 /* WCManager.swift in Sources */,
 				902077062C458ABB00988D2B /* WatchViewModel.swift in Sources */,
+				510FA43F2E43ABB100287EAD /* WatchViewModel+Timer.swift in Sources */,
 				51C107262E41ED9700999C0B /* WatchMusicTimeDisplay.swift in Sources */,
+				5149F3A62E43A40E00482C2A /* WatchCommunicationService.swift in Sources */,
 				1FA811892D534029004B4807 /* MarkerResetAlert.swift in Sources */,
 				510D90262CA2F1C0002E82CC /* WatchMusicListView.swift in Sources */,
 				51C107242E41ED6900999C0B /* WatchMusicInfoHeader.swift in Sources */,
+				510FA43D2E43AB8E00287EAD /* WatchViewModel+Sync.swift in Sources */,
+				510FA4452E43B55500287EAD /* WatchDataManageable.swift in Sources */,
 				51447EF62E41E70900ED1669 /* WatchMusicGrid.swift in Sources */,
 				51447EF42E41E6EF00ED1669 /* WatchEmptyMusicView.swift in Sources */,
 				512CED492DF08E59001A800B /* Errors.swift in Sources */,
+				510FA4392E43AB2200287EAD /* WatchViewModel+Communication.swift in Sources */,
 				510D901A2CA2F1C0002E82CC /* WatchMarkerDetailView.swift in Sources */,
 				510D901B2CA2F1C0002E82CC /* WatchMarkerEditView.swift in Sources */,
+				510FA4472E43B56500287EAD /* WatchDataService.swift in Sources */,
+				510FA4432E43B54200287EAD /* WatchSyncService.swift in Sources */,
 				510D901C2CA2F1C0002E82CC /* WatchMarkerListView.swift in Sources */,
+				510FA44B2E43B59400287EAD /* WatchTimerService.swift in Sources */,
 				5104B7F82C3D6C3F008E10E8 /* Music.swift in Sources */,
 				51447EF82E41E74100ED1669 /* WatchPlayingIndicator.swift in Sources */,
 				90A472312C450A68008577A2 /* WatchDancingMarkerApp.swift in Sources */,
+				5149F3A42E43A3EE00482C2A /* WatchCommunicatable.swift in Sources */,
 				517F19982E425A15000B721E /* MarkerSaveButton.swift in Sources */,
 				517F19962E4259DA000B721E /* MarkerTimeControl.swift in Sources */,
 				901BF9B62C2A533200C02FF9 /* WatchNavigationManager.swift in Sources */,

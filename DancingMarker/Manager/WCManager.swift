@@ -106,7 +106,6 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
         print("   - session.isReachable: \(session.isReachable)")
         print("   - session.activationState: \(session.activationState.rawValue)")
         
-        // ✅ 직접 처리하도록 변경
         switch action {
         case "SendRequireMusicList":
             print(" WCManager: 음악 목록 요청 수신")
@@ -550,7 +549,6 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
         }
     }
 
-    // ✅ triggerAutoSync 메서드 추가
     private func triggerAutoSync() {
         print("🎯 triggerAutoSync 호출됨")
         

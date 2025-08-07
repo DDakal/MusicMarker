@@ -27,7 +27,10 @@ struct WatchMusicListView: View {
                     if !viewModel.musicList.isEmpty && viewModel.hasSelectedMusic {
                         WatchPlayingIndicator(
                             isPlaying: viewModel.isPlaying,
-                            onTap: { navigationManager.push(to: .playing) }
+                            onTap: { 
+                                viewModel.requestImmediateSync()
+                                navigationManager.push(to: .playing) 
+                            }
                         )
                     }
                 }
@@ -42,79 +45,24 @@ struct WatchMusicListView: View {
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
-                handleSceneActivation()
+                viewModel.handleAppActivation()
             }
         }
         .onChange(of: afterOnAppear) { _, afterAppear in
             if afterAppear {
-                handleOnAppear()
+                viewModel.handleViewAppear()
+                afterOnAppear = false
             }
         }
     }
     
-    // MARK: - Event Handlers
+    // MARK: - Event Handlers 
     
     private func handleMusicTap(_ musicID: String) {
         DispatchQueue.main.async {
             viewModel.sendUUID(id: musicID)
             navigationManager.push(to: .playing)
         }
-    }
-    
-    private func handleSceneActivation() {
-        print("onActive")
-        requestMusicListSync()
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            requestMusicListSync()
-        }
-    }
-    
-    private func handleOnAppear() {
-        print("onAppear")
-        requestMusicListSync()
-        afterOnAppear = false
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            requestMusicListSync()
-            afterOnAppear = false
-        }
-    }
-    
-    private func requestMusicListSync() {
-        DispatchQueue.main.async {
-            viewModel.connectivityManager.sendRequireMusicListToIOS()
-            print("음악 목록 요청 - 현재 목록: \(viewModel.musicList)")
-        }
-    }
-}
-
-// MARK: - Sync Methods Extension
-extension WatchMusicListView {
-    
-    func performInitialSync() async {
-        print("🎯 앱 시작 - 초기 음악 목록 동기화")
-        await syncMusicList()
-        hasInitialized = true  // ✅ 같은 파일이므로 접근 가능
-    }
-    
-    func syncMusicList() async {
-        guard viewModel.connectivityManager.isReachable else {
-            print("⚠️ 워치 연결 안됨 - 동기화 건너뜀")
-            return
-        }
-        
-        viewModel.connectivityManager.sendRequireMusicListToIOS()
-        
-        try? await Task.sleep(nanoseconds: 500_000_000)
-        viewModel.connectivityManager.sendRequireMusicListToIOS()
-        
-        print("✅ 음악 목록 동기화 요청 완료")
-    }
-    
-    func syncMusicListOnAppear() async {
-        print("🎯 syncMusicListOnAppear 시작")
-        await viewModel.syncMusicListOnAppear()
     }
 }
 

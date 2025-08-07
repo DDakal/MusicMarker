@@ -96,7 +96,8 @@ extension WatchMarkerEditView {
     // MARK: - Action Handlers
     
     func handleSave(_ finalTime: Int) {
-        viewModel.connectivityManager.sendMarkerEditSuccessToIOS(forEdit: [index, finalTime])
+        // ✅ 새로운 방식 - ViewModel의 깔끔한 인터페이스 사용
+        viewModel.saveMarkerEdit(index: index, time: finalTime)
         dismiss()
         navigationPath.removeLast(navigationPath.count)
     }
