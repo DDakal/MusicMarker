@@ -37,11 +37,13 @@ struct AlbumArtEditor: View {
                 isImagePickerPresented = true
             }
             .font(.caption)
+            .bold()
             .foregroundStyle(.markerPurple)
-            .underline(true, color: .markerPurple)
-            .buttonStyle(.plain)
+            .buttonStyle(.borderedProminent)
+            // TODO: 피드백 받고 지우기
+            //.tint(.inactiveGray)
         }
-        .padding(.top, 67)
-        .padding(.bottom, 43)
+        .padding(.top, 37)
+        .padding(.bottom, 33)
     }
 }
