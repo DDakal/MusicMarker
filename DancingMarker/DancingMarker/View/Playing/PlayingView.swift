@@ -46,19 +46,28 @@ struct PlayingView: View {
         .padding(.horizontal, 16)
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle("")
-        .navigationBarBackButtonHidden(true)
         .enableSwipeBack()
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                HStack {
-                    Image(systemName: "chevron.left")
-                        .bold()
-                    Text("Local_Back")
-                }
-                .foregroundStyle(.accent)
-                .onTapGesture {
-                    navigationManager.pop()
-                }
+                .apply { view in
+            if #available(iOS 26.0, *) {
+                // ✅ iOS 26: 기본 뒤로가기 버튼 사용 (자동 Liquid Glass)
+                view
+            } else {
+                // ✅ iOS 18 이하: 커스텀 뒤로가기 버튼 유지
+                view
+                    .navigationBarBackButtonHidden(true)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            HStack {
+                                Image(systemName: "chevron.left")
+                                    .bold()
+                                Text("Local_Back")
+                            }
+                            .foregroundStyle(.accent)
+                            .onTapGesture {
+                                navigationManager.pop()
+                            }
+                        }
+                    }
             }
         }
     }
