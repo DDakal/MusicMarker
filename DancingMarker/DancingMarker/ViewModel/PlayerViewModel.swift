@@ -277,6 +277,9 @@ extension PlayerViewModel {
                 
                 print("✅ UI에서 음원 편집 완료: \(updatedMusicData.title)")
             }
+            
+            await sendMusicListToWatch()
+            
         } catch {
             print("❌ UI 음원 편집 저장 실패: \(error.localizedDescription)")
         }
