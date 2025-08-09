@@ -15,8 +15,6 @@ struct MusicListView: View {
     
     @Query var musicList: [Music] = []
     @State private var isFileImporterPresented: Bool = false
-    @State private var musicToEdit: Music? = nil
-    @State private var isEditSheetPresented: Bool = false
     
     var body: some View {
         VStack {
@@ -38,9 +36,12 @@ struct MusicListView: View {
         ) { result in
             handleFileImportResult(result)
         }
-        .sheet(isPresented: $isEditSheetPresented, onDismiss: {
-            musicToEdit = nil
-        }) {
+        .sheet(
+            isPresented: $playerViewModel.isEditSheetPresented,
+            onDismiss: {
+                playerViewModel.dismissMusicEditSheet()
+            }
+        ) {
             musicEditSheet
         }
         .edgesIgnoringSafeArea(.bottom)
@@ -78,7 +79,8 @@ struct MusicListView: View {
                     }
                 },
                 onEdit: {
-                    editMusic(music) // ✅ 수정됨
+                    // ✅ PlayerViewModel의 책임으로 위임
+                    playerViewModel.presentMusicEditSheet(for: music)
                 },
                 onDelete: {
                     Task {
@@ -121,20 +123,25 @@ struct MusicListView: View {
         }
     }
     
+    // ✅ 안전한 시트 렌더링 (옵셔널 바인딩으로 nil 방지)
+    @ViewBuilder
     private var musicEditSheet: some View {
         NavigationStack {
-            if let music = musicToEdit {
-                MusicEditView(music: music, didSaveMusic: .constant(false))
+            if let music = playerViewModel.musicToEdit {
+                MusicEditView(
+                    music: music,
+                    didSaveMusic: .constant(false)
+                )
+            } else {
+                // ✅ 로딩 fallback (거의 발생하지 않음)
+                ProgressView("Loading...")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.editViewBGBlack)
             }
         }
     }
     
     // MARK: - Private Methods
-    
-    private func editMusic(_ music: Music) {
-        musicToEdit = music
-        isEditSheetPresented = true
-    }
     
     private func handleFileImportResult(_ result: Result<[URL], Error>) {
         switch result {
