@@ -113,7 +113,7 @@ extension TextMarquee {
             artistContentWidth = measureTextWidth(artist, font: artistFont)
             
             // 애니메이션이 필요한지 체크 (약간의 여유를 두고)
-            let threshold = availableWidth - 10
+            let threshold = availableWidth - 6
             shouldAnimateTitle = titleContentWidth > threshold
             shouldAnimateArtist = artistContentWidth > threshold
             
