@@ -90,20 +90,4 @@ extension View {
             }
         }
     }
-    
-    /// 편집 버튼용 Glass 스타일 (Change Cover Image 등)
-    @ViewBuilder
-    func editButtonGlassStyle() -> some View {
-        self.apply {
-            if #available(iOS 26.0, *) {
-                $0.buttonStyle(.glass)
-                  .foregroundStyle(.accent)
-            } else {
-                $0.font(.caption)
-                  .foregroundStyle(.markerPurple)
-                  .underline(true, color: .markerPurple)
-                  .buttonStyle(.plain)
-            }
-        }
-    }
 }
