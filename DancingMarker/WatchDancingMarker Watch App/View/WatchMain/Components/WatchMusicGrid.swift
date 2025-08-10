@@ -11,23 +11,18 @@ struct WatchMusicGrid: View {
     let musicList: [[String]]
     let onMusicTap: (String) -> Void
     
-    private let columns = [GridItem(.flexible())]
-    
     var body: some View {
-        ScrollView {
-            LazyVGrid(columns: columns) {
-                ForEach(musicList.indices, id: \.self) { index in
-                    if musicList[index][0] != "" {
-                        WatchMusicGridItem(
-                            title: musicList[index][0],
-                            onTap: {
-                                onMusicTap(musicList[index][1])
-                            }
-                        )
-                    }
+        List {
+            ForEach(musicList.indices, id: \.self) { index in
+                if !musicList[index][0].isEmpty {
+                    WatchMusicGridItem(
+                        title: musicList[index][0],
+                        onTap: { onMusicTap(musicList[index][1]) }
+                    )
                 }
             }
         }
+        .listStyle(.carousel)
     }
 }
 
