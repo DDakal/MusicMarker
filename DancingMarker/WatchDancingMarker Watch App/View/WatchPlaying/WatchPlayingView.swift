@@ -1,7 +1,6 @@
-
 import SwiftUI
 import SwiftData
-import Mixpanel
+// import Mixpanel  // ❌ 제거 - watchOS에 없음
 
 struct WatchPlayingView: View {
     
@@ -11,141 +10,88 @@ struct WatchPlayingView: View {
     @Query var musicList: [Music] = []
     
     @State var showMarkerListOverlay: Bool = false
-    
-    @State var progress: Double = 0.25 // 현재 진행 상황을 나타내는 변수
+    @State var progress: Double = 0.25  
     @State private var isIdle = true
     
     var body: some View {
         VStack {
+            // 음악 제목
+            WatchMusicInfoHeader(musicTitle: viewModel.musicTitle)
+            
+            // 마커/스피드 TabView
             HStack {
-                Text("\(viewModel.musicTitle)")
-                    .font(.system(size: 12, weight: .regular))
-                    .fixedSize()
-            }
-            HStack {
-                TabView{
+                TabView {
                     WatchPlayingMarkerView()
                     WatchPlayingSpeedView()
                 }
             }
             
-            HStack{
-                Spacer()
-                
-                Circle()
-                    .fill(.gray.opacity(0.2))
-                    .cornerRadius(4)
-                    .frame(height: 35)
-                    .overlay(
-                        Button {
-                            viewModel.playBackward()
-                        } label: {
-                            Image(systemName: "gobackward.5")
-                                .resizable()
-                                .frame(width: 20, height: 21)
-                        }
-                        .frame(width: 34, height: 35)
-                        .buttonStyle(PlainButtonStyle())
-                    )
-                
-                Spacer()
-                
-                ZStack {
-                    Circle()
-                        .fill(.gray.opacity(0.2))
-                        .frame(height: 44)
-                        .overlay(
-                            Button {
-                                viewModel.playToggle()
-                                if viewModel.isPlaying != true {
-                                    playMixpanelMarker()
-                                }
-                            } label: {
-                                // 재생 on/off에 따라 이미지 변경
-                                Image(systemName: viewModel.isPlaying == true ? "pause.fill" : "play.fill")
-                                .resizable()
-                                .frame(width: 18, height: 18)
-                            }
-                            .frame(width: 44, height: 44)
-                            .buttonBorderShape(.circle)
-                            .buttonStyle(PlainButtonStyle())
-                        )
-                    CircleProgressView(progress: viewModel.progress) // 현재 노래의 길이를 value로 바꿔서 주면됨.
-                        .frame(width: 42, height: 42)
+            // 재생 컨트롤
+            WatchPlaybackControls(
+                isPlaying: viewModel.isPlaying,
+                progress: viewModel.progress,
+                onBackward: {
+                    await viewModel.performBackward()
+                },
+                onPlayToggle: {
+                    let newlyStarted = await viewModel.performPlayToggle()
+                    if newlyStarted {
+                        trackPlayEvent()  // UI 관련 로직은 View에서 OK
+                    }
+                },
+                onForward: {
+                    await viewModel.performForward()
                 }
-                
-                Spacer()
-                
-                Circle()
-                    .fill(.gray.opacity(0.2))
-                    .cornerRadius(4)
-                    .frame(height: 35)
-                    .overlay(
-                        Button {
-                            viewModel.playForward()
-                        } label: {
-                            Image(systemName: "goforward.5")
-                                .resizable()
-                                .frame(width: 20, height: 21)
-                        }
-                        .frame(width: 34, height: 35)
-                        .buttonStyle(PlainButtonStyle())
-                    )
-                Spacer()
-            }
+            )
             
-            HStack {
-                Text(viewModel.formattedProgress) // 현재 재생시간 데이터 넣어주기
-                    .font(.system(size: 10, weight: .light))
-                    .fixedSize()
-            }
-            .padding(.bottom, 10)
+            // 현재 시간 표시
+            WatchMusicTimeDisplay(formattedTime: viewModel.formattedProgress)
         }
         .focusable(true)
         .edgesIgnoringSafeArea(.bottom)
         .navigationBarBackButtonHidden(true)
         .scrollIndicators(.hidden)
-        .digitalCrownRotation(detent: $viewModel.crownVolume, from: 0, through: 60, by: 3, sensitivity: .low, isContinuous: false, isHapticFeedbackEnabled: true
+        .digitalCrownRotation(
+            detent: $viewModel.crownVolume,
+            from: 0, through: 60, by: 3,
+            sensitivity: .low,
+            isContinuous: false,
+            isHapticFeedbackEnabled: true
         )
-        .onChange(of: viewModel.crownVolume) { oldValue, newValue in
+        .onChange(of: viewModel.crownVolume) { _, newValue in
             viewModel.handleCrownValueChange(newValue)
         }
         .toolbar {
-            ToolbarItem(placement: .topBarLeading){
-                Button {
-                    dismiss()
-                } label: {
+            ToolbarItem(placement: .topBarLeading) {
+                Button(action: { dismiss() }) {
                     Image(systemName: "chevron.left")
                         .foregroundStyle(.accent)
                 }
             }
-            ToolbarItem(placement: .topBarTrailing){
-                Button {
-                    showMarkerListOverlay = true
-                } label: {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: { showMarkerListOverlay = true }) {
                     Image(systemName: "list.bullet")
                         .foregroundStyle(.accent)
                 }
             }
         }
-        .fullScreenCover(isPresented: $showMarkerListOverlay, content: {
+        .fullScreenCover(isPresented: $showMarkerListOverlay) {
             WatchMarkerListView()
-                .background {
-                    Color.black
-                }
-        })
+                .background(Color.black)
+        }
     }
     
-    private func playMixpanelMarker() {
-        Mixpanel.mainInstance().track(event: "노래 재생")
-        Mixpanel.mainInstance().people.increment(property: "playMusic", by: 1)
+    // MARK: - UI Helper Methods (UI 관련만)
+    
+    private func trackPlayEvent() {
+        print("📊 워치에서 노래 재생됨")
+        // Mixpanel 등 분석 도구 호출
     }
 }
 
-// MARK: 재생 버튼 ProgressBar
+// MARK: - CircleProgressView
+
 struct CircleProgressView: View {
-    
-    //    @Binding var progress: Double
     var progress: Double
     
     var body: some View {

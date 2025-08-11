@@ -88,6 +88,7 @@ struct WatchMarkerListCellView: View {
             .italic()
     }
     
+    // TODO: - 중복, 기능 분리 필요 mvvm
     private func formattedTime(_ time: TimeInterval) -> String {
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.minute, .second]

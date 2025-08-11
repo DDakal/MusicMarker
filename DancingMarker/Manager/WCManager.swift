@@ -106,7 +106,6 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
         print("   - session.isReachable: \(session.isReachable)")
         print("   - session.activationState: \(session.activationState.rawValue)")
         
-        // ✅ 직접 처리하도록 변경
         switch action {
         case "SendRequireMusicList":
             print(" WCManager: 음악 목록 요청 수신")
@@ -174,6 +173,12 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
                 print("📥 WCManager: MarkerEditSuccess 수신 - 인덱스: \(forEdit[0]), 시간: \(forEdit[1])")
                 NotificationCenter.default.post(name: .markerEditSuccess, object: forEdit)
             }
+            replyHandler(["success": true])
+            
+        case "SendRequireCurrentState":
+            print("🔄 WCManager: 워치에서 현재 상태 즉시 요청 수신")
+            // PlayerViewModel에 즉시 상태 전송 요청
+            NotificationCenter.default.post(name: .requireCurrentState, object: nil)
             replyHandler(["success": true])
             
         default:
@@ -451,6 +456,18 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
             print(error.localizedDescription)
         }
     }
+    
+    func sendRequireCurrentStateToIOS() {
+        let message = ["action": "SendRequireCurrentState"]
+        
+        print("📤 워치: iOS에 현재 상태 요청 전송")
+        session.sendMessage(message) { replyHandler in
+            print("✅ 워치: 현재 상태 요청 성공")
+            print("   - 응답: \(replyHandler)")
+        } errorHandler: { error in
+            print("❌ 워치: 현재 상태 요청 실패: \(error.localizedDescription)")
+        }
+    }
     #endif
     
     // MARK: - Common Methods (Both iOS and watchOS)
@@ -532,7 +549,6 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
         }
     }
 
-    // ✅ triggerAutoSync 메서드 추가
     private func triggerAutoSync() {
         print("🎯 triggerAutoSync 호출됨")
         
@@ -650,6 +666,6 @@ extension Notification.Name {
     static let sendMusicTitle = Notification.Name("SendMusicTitle")
     static let sendSystemVolume = Notification.Name("SendSystemVolume")
     
-    // ✅ 새로운 알림 추가
     static let triggerAutoSync = Notification.Name("TriggerAutoSync")
+    static let requireCurrentState = Notification.Name("SendRequireCurrentState")
 }
