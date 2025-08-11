@@ -40,8 +40,7 @@ struct AlbumArtEditor: View {
             .bold()
             .foregroundStyle(.markerPurple)
             .buttonStyle(.borderedProminent)
-            // TODO: 피드백 받고 지우기
-            //.tint(.inactiveGray)
+            .tint(.editViewAlbumGray)
         }
         .padding(.top, 37)
         .padding(.bottom, 33)
