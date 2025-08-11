@@ -37,9 +37,10 @@ struct AlbumArtEditor: View {
                 isImagePickerPresented = true
             }
             .font(.caption)
+            .bold()
             .foregroundStyle(.markerPurple)
-            .underline(true, color: .markerPurple)
-            .buttonStyle(.plain)
+            .buttonStyle(.borderedProminent)
+            .tint(.editViewAlbumGray)
         }
         .padding(.top, 67)
         .padding(.bottom, 43)
