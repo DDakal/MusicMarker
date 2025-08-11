@@ -54,6 +54,10 @@ final class PlayerViewModel: ObservableObject {
     @Published var isEditingMarker: Bool = false
     @Published var editingMarkerIndex: Int?
     
+    // 음악 편집 시트 상태 관리
+    @Published var musicToEdit: Music?
+    @Published var isEditSheetPresented: Bool = false
+    
     // 기타
     @Published var countNum: Int = 0
     
@@ -526,5 +530,48 @@ extension PlayerViewModel {
         
         // 포맷된 시간 업데이트
         formattedProgress = formattedTime(currentTime)
+    }
+}
+
+// MARK: - UI State Management (MusicList 관련)
+
+extension PlayerViewModel {
+    
+    // MARK: - UI Actions for MusicList
+    
+    /// 음악 편집 시트 표시 (타이밍 이슈 해결)
+    public func presentMusicEditSheet(for music: Music) {
+        musicToEdit = music
+        isEditSheetPresented = true
+    }
+    
+    /// 음악 편집 시트 닫기
+    public func dismissMusicEditSheet() {
+        isEditSheetPresented = false
+        
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 300_000_000) // 0.3초
+            musicToEdit = nil
+        }
+    }
+    
+    /// 음악 편집 저장 후 시트 자동 닫기 (기존 메서드 확장)
+    public func saveMusicEditAndDismiss(
+        music: Music,
+        title: String,
+        artist: String,
+        albumArt: UIImage?,
+        hasChanges: Bool
+    ) async {
+        
+        guard !title.isEmpty && !artist.isEmpty && hasChanges else {
+            print("❌ 저장 조건 미충족: title=\(title.isEmpty), artist=\(artist.isEmpty), hasChanges=\(hasChanges)")
+            return
+        }
+
+        await saveMusicEdit(music: music, title: title, artist: artist, albumArt: albumArt)
+        await MainActor.run {
+            dismissMusicEditSheet()
+        }
     }
 }
