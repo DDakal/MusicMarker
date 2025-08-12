@@ -54,7 +54,7 @@ final class PlayerViewModel: ObservableObject {
     @Published var isEditingMarker: Bool = false
     @Published var editingMarkerIndex: Int?
     
-    // 음악 편집 시트 상태 관리 (메인 클래스에 추가)
+    // 음악 편집 시트 상태 관리
     @Published var musicToEdit: Music?
     @Published var isEditSheetPresented: Bool = false
     

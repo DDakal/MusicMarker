@@ -98,8 +98,8 @@ struct TextMarquee: View {
                 // 화면 너비에 맞게 텍스트 길이 체크
                 checkIfShouldAnimate(geo.size.width)
             }
-            .onChange(of: title) { _ in resetAndCheckAnimation(geo.size.width) }
-            .onChange(of: artist) { _ in resetAndCheckAnimation(geo.size.width) }
+            .onChange(of: title) { resetAndCheckAnimation(geo.size.width) }
+            .onChange(of: artist) { resetAndCheckAnimation(geo.size.width) }
         }
     }
 }

@@ -79,7 +79,6 @@ struct MusicListView: View {
                     }
                 },
                 onEdit: {
-                    // ✅ PlayerViewModel의 책임으로 위임
                     playerViewModel.presentMusicEditSheet(for: music)
                 },
                 onDelete: {
@@ -123,7 +122,6 @@ struct MusicListView: View {
         }
     }
     
-    // ✅ 안전한 시트 렌더링 (옵셔널 바인딩으로 nil 방지)
     @ViewBuilder
     private var musicEditSheet: some View {
         NavigationStack {
@@ -133,7 +131,6 @@ struct MusicListView: View {
                     didSaveMusic: .constant(false)
                 )
             } else {
-                // ✅ 로딩 fallback (거의 발생하지 않음)
                 ProgressView("Loading...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(Color.editViewBGBlack)
