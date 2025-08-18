@@ -47,6 +47,10 @@ final class LiveActivityService: ControlCenterManageable {
             nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = info.currentTime
             nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = info.isPlaying ? info.playbackRate : 0.0
             
+            // URL Scheme 설정 - Control Center에서 앱으로 이동할 수 있도록
+            nowPlayingInfo[MPNowPlayingInfoPropertyDefaultPlaybackRate] = 1.0
+            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackProgress] = info.currentTime / info.duration
+            
             // 앨범 아트 설정
             if let albumArtData = info.albumArtData,
                let albumArt = UIImage(data: albumArtData) {
@@ -199,8 +203,6 @@ final class LiveActivityService: ControlCenterManageable {
         remoteCommandCenter.nextTrackCommand.removeTarget(nil)
         remoteCommandCenter.previousTrackCommand.removeTarget(nil)
         
-        // ✅ handler는 nil로 만들지 않음 (계속 유지)
-        // remoteControlHandler = nil
         
         print("🧹 Remote Command 비활성화 완료 (handler는 유지)")
     }

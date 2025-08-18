@@ -99,6 +99,9 @@ final class PlayerViewModel: ObservableObject {
         formatter.unitsStyle = .positional
         formatter.zeroFormattingBehavior = [.pad]
         
+        // 앱 포그라운드 전환 감지 설정
+        setupAppForegroundObserver()
+        
         // 초기화 작업
         setupServiceObservation()
         
@@ -578,3 +581,52 @@ extension PlayerViewModel {
         }
     }
 }
+
+// MARK: - URL Navigation Support
+
+extension PlayerViewModel {
+    
+    /// URL을 통해 PlayingView로 이동 (재생 상태 유지)
+    func handleURLNavigationToPlaying() {
+        print(" URL 네비게이션: PlayingView로 이동")
+        
+        // 현재 재생 중인 음원이 있는지 확인
+        guard currentMusic != nil else {
+            print("❌ URL 네비게이션: 현재 재생 중인 음원이 없음")
+            return
+        }
+        
+        // NavigationManager에 알림 (재생 상태는 그대로 유지)
+        NotificationCenter.default.post(
+            name: .navigateToPlayingFromURL,
+            object: nil
+        )
+    }
+    
+    // MARK: - App Foreground Observer
+
+    private func setupAppForegroundObserver() {
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.willEnterForegroundNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handleAppWillEnterForeground()
+        }
+    }
+
+    private func handleAppWillEnterForeground() {
+        // 현재 음원이 있고, 재생/일시정지 상태와 관계없이 PlayingView로 이동
+        if currentMusic != nil {
+            print("🎵 앱이 포그라운드로 전환됨, 현재 음원이 있음 (재생 상태: \(isPlaying))")
+            
+            // 약간의 지연 후 네비게이션 처리 (UI가 준비될 시간을 줌)
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 500_000_000) // 0.5초
+                handleURLNavigationToPlaying()
+            }
+        }
+    }
+
+}
+
