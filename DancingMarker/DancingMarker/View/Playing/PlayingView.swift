@@ -47,7 +47,7 @@ struct PlayingView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle("")
         .enableSwipeBack()
-                .apply { view in
+        .apply { view in
             if #available(iOS 26.0, *) {
                 // ✅ iOS 26: 기본 뒤로가기 버튼 사용 (자동 Liquid Glass)
                 view
