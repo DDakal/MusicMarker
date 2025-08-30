@@ -59,16 +59,6 @@ extension PlayerViewModel {
                 }
             }
             .store(in: &cancellables)
-        
-        // MarkerService의 editingMarker 변경 구독
-        if let markerServiceObject = markerService as? MarkerService {
-            markerServiceObject.$editingMarker
-                .receive(on: DispatchQueue.main)
-                .sink { [weak self] _ in
-                    self?.objectWillChange.send()
-                }
-                .store(in: &cancellables)
-        }
     }
     
     /// AudioService의 재생 상태 변경 처리

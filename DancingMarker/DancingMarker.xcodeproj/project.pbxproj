@@ -74,7 +74,6 @@
 		514F1E322E3C9FBD00690DB5 /* TipButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E312E3C9FBD00690DB5 /* TipButtonView.swift */; };
 		514F1E342E3C9FE200690DB5 /* AddMarkerButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E332E3C9FE200690DB5 /* AddMarkerButton.swift */; };
 		514F1E362E3C9FFE00690DB5 /* MarkerButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E352E3C9FFE00690DB5 /* MarkerButton.swift */; };
-		514F1E382E3CA04C00690DB5 /* EditMarkerButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E372E3CA04C00690DB5 /* EditMarkerButton.swift */; };
 		514F1E3A2E3CA06600690DB5 /* MarkerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E392E3CA06600690DB5 /* MarkerListView.swift */; };
 		514F1E3E2E3CB52000690DB5 /* AlbumArtEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E3D2E3CB52000690DB5 /* AlbumArtEditor.swift */; };
 		514F1E402E3CB55D00690DB5 /* MusicTextFiedlEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514F1E3F2E3CB55D00690DB5 /* MusicTextFiedlEditor.swift */; };
@@ -194,7 +193,6 @@
 		514F1E312E3C9FBD00690DB5 /* TipButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipButtonView.swift; sourceTree = "<group>"; };
 		514F1E332E3C9FE200690DB5 /* AddMarkerButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMarkerButton.swift; sourceTree = "<group>"; };
 		514F1E352E3C9FFE00690DB5 /* MarkerButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkerButton.swift; sourceTree = "<group>"; };
-		514F1E372E3CA04C00690DB5 /* EditMarkerButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditMarkerButton.swift; sourceTree = "<group>"; };
 		514F1E392E3CA06600690DB5 /* MarkerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkerListView.swift; sourceTree = "<group>"; };
 		514F1E3D2E3CB52000690DB5 /* AlbumArtEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumArtEditor.swift; sourceTree = "<group>"; };
 		514F1E3F2E3CB55D00690DB5 /* MusicTextFiedlEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicTextFiedlEditor.swift; sourceTree = "<group>"; };
@@ -431,7 +429,6 @@
 				514F1E312E3C9FBD00690DB5 /* TipButtonView.swift */,
 				514F1E332E3C9FE200690DB5 /* AddMarkerButton.swift */,
 				514F1E352E3C9FFE00690DB5 /* MarkerButton.swift */,
-				514F1E372E3CA04C00690DB5 /* EditMarkerButton.swift */,
 				514F1E392E3CA06600690DB5 /* MarkerListView.swift */,
 			);
 			path = Components;
@@ -824,7 +821,6 @@
 				5131FFF52E0640540049E281 /* PlayerViewModel+LiveActivity.swift in Sources */,
 				514F1E422E3CB58200690DB5 /* SaveButton.swift in Sources */,
 				51CD43CA2DFB327900BC8EDF /* PlayerViewModel.swift in Sources */,
-				514F1E382E3CA04C00690DB5 /* EditMarkerButton.swift in Sources */,
 				51CD44D72DFB3B6A00BC8EDF /* PlayerViewModel+Timer.swift in Sources */,
 				514F1E482E3CC12400690DB5 /* URL+Unique.swift in Sources */,
 				512CED4A2DF08E59001A800B /* Errors.swift in Sources */,
