@@ -31,7 +31,7 @@ struct PlayingView: View {
             
             // 진행률 슬라이더
             ProgressSliderView()
-            .padding(.bottom, 40)
+                .padding(.bottom, 40)
             
             // 재생 제어 버튼들
             PlaybackControlsView(

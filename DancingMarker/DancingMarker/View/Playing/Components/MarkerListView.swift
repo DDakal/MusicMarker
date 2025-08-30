@@ -16,8 +16,7 @@ struct MarkerListView: View {
                 Text("Local_MarkerList")
                     .font(.headline)
                 Spacer()
-                
-                TipButtonView()
+
             }
             
             VStack(spacing: 16) {
