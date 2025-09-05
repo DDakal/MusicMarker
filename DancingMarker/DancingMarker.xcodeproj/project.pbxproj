@@ -1109,7 +1109,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "WatchDancingMarker-Watch-App-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = WatchDancingMarker;
+				INFOPLIST_KEY_CFBundleDisplayName = "Music Marker";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.test.DancingMarker;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
@@ -1142,7 +1142,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "WatchDancingMarker-Watch-App-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = WatchDancingMarker;
+				INFOPLIST_KEY_CFBundleDisplayName = "Music Marker";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.test.DancingMarker;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
