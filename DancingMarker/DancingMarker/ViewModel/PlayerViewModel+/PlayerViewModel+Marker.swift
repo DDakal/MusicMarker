@@ -107,30 +107,6 @@ extension PlayerViewModel {
         }
     }
     
-    /// 마커를 편집합니다
-    /// - Parameters:
-    ///   - index: 마커 인덱스
-    ///   - newTime: 새로운 시간
-    func editMarker(at index: Int, to newTime: TimeInterval) async {
-        do {
-            try await markerService.editMarker(at: index, to: newTime)
-            
-            // PlayerViewModel의 마커 배열 동기화
-            await updateMarkersFromService()
-            
-            // 현재 음악의 마커 업데이트
-            try await updateCurrentMusicMarkers()
-            
-            // 워치에 마커 정보 전송
-            await sendMarkersToWatch()
-            
-            print("마커 \(index + 1) 편집됨: \(formattedTime(newTime))")
-            
-        } catch {
-            print("마커 편집 실패: \(error)")
-        }
-    }
-    
     /// 모든 마커를 초기화합니다
     func clearAllMarkers() async {
         do {
@@ -150,101 +126,6 @@ extension PlayerViewModel {
         } catch {
             print("마커 초기화 실패: \(error)")
         }
-    }
-    
-    // MARK: - Marker Editing Support
-    
-    /// 마커 편집 모드를 시작합니다
-    /// - Parameter index: 편집할 마커 인덱스
-    func startMarkerEditing(at index: Int) {
-        markerService.startEditing(at: index)
-        isEditingMarker = true
-        editingMarkerIndex = index
-        
-        print("마커 \(index + 1) 편집 모드 시작")
-    }
-    
-    /// 마커 편집 모드를 종료합니다
-    func stopMarkerEditing() {
-        markerService.stopEditing()
-        isEditingMarker = false
-        editingMarkerIndex = nil
-        
-        print("마커 편집 모드 종료")
-    }
-    
-    /// 편집 중인 마커를 저장합니다
-    func saveEditingMarker() async {
-        do {
-            // ✅ MarkerService의 실제 메서드 사용
-            try await markerService.saveEditingMarker()
-            
-            // 편집 모드 종료
-            stopMarkerEditing()
-            
-            // PlayerViewModel의 마커 배열 동기화
-            await updateMarkersFromService()
-            
-            // 현재 음악의 마커 업데이트
-            try await updateCurrentMusicMarkers()
-            
-            // 워치에 마커 정보 전송
-            await sendMarkersToWatch()
-            
-            print("편집 중인 마커 저장됨")
-            
-        } catch {
-            print("편집 마커 저장 실패: \(error)")
-        }
-    }
-    
-    // MARK: - UI Helper Methods (PlayingView에서 사용)
-    
-    /// 편집 중인 마커의 시간을 1초 감소시킵니다 (유효성 검사 포함)
-    func decreaseEditingMarkerTime() {
-        guard canDecreaseEditingMarker else {
-            print("⚠️ 마커 편집 시간을 더 이상 감소시킬 수 없습니다")
-            return
-        }
-        
-        markerService.decreaseEditingTime()
-        print("마커 편집 시간 1초 감소: \(formattedTime(currentEditingTime ?? 0))")
-    }
-    
-    /// 편집 중인 마커의 시간을 1초 증가시킵니다 (유효성 검사 포함)
-    func increaseEditingMarkerTime() {
-        guard canIncreaseEditingMarker else {
-            print("⚠️ 마커 편집 시간을 더 이상 증가시킬 수 없습니다")
-            return
-        }
-        
-        markerService.increaseEditingTime(maxDuration: duration)
-        print("마커 편집 시간 1초 증가: \(formattedTime(currentEditingTime ?? 0))")
-    }
-    
-    /// 편집 중인 마커의 현재 시간을 반환합니다
-    var currentEditingTime: TimeInterval? {
-        return markerService.currentEditingTime
-    }
-    
-    // MARK: - Marker Editing Validation (Computed Properties)
-    
-    /// 마커 편집 시간을 감소시킬 수 있는지 확인
-    var canDecreaseEditingMarker: Bool {
-        guard let currentEditingTime = currentEditingTime else {
-            return false
-        }
-        // 1초 이상일 때만 감소 가능
-        return currentEditingTime > 1.0
-    }
-    
-    /// 마커 편집 시간을 증가시킬 수 있는지 확인
-    var canIncreaseEditingMarker: Bool {
-        guard let currentEditingTime = currentEditingTime else {
-            return false
-        }
-        // duration-1초 미만일 때만 증가 가능
-        return currentEditingTime < (duration - 1.0)
     }
     
     // MARK: - Notification Handlers (워치에서 호출)
@@ -277,22 +158,6 @@ extension PlayerViewModel {
         }
         
         await deleteMarker(at: index)
-    }
-    
-    /// 워치에서 마커 편집 요청 처리
-    internal func handleMarkerEdit(at index: Int, adjustment: Double) async {
-        guard index >= 0 && index < 3 else {
-            print("잘못된 마커 인덱스: \(index)")
-            return
-        }
-        
-        guard markers[index] != -1 else {
-            print("편집할 마커가 존재하지 않음: \(index)")
-            return
-        }
-        
-        let newTime = markers[index] + adjustment
-        await editMarker(at: index, to: max(0, newTime))
     }
 }
 

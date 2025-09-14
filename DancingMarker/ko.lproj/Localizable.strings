@@ -18,12 +18,10 @@
 "Local_ChangeCoverImage" = "커버이미지 변경";
 "Local_MarkerList" = "마커리스트";
 "Local_MarkerAdd" = "추가";
-"Local_MarkerEdit" = "수정하기";
 "Local_MarkerReset" = "지우기";
-"Local_TipViewClose" = "닫기";
-"Local_TipViewMessage1" = "마커를 수정하거나 삭제하고 싶을 때는";
-"Local_TipViewMessage2" = "마커를 꾹 눌러주세요.";
 "Local_EmptyMusic" = "추가된 음악이 없어요.";
+"Local_EnterMusicTitleMessage" = "음원의 제목을 입력해주세요.";
+"Local_EnterMusicArtistMessage" = "아티스트 정보를 입력해주세요.";
 "Local_EditMusicNavigationTitle" = "음악 수정하기";
 
 // Watch OS
@@ -31,6 +29,3 @@
 "Local_Watch_ManagementMarker" = "마커 관리 ";
 "Local_Watch_MarkerNone" = "없음";
 "Local_Watch_ClearMarkerMessage" = "이 마커에 저장된 정보를\n지우시겠습니까?";
-"Local_Watch_EditMarkerBackup" = "이 변경 사항을\n폐기하시겠습니까?";
-"Local_Watch_ClearEditTimeMarker" = "변경 사항 폐기";
-"Local_Watch_ContinueEdit" = "계속 수정하기";

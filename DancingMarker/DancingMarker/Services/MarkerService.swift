@@ -18,9 +18,6 @@ final class MarkerService: MarkerManageable {
     // MARK: - Published Properties
     
     @Published private(set) var markers: [TimeInterval] = [-1, -1, -1]
-    @Published private(set) var editingIndex: Int? = nil
-    @Published private(set) var isEditing: Bool = false
-    @Published private(set) var editingMarker: TimeInterval = 0.0
     
     // MARK: - Private Properties
     
@@ -71,42 +68,6 @@ final class MarkerService: MarkerManageable {
         
     }
     
-    func editMarker(at index: Int, to newTime: TimeInterval) async throws {
-        // 인덱스 유효성 검사
-        guard index >= 0 && index < 3 else {
-            throw DancingMarkerError.markerInvalidIndex
-        }
-        
-        // 마커 존재 여부 확인
-        guard markers[index] != -1 else {
-            throw DancingMarkerError.markerNotFound
-        }
-        
-        // 시간 유효성 검사
-        guard newTime >= 0 else {
-            throw DancingMarkerError.markerInvalidTime
-        }
-        
-        await MainActor.run {
-            self.markers[index] = newTime
-        }
-    }
-    
-    func startEditing(at index: Int) {
-        guard index >= 0 && index < 3 else { return }
-        guard markers[index] != -1 else { return }
-        
-        isEditing = true
-        editingIndex = index
-        editingMarker = markers[index]
-    }
-    
-    func stopEditing() {
-        isEditing = false
-        editingIndex = nil
-        editingMarker = 0.0
-    }
-    
     func clearAllMarkers() async throws {
         await MainActor.run {
             self.markers = [-1, -1, -1]
@@ -149,44 +110,6 @@ final class MarkerService: MarkerManageable {
         return markers.filter { $0 != -1 }.count
     }
     
-    // MARK: - Editing Support Methods
-    
-    /// 현재 편집 중인 마커의 시간을 반환합니다.
-    var currentEditingTime: TimeInterval? {
-        guard isEditing else { return nil }
-        return editingMarker
-    }
-    
-    /// 편집 중인 마커의 시간을 1초씩 증가시킵니다.
-    func increaseEditingTime(maxDuration: TimeInterval) {
-        guard isEditing else { return }
-        
-        if editingMarker < maxDuration - 1 {
-            editingMarker += 1
-            print("✅ 편집 중인 마커 시간 증가: \(editingMarker)")
-        }
-    }
-    
-    /// 편집 중인 마커의 시간을 1초씩 감소시킵니다.
-    func decreaseEditingTime() {
-        guard isEditing else { return }
-        
-        if editingMarker > 1 {
-            editingMarker -= 1
-            print("✅ 편집 중인 마커 시간 감소: \(editingMarker)")
-        }
-    }
-    
-    /// 편집 중인 마커의 변경사항을 저장합니다.
-    func saveEditingMarker() async throws {
-        guard let index = editingIndex else {
-            throw DancingMarkerError.markerNotFound
-        }
-        
-        try await editMarker(at: index, to: editingMarker)
-        stopEditing()
-    }
-    
     /// 특정 마커로 이동할 수 있는지 확인합니다.
     func canMoveToMarker(at index: Int) -> Bool {
         return isValidMarker(at: index)
@@ -213,26 +136,5 @@ final class MarkerService: MarkerManageable {
     /// 특정 인덱스에 현재 재생 시간을 마커로 저장합니다.
     func addCurrentTimeAsMarker(currentTime: TimeInterval, at index: Int) async throws {
         try await addMarker(at: currentTime, index: index)
-    }
-}
-
-// MARK: - Extensions
-
-extension MarkerService {
-    
-    /// 마커 정보를 디버깅용 문자열로 반환합니다.
-    var debugDescription: String {
-        let markerStrings = markers.enumerated().map { index, marker in
-            let timeString = marker == -1 ? "Empty" : formatter.string(from: marker) ?? "Invalid"
-            return "Marker \(index): \(timeString)"
-        }
-        
-        return """
-        MarkerService Debug Info:
-        \(markerStrings.joined(separator: "\n"))
-        Editing: \(isEditing)
-        Editing Index: \(editingIndex?.description ?? "None")
-        Valid Markers: \(validMarkerCount)
-        """
     }
 }
