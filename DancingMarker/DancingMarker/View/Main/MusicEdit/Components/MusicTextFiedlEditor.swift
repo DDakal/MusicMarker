@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct MusicTextFieldEditor: View {
-    let label: String
-    let placeholder: String
+    let label: LocalizedStringKey
+    let placeholder: LocalizedStringKey
     @Binding var text: String
     
     var body: some View {

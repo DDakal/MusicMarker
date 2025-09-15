@@ -5,7 +5,6 @@ struct WatchMarkerDetailView: View {
     @Binding var navigationPath: NavigationPath
     @EnvironmentObject var viewModel: WatchViewModel
     
-    @State private var isShowingEditView = false // 수정하기 Bool 변수
     @State private var isShownResetAlert = false // 초기화하기 Bool 변수
     
     let index: Int
@@ -16,22 +15,6 @@ struct WatchMarkerDetailView: View {
                 .font(.system(size: 17, weight: .regular))
                 .fixedSize()
                 .padding(.bottom)
-            
-            Button {
-                self.isShowingEditView.toggle()
-            } label: {
-                Text("Local_MarkerEdit")
-                    .font(.system(size: 17, weight: .regular))
-                    .fixedSize()
-            }
-            .buttonStyle(
-                CommonButtonStyle(
-                    backgroundColor: .gray.opacity(0.2),
-                    foregroundColor: .white)
-            )
-            .fullScreenCover(isPresented: $isShowingEditView) {
-                WatchMarkerEditView(data: viewModel.timeintervalMarkers[index], isPresented: $isShowingEditView, index: index, navigationPath: $navigationPath)
-            }
             
             Button {
                 self.isShownResetAlert.toggle()

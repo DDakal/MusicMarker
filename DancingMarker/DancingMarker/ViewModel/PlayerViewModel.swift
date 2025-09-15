@@ -51,8 +51,6 @@ final class PlayerViewModel: ObservableObject {
     
     // 마커 관련
     @Published var markers: [TimeInterval] = [-1, -1, -1]
-    @Published var isEditingMarker: Bool = false
-    @Published var editingMarkerIndex: Int?
     
     // 음악 편집 시트 상태 관리
     @Published var musicToEdit: Music?
@@ -277,6 +275,9 @@ extension PlayerViewModel {
                 
                 print("✅ UI에서 음원 편집 완료: \(updatedMusicData.title)")
             }
+            
+            await sendMusicListToWatch()
+            
         } catch {
             print("❌ UI 음원 편집 저장 실패: \(error.localizedDescription)")
         }
@@ -462,18 +463,6 @@ extension PlayerViewModel: WatchMessageDelegate {
     func didReceiveMarkerDeleteCommand(index: Int) {
         Task { @MainActor in
             await handleMarkerDelete(at: index)
-        }
-    }
-    
-    func didReceiveMarkerEditCommand(index: Int, adjustment: Double) {
-        Task { @MainActor in
-            await handleMarkerEdit(at: index, adjustment: adjustment)
-        }
-    }
-    
-    func didReceiveMarkerEditSuccessCommand(index: Int, newTime: Double) {
-        Task { @MainActor in
-            await handleMarkerEditSuccess(at: index, newTime: newTime)
         }
     }
     

@@ -170,15 +170,6 @@ final class WatchService: NSObject, ObservableObject, WatchConnectivityManageabl
                 return true
             }
             
-        // ✅ 추가: MarkerEditSuccess 케이스
-        case "MarkerEditSuccess":
-            if let forEdit = message["forEdit"] as? [Int], forEdit.count >= 2 {
-                messageDelegate?.didReceiveMarkerEditSuccessCommand(
-                    index: forEdit[0], 
-                    newTime: Double(forEdit[1])
-                )
-                return true
-            }
             
         case "SendRequireMusicList":
             messageDelegate?.didReceiveMusicListRequestCommand()
@@ -525,14 +516,6 @@ final class WatchService: NSObject, ObservableObject, WatchConnectivityManageabl
                 return true
             }
             
-        case "MarkerEditSuccess":
-            if let forEdit = message["forEdit"] as? [Int], forEdit.count >= 2 {
-                messageDelegate?.didReceiveMarkerEditSuccessCommand(
-                    index: forEdit[0], 
-                    newTime: Double(forEdit[1])
-                )
-                return true
-            }
             
         case "SendRequireMusicList":
             messageDelegate?.didReceiveMusicListRequestCommand()

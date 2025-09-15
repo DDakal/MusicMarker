@@ -90,17 +90,19 @@ struct MusicEditView: View {
                 Spacer()
                 
                 // 저장 버튼
-                SaveButton(canSave: canSave) {
-                    guard canSave else { return }
-                    Task {
-                        await playerViewModel.saveMusicEdit(
-                            music: music,
-                            title: title,
-                            artist: artist,
-                            albumArt: albumArt
-                        )
-                        didSaveMusic = true
-                        dismiss()
+                if #unavailable(iOS 26.0) {
+                    SaveButton(canSave: canSave) {
+                        guard canSave else { return }
+                        Task {
+                            await playerViewModel.saveMusicEdit(
+                                music: music,
+                                title: title,
+                                artist: artist,
+                                albumArt: albumArt
+                            )
+                            didSaveMusic = true
+                            dismiss()
+                        }
                     }
                 }
             }
@@ -109,12 +111,28 @@ struct MusicEditView: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden(true)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Text("Local_Cancel")
-                        .foregroundStyle(.accent)
-                        .onTapGesture {
-                            dismiss()
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Local_Cancel", systemImage: "xmark") {
+                        dismiss()
+                    }
+                }
+                
+                if #available(iOS 26.0, *) {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Local_Done", systemImage: "checkmark") {
+                            Task {
+                                await playerViewModel.saveMusicEdit(
+                                    music: music,
+                                    title: title,
+                                    artist: artist,
+                                    albumArt: albumArt
+                                )
+                                didSaveMusic = true
+                                dismiss()
+                            }
                         }
+                        .disabled(!canSave)
+                    }
                 }
             }
         }

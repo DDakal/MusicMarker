@@ -18,11 +18,7 @@
 "Local_ChangeCoverImage" = "Change Cover Image";
 "Local_MarkerList" = "Marker List";
 "Local_MarkerAdd" = "Add";
-"Local_MarkerEdit" = "Edit";
 "Local_MarkerReset" = "Reset";
-"Local_TipViewClose" = "Close";
-"Local_TipViewMessage1" = "Long press a marker";
-"Local_TipViewMessage2" = "to edit or delete it.";
 "Local_EmptyMusic" = "There is no added music.";
 "Local_EnterMusicTitleMessage" = "Please enter the music title.";
 "Local_EnterMusicArtistMessage" = "Please enter the music artist.";
@@ -33,6 +29,3 @@
 "Local_Watch_ManagementMarker" = "Manage Marker";
 "Local_Watch_MarkerNone" = "Empty";
 "Local_Watch_ClearMarkerMessage" = "Clear the Marker?";
-"Local_Watch_EditMarkerBackup" = "Discard the changes?";
-"Local_Watch_ClearEditTimeMarker" = "Discard Changes";
-"Local_Watch_ContinueEdit" = "Keep Editing";

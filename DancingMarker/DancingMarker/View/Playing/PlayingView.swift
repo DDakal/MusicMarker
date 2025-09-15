@@ -31,7 +31,7 @@ struct PlayingView: View {
             
             // 진행률 슬라이더
             ProgressSliderView()
-            .padding(.bottom, 40)
+                .padding(.bottom, 40)
             
             // 재생 제어 버튼들
             PlaybackControlsView(
@@ -46,19 +46,27 @@ struct PlayingView: View {
         .padding(.horizontal, 16)
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle("")
-        .navigationBarBackButtonHidden(true)
         .enableSwipeBack()
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                HStack {
-                    Image(systemName: "chevron.left")
-                        .bold()
-                    Text("Local_Back")
-                }
-                .foregroundStyle(.accent)
-                .onTapGesture {
-                    navigationManager.pop()
-                }
+                .apply { view in
+            if #available(iOS 26.0, *) {
+                // ✅ iOS 26: 기본 뒤로가기 버튼 사용 (자동 Liquid Glass)
+                view
+            } else {
+                view
+                    .navigationBarBackButtonHidden(true)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            HStack {
+                                Image(systemName: "chevron.left")
+                                    .bold()
+                                Text("Local_Back")
+                            }
+                            .foregroundStyle(.accent)
+                            .onTapGesture {
+                                navigationManager.pop()
+                            }
+                        }
+                    }
             }
         }
     }

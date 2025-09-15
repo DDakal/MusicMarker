@@ -256,30 +256,6 @@ extension PlayerViewModel {
             }
         }
         
-        NotificationCenter.default.addObserver(
-            forName: .markerEdit,
-            object: nil,
-            queue: .main
-        ) { [weak self] notification in
-            if let forEdit = notification.object as? [Int] {
-                Task { @MainActor in
-                    await self?.handleMarkerEdit(at: forEdit[0], adjustment: Double(forEdit[1]))
-                }
-            }
-        }
-        
-        NotificationCenter.default.addObserver(
-            forName: .markerEditSuccess,
-            object: nil,
-            queue: .main
-        ) { [weak self] notification in
-            if let forEdit = notification.object as? [Int] {
-                Task { @MainActor in
-                    await self?.handleMarkerEditSuccess(at: forEdit[0], newTime: Double(forEdit[1]))
-                }
-            }
-        }
-        
         // 음악 선택
         NotificationCenter.default.addObserver(
             forName: .UUIDPlay,
@@ -382,17 +358,6 @@ extension PlayerViewModel {
         }
     }
     
-    /// 마커 편집 성공 처리 (워치에서 호출) - 수정된 버전
-    internal func handleMarkerEditSuccess(at index: Int, newTime: Double) async {
-        guard index >= 0 && index < 3 else { return }
-        guard markers[index] != -1 else { return }
-        
-        // ✅ 절대값으로 마커 시간 설정
-        await editMarker(at: index, to: max(0, newTime))
-        
-        print("워치에서 마커 편집 성공 명령 수신: 마커 \(index + 1), 새로운 시간: \(formattedTime(newTime))")
-    }
-    
     /// 음악 선택 처리 (워치에서 호출) - 개선된 버전
     internal func handleMusicSelection(musicID: UUID) async {
         print("🎯 워치에서 음악 선택 명령 수신: \(musicID)")
@@ -410,7 +375,7 @@ extension PlayerViewModel {
             return
         }
         
-        // ✅ 이미 같은 음악이 재생 중이면 아무것도 하지 않음 (토글하지 않음)
+        // 이미 같은 음악이 재생 중이면 아무것도 하지 않음 (토글하지 않음)
         if currentMusic?.id == musicID {
             print("🎯 이미 선택된 음악입니다. 상태 유지: \(musicData.title)")
             
