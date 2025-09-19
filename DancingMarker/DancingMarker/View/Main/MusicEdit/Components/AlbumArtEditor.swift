@@ -42,7 +42,7 @@ struct AlbumArtEditor: View {
             .buttonStyle(.borderedProminent)
             .tint(.editViewAlbumGray)
         }
-        .padding(.top, 67)
-        .padding(.bottom, 43)
+        .padding(.top, 37)
+        .padding(.bottom, 33)
     }
 }

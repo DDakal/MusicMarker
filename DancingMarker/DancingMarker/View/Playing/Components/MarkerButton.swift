@@ -12,7 +12,6 @@ struct MarkerButton: View {
     let index: Int
     let formattedTime: String
     let onTap: (Int) async -> Void
-    let onEdit: (Int) -> Void
     let onDelete: (Int) async -> Void
     
     var body: some View {
@@ -33,12 +32,7 @@ struct MarkerButton: View {
             .cornerRadius(12)
         }
         .contextMenu {
-            Button(action: {
-                onEdit(index)
-            }) {
-                Text("Local_MarkerEdit")
-                Image(systemName: "pencil")
-            }
+            // 편집 버튼 제거, 삭제 버튼만 유지
             Button(role: .destructive, action: {
                 Task {
                     await onDelete(index)
