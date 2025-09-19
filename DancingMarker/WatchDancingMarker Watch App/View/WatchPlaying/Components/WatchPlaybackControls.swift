@@ -47,7 +47,7 @@ struct BackwardButton: View {
     
     var body: some View {
         Group {
-            if #available (watchOS 26.0, *) {
+            if #available(watchOS 26.0, *) {
                 Button {
                     Task {
                         do {
@@ -76,7 +76,7 @@ struct BackwardButton: View {
                                 do {
                                     try await onTap()
                                 } catch {
-                                    print("앞으로 이동 중 오류: \(error)")
+                                    print("뒤로 이동 중 오류: \(error)")
                                 }
                             }
                         }) {
@@ -84,8 +84,8 @@ struct BackwardButton: View {
                                 .resizable()
                                 .frame(width: 20, height: 21)
                         }
-                            .frame(width: 34, height: 35)
-                            .buttonStyle(PlainButtonStyle())
+                        .frame(width: 34, height: 35)
+                        .buttonStyle(PlainButtonStyle())
                     )
             }
         }
@@ -186,29 +186,8 @@ struct ForwardButton: View {
     let onTap: () async throws -> Void
     
     var body: some View {
-//        Circle()
-//            .fill(.gray.opacity(0.2))          
-//            .cornerRadius(4)                    
-//            .frame(height: 35)
-//            .overlay(
-//                Button(action: {
-//                    Task {                      
-//                        do {
-//                            try await onTap()   
-//                        } catch {
-//                            print("앞으로 이동 중 오류: \(error)")
-//                        }
-//                    }
-//                }) {
-//                    Image(systemName: "goforward.5")
-//                        .resizable()
-//                        .frame(width: 20, height: 21)
-//                }
-//                .frame(width: 34, height: 35)
-//                .buttonStyle(PlainButtonStyle())
-//            )
         Group {
-            if #available (watchOS 26.0, *) {
+            if #available(watchOS 26.0, *) {
                 Button {
                     Task {
                         do {
@@ -237,7 +216,7 @@ struct ForwardButton: View {
                                 do {
                                     try await onTap()
                                 } catch {
-                                    print("뒤로 이동 중 오류: \(error)")
+                                    print("앞으로 이동 중 오류: \(error)")
                                 }
                             }
                         }) {
